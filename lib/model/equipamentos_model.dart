@@ -1,5 +1,5 @@
 class EquipamentosModel {
-  final int patrimonio;
+  final String patrimonio;
   final String equipamento;
   final String marcaModelo;
   final String snServiceTag;

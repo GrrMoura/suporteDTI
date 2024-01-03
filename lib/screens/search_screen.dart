@@ -23,43 +23,103 @@ class _SearchScreenState extends State<SearchScreen> {
     super.initState();
 
     delegaciaList = delegaciaData;
-    searchResults = equipamentosData;
+    todosOsEquipamentos = equipamentosData;
   }
 
-  List<EquipamentosModel> searchResults = [];
+  List<EquipamentosModel> todosOsEquipamentos = [];
+  List<EquipamentosModel> _acharEquipamentos = [];
 
-  void onQueryChanged(String query) {
-    setState(() {
-      searchResults = equipamentoList
-          .toString()
-          .where((item) => item.toLowerCase().contains(query.toLowerCase()))
-          .toList();
-    });
+  void _runFilter(String enteredKeyword) {
+    // List<EquipamentosModel> results = [];
+    // if (enteredKeyword.isEmpty) {
+    //   results = todosOsEquipamentos;
+    // } else {
+    //   results = todosOsEquipamentos
+    //       .where((equipamento) => equipamento.patrimonio
+    //           .toLowerCase()
+    //           .contains(enteredKeyword.toLowerCase()))
+    //       .toList();
+    // }
+
+    // setState(() {
+    //   _acharEquipamentos = results;
+    // });
   }
 
   @override
   Widget build(BuildContext context) {
+    double height = MediaQuery.of(context).size.height;
     return Scaffold(
-      backgroundColor: AppColors.cPrimaryColor,
-      body: Column(
-        children: [
-          heading(),
-          pesquisaRapida(),
-          const SearchBar2(),
-          SizedBox(height: 10.h),
+        backgroundColor: AppColors.cPrimaryColor,
+        body: Container(
+          height: height,
+          child: Column(
+            children: [
+              heading(),
+              pesquisaRapida(),
+              Padding(
+                padding: EdgeInsets.only(top: 15.h, left: 10.w, right: 10.w),
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    color: AppColors.cSecondaryColor,
+                  ),
+                  padding: const EdgeInsets.all(8),
+                  child: TextField(
+                    style: Styles().mediumTextStyle(),
+                    onChanged: _runFilter,
+                    decoration: InputDecoration(
+                      fillColor: AppColors.cWhiteColor,
+                      filled: true,
+                      isDense: true,
+                      hintText: 'Patrimônio, Marca, Tipo, Modelo, Tag...',
+                      hintStyle: Styles().hintTextStyle(),
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30)),
+                      prefixIcon: Icon(Icons.search,
+                          size: 25.sp, color: AppColors.cDescriptionIconColor),
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(height: 10.h),
+              // !_acharEquipamentos.isNotEmpty
+              //     ? ListView.builder(
+              //         scrollDirection: Axis.horizontal,
+              //         itemCount: _acharEquipamentos.length,
+              //         itemBuilder: (context, index) => Card(
+              //           key: ValueKey(_acharEquipamentos[index]),
+              //           color: Colors.amberAccent,
+              //           elevation: 4,
+              //           margin: const EdgeInsets.symmetric(vertical: 10),
+              //           child: ListTile(
+              //             leading: Text(
+              //               _acharEquipamentos[index].lotacao.toString(),
+              //               style: const TextStyle(fontSize: 24),
+              //             ),
+              //             title: Text(_acharEquipamentos[index].patrimonio),
+              //             subtitle: Text(
+              //                 '${_acharEquipamentos[index].marcaModelo.toString()} years old'),
+              //           ),
+              //         ),
+              //       )
+              //     : const Text(
+              //         'No results found',
+              //         style: TextStyle(fontSize: 24),
+              //       ),
+            ],
+          ),
+        ));
 
-          // Padding(
-          //   padding: EdgeInsets.only(top: 10.h),
-          //   child: SizedBox(
-          //       height: 150.h,
-          //       child: ListView(
-          //         scrollDirection: Axis.horizontal,
-          //         children: [cardUltimas(), cardUltimas()],
-          //       )),
-          // )
-        ],
-      ),
-    );
+    // Padding(
+    //   padding: EdgeInsets.only(top: 10.h),
+    //   child: SizedBox(
+    //       height: 150.h,
+    //       child: ListView(
+    //         scrollDirection: Axis.horizontal,
+    //         children: [cardUltimas(), cardUltimas()],
+    //       )),
+    // )
   }
 
   Padding cardUltimas() {
@@ -219,6 +279,7 @@ class _SearchBarState extends State<SearchBar2> {
 
   void onQueryChanged(String newQuery) {
     setState(() {
+      print(newQuery);
       query = newQuery;
     });
   }

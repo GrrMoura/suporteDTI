@@ -1,32 +1,35 @@
 class EquipamentosHistoricoModel {
-  final int id;
-  final String tipo;
-  final String patrimonio;
-  final String marca;
-  final String tag;
+  final int? id;
+  final String? tipo;
+  final String? patrimonio;
+  final String? marca;
+  final String? tag;
+  final String? lotacao;
 
-  EquipamentosHistoricoModel({
-    required this.id,
-    required this.tipo,
-    required this.patrimonio,
-    required this.marca,
-    required this.tag,
-  });
+  EquipamentosHistoricoModel(
+      {this.id,
+      this.tipo,
+      this.patrimonio,
+      this.marca,
+      this.tag,
+      this.lotacao});
 
   EquipamentosHistoricoModel.fromMap(Map<String, dynamic> item)
       : id = item["id"],
         tipo = item["tipo"],
         patrimonio = item["patrimonio"],
         marca = item["marca"],
-        tag = item["tag"];
+        tag = item["tag"],
+        lotacao = item["lotacao"];
 
   Map<String, Object> toMap() {
     return {
-      'id': id,
-      'tipo': patrimonio,
-      'patriomonio': patrimonio,
-      'marca': marca,
-      'tag': tag
+      'id': id!,
+      'tipo': tipo!,
+      'patrimonio': patrimonio!,
+      'marca': marca!,
+      'tag': tag!,
+      'lotacao': lotacao!
     };
   }
 }

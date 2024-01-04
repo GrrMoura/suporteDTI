@@ -6,8 +6,8 @@ class SqliteService {
   Database? _database;
   Future<Database> get database async {
     final String dbpath = await getDatabasesPath();
-    const dbname = "historico.db";
-    final path = join(dbpath, dbname);
+    const dbName = "historico.db";
+    final path = join(dbpath, dbName);
     _database = await openDatabase(path, version: 1, onCreate: _createDB);
 
     return _database!;
@@ -21,28 +21,29 @@ class SqliteService {
           patrimonio TEXT NOT NULL, 
           tipo TEXT NOT NULL,
           marca TEXT NOT NULL,
+          lotacao TEXT NOT NULL,
           tag TEXT NOT NULL)''',
     );
   }
 
-  Future add(EquipamentosHistoricoModel historico) async {
+  Future add(EquipamentosHistoricoModel equipamento) async {
     final db = await database;
 
     var termoExiste = await db.rawQuery(
-        "SELECT * FROM historico WHERE patrimonio='${historico.patrimonio}'");
+        "SELECT * FROM Equipamentos WHERE patrimonio='${equipamento.patrimonio}'");
     if (termoExiste.isNotEmpty) {
-      await db.delete('historico',
-          where: 'patrimonio==?', whereArgs: [historico.patrimonio]);
+      await db.delete('Equipamentos',
+          where: 'patrimonio==?', whereArgs: [equipamento.patrimonio]);
     }
 
-    await db.insert('historico', historico.toMap(),
+    await db.insert('Equipamentos', equipamento.toMap(),
         conflictAlgorithm: ConflictAlgorithm.replace);
   }
 
   Future<List<EquipamentosHistoricoModel>> getEquipamentos() async {
     final db = await database;
     List<Map<String, dynamic>> equipamentoList =
-        await db.query('historico', orderBy: 'id DESC');
+        await db.query('Equipamentos', orderBy: 'id DESC');
 
     return List.generate(
         equipamentoList.length,
@@ -51,13 +52,19 @@ class SqliteService {
             patrimonio: equipamentoList[i]['patrimonio'],
             tipo: equipamentoList[i]['tipo'],
             marca: equipamentoList[i]['marca'],
+            lotacao: equipamentoList[i]['lotacao'],
             tag: equipamentoList[i]['tag']));
   }
 
   Future<void> deletarEquipamento(String patrimonio) async {
     final db = await database;
 
-    await db
-        .delete('historico', where: 'patrimonio==?', whereArgs: [patrimonio]);
+    await db.delete('Equipamentos',
+        where: 'patrimonio==?', whereArgs: [patrimonio]);
+  }
+
+  Future<void> deletarTabela() async {
+    final db = await database;
+    db.delete('Equipamentos');
   }
 }

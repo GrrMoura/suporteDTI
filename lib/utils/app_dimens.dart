@@ -63,6 +63,6 @@ class AppDimens {
 // Letter Spacing......
 
   static double espacamentoMedio = 3.0;
-  static const double espacamentoPequeno = 1.0;
+  static const double espacamentoPequeno = 1.3;
   static const double espacamentoGrande = 5.2;
 }

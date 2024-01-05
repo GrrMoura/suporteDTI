@@ -30,7 +30,7 @@ class Styles {
         fontSize: AppDimens.mediumTextSize,
         fontFamily: AppFonts.robotoMedium,
         fontWeight: FontWeight.w400,
-        letterSpacing: AppDimens.espacamentoMedio);
+        letterSpacing: AppDimens.espacamentoPequeno);
   }
 
   TextStyle smallTextStyle() {

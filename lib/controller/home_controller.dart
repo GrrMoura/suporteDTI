@@ -1,7 +1,6 @@
 import 'package:convex_bottom_bar/convex_bottom_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:suporte_dti/screens/home_screen.dart';
 import 'package:suporte_dti/screens/login_screen.dart';
 import 'package:suporte_dti/screens/search_screen.dart';
@@ -37,12 +36,7 @@ class _HomePageState extends State<HomeControler> {
               color: AppColors.cDescriptionIconColor,
               style: TabStyle.reactCircle,
               items: const [
-                TabItem(
-                    icon: Icons
-                        .search_rounded), // TabItem(icon: FaIcon(FontAwesomeIcons.gamepad)),
-
-                //TabItem(icon: IconsPolicia.qrCode),
-
+                TabItem(icon: Icons.search_rounded),
                 TabItem(icon: Icons.qr_code),
                 TabItem(icon: Icons.settings),
               ],

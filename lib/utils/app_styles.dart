@@ -17,7 +17,7 @@ class Styles {
   }
 
   TextStyle subTitleStyle() {
-    return const TextStyle(
+    return TextStyle(
         fontStyle: FontStyle.italic,
         letterSpacing: AppDimens.espacamentoPequeno,
         color: AppColors.cSubTitleColor,
@@ -55,5 +55,30 @@ class Styles {
         fontFamily: AppFonts.poppinsRegular,
         fontWeight: FontWeight.w400,
         letterSpacing: AppDimens.espacamentoPequeno);
+  }
+
+  TextStyle titleDetail() {
+    return const TextStyle(
+        fontStyle: FontStyle.normal,
+        fontSize: AppDimens.largeTextSize,
+        fontWeight: FontWeight.w800,
+        letterSpacing: AppDimens.espacamentoPequeno);
+  }
+
+  TextStyle subTitleDetail() {
+    return TextStyle(
+        color: AppColors.cDescriptionIconColor,
+        fontStyle: FontStyle.normal,
+        fontSize: AppDimens.minSmallTextSize,
+        fontWeight: FontWeight.w300,
+        letterSpacing: AppDimens.espacamentoPequeno);
+  }
+
+  TextStyle descriptionDetail() {
+    return TextStyle(
+        fontStyle: FontStyle.normal,
+        fontSize: AppDimens.largeTextSize,
+        fontWeight: FontWeight.w500,
+        letterSpacing: AppDimens.espacamentoMedio);
   }
 }

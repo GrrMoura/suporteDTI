@@ -3,4 +3,5 @@ abstract class AppRouterName {
   static const String homeController = '/homeController';
   static const String login = '/login';
   static const String resultado = '/resultado';
+  static const String detalhe = '/detalhe';
 }

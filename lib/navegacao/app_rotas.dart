@@ -1,13 +1,14 @@
 import 'package:go_router/go_router.dart';
 import 'package:suporte_dti/controller/home_controller.dart';
 import 'package:suporte_dti/navegacao/app_screens_string.dart';
+import 'package:suporte_dti/screens/equipamento_detalhe_screen.dart';
 import 'package:suporte_dti/screens/login_screen.dart';
 import 'package:suporte_dti/screens/resultado_screen.dart';
 
 class Rotas {
   Rotas();
   static final routers = GoRouter(
-    initialLocation: AppRouterName.resultado,
+    initialLocation: AppRouterName.detalhe,
     routes: [
       GoRoute(
         name: 'login',
@@ -23,6 +24,11 @@ class Rotas {
         name: 'resultado',
         path: AppRouterName.resultado,
         builder: (context, state) => (ResultadoScreen()),
+      ),
+      GoRoute(
+        name: 'detalhe',
+        path: AppRouterName.detalhe,
+        builder: (context, state) => (const EquipamentoDetalhe()),
       ),
     ],
   );

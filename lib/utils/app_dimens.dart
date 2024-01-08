@@ -5,18 +5,19 @@ class AppDimens {
   // Font sizes ......
   static double titleSize = 30.sp;
   static double subTitleSize = 20.0.sp;
+  static const double largeTextSize = 20.0;
   static double mediumTextSize = 17.0.sp;
-  static const double subTextSize = 15.0;
+  static double smallTextSize = 13.sp;
+  static double subTextSize = 15.sp;
   static const double minTextSize = 20.0;
   static const double headingSize = 28.0;
   static const double pageTitleSize = 25.0;
   static const double subHeadingSize = 26.0;
-  static double smallTextSize = 13.sp;
+
   static const double largeSize = 32.0;
   static const double mediumSize = 16.5;
   static double smallSize = 14.sp;
-  static const double minSmallTextSize = 10.0;
-  static const double largeTextSize = 36.0;
+  static double minSmallTextSize = 10.sp;
 
   // -- Theme Font Size -- //
   static const double h1Size = 20.0;

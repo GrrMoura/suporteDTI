@@ -1,12 +1,13 @@
 // ignore_for_file: avoid_print
 
-import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 import 'package:path_provider/path_provider.dart';
+
 import 'package:screenshot/screenshot.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:suporte_dti/utils/app_colors.dart';
@@ -65,7 +66,10 @@ class EquipamentoDetalhe extends StatelessWidget {
       width: width,
       child: Scaffold(
         appBar: AppBar(
-          automaticallyImplyLeading: true,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back, color: Colors.white),
+            onPressed: () => context.pop(),
+          ),
           backgroundColor: AppColors.cSecondaryColor,
           title: Text("Detalhes do equipamento",
               style: Styles()
@@ -78,7 +82,7 @@ class EquipamentoDetalhe extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              ScreenShoti(),
+              const ScreenShoti(),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -91,32 +95,14 @@ class EquipamentoDetalhe extends StatelessWidget {
                         },
                       );
                     },
-                    icon: Icon(Icons.share, size: 30.sp),
+                    icon: Icon(Icons.history, size: 30.sp),
                   ),
                   SizedBox(width: 10.w),
                   IconButton(
                       onPressed: () async {
-                        await screenshotController
-                            .captureFromWidget(const ScreenShoti())
-                            .then((value) async {
-                          Uint8List image = value;
-                          print("passou aqui");
-
-                          final directory =
-                              await getApplicationDocumentsDirectory();
-                          final imagePath =
-                              await File('${directory.path}/captured.png')
-                                  .create();
-                          await imagePath.writeAsBytes(image);
-
-                          /// Share Plugin
-                          ///convertendo imagem
-                          await Share.shareFiles([imagePath.path]);
-                          // XFile imageFileAsXFile = XFile(imagePath.path);
-                          // await Share.shareXFiles([imageFileAsXFile]);
-                        });
+                        screenShotShare(screenshotController);
                       },
-                      icon: Icon(Icons.history, size: 30.sp))
+                      icon: Icon(Icons.share, size: 30.sp))
                 ],
               )
             ],
@@ -125,17 +111,31 @@ class EquipamentoDetalhe extends StatelessWidget {
         bottomNavigationBar: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
-              "Levantado em: 16/10/2023",
-              style: Styles().subTitleDetail(),
-            ),
+            Text("Levantado em: 16/10/2023", style: Styles().subTitleDetail()),
           ],
         ),
       ),
     );
   }
 
-  void compartilhar() {}
+  void screenShotShare(ScreenshotController screenshotController) async {
+    await screenshotController
+        .captureFromWidget(const ScreenShoti())
+        .then((value) async {
+      Uint8List image = value;
+      print("passou aqui");
+
+      final directory = await getApplicationDocumentsDirectory();
+      final imagePath = await File('${directory.path}/captured.png').create();
+      await imagePath.writeAsBytes(image);
+
+      /// Share Plugin
+
+      //    await Share.shareFiles([imagePath.path]);
+      XFile imageFileAsXFile = XFile(imagePath.path);
+      await Share.shareXFiles([imageFileAsXFile]);
+    });
+  }
 }
 
 class ScreenShoti extends StatelessWidget {

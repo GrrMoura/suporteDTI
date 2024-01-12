@@ -8,6 +8,7 @@ class SqliteService {
     final String dbpath = await getDatabasesPath();
     const dbName = "historico.db";
     final path = join(dbpath, dbName);
+
     _database = await openDatabase(path, version: 1, onCreate: _createDB);
 
     return _database!;

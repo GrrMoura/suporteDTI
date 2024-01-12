@@ -101,8 +101,9 @@ class _LoginScreenState extends State<LoginScreen> {
   ElevatedButton bottonEnter(BuildContext context) {
     return ElevatedButton(
       onPressed: () {
-        validateUserAndSenhaTextfield(
-            loginController.text, passController.text);
+        context.go(AppRouterName.homeController);
+        // validateUserAndSenhaTextfield(
+        //     loginController.text, passController.text);
       },
       style: ElevatedButton.styleFrom(
         backgroundColor: AppColors.cSecondaryColor,

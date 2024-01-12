@@ -22,5 +22,9 @@
   <string>1.0</string>
   <key>MinimumOSVersion</key>
   <string>11.0</string>
+  <key>NSCameraUsageDescription</key>
+  <string>Este aplicativo precisa de acesso à câmera para escanear códigos QR</string>
+  <key>NSPhotoLibraryUsageDescription</key>
+  <string>Este aplicativo precisa de acesso às fotos para obter o código QR da biblioteca de fotos</string>
 </dict>
 </plist>

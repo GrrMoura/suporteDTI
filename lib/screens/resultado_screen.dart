@@ -1,65 +1,37 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
+import 'package:suporte_dti/navegacao/app_screens_string.dart';
+import 'package:suporte_dti/screens/widgets/widget_gridview_itens.dart';
 import 'package:suporte_dti/utils/app_colors.dart';
 import 'package:suporte_dti/utils/app_styles.dart';
 
 class ResultadoScreen extends StatelessWidget {
   ResultadoScreen({super.key});
   final List<Map> myProducts =
-      List.generate(5, (index) => {"id": index, "name": "Produto $index"})
+      List.generate(10, (index) => {"id": index, "name": "Produto $index"})
           .toList();
 
   @override
   Widget build(BuildContext context) {
-    double height = MediaQuery.of(context).size.height;
     return Scaffold(
         body: SingleChildScrollView(
       child: Column(
         children: [
           const BoxSearchBar(),
           const Titulo(),
-          GridviewEquipamentos(height: height, myProducts: myProducts),
-        ],
-      ),
-    ));
-  }
-}
-
-class GridviewEquipamentos extends StatelessWidget {
-  const GridviewEquipamentos({
-    super.key,
-    required this.height,
-    required this.myProducts,
-  });
-
-  final double height;
-  final List<Map> myProducts;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 10.w),
-      child: SizedBox(
-        height: height - 200.h - 70.h,
-        child: GridView.builder(
-            gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-                maxCrossAxisExtent: 250.sp,
-                childAspectRatio: 1.05,
-                crossAxisSpacing: 5.sp,
-                mainAxisSpacing: 10.sp),
-            itemCount: myProducts.length,
-            itemBuilder: (BuildContext ctx, index) {
-              return const CardEquipamentosResultado(
+          GridviewEquipamentos(
+              myProducts: myProducts,
+              widget: const CardEquipamentosResultado(
                 lotacao: "Lagarto",
                 patrimonio: "172798",
                 marca: "Dell/optiplex 3090",
-                tag: "BR2313NC",
-              );
-              //  child: Text(myProducts[index]["name"]),
-            }),
+                tag: "GN0N2D7T",
+              )),
+        ],
       ),
-    );
+    ));
   }
 }
 
@@ -71,7 +43,7 @@ class Titulo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: 15.h),
+      padding: EdgeInsets.only(top: 15.h),
       child: Text(
         "Resultados para \"Monitor\"  ",
         style: Styles()
@@ -92,19 +64,33 @@ class BoxSearchBar extends StatelessWidget {
       child: Stack(
         children: [
           Container(
-            height: 200.h,
+            height: 180.h,
             width: double.infinity,
             color: AppColors.cSecondaryColor,
           ),
+          Positioned(
+              top: 30.h,
+              child: IconButton(
+                  onPressed: () {
+                    context.pop();
+                  },
+                  icon: Icon(
+                    Icons.arrow_back,
+                    size: 25.sp,
+                    color: Colors.white,
+                  ))),
           Positioned(
             left: 30.w,
             top: 70.h,
             right: 30.w,
             bottom: 80.h,
             child: SearchBar(
-              textStyle: MaterialStateProperty.all(Styles().mediumTextStyle()),
+              textStyle: MaterialStateProperty.all(
+                Styles().mediumTextStyle(),
+              ),
               side: MaterialStateProperty.all(
-                  const BorderSide(color: Colors.grey)),
+                const BorderSide(color: Colors.grey),
+              ),
               elevation: MaterialStateProperty.all(10),
               trailing: [
                 IconButton(
@@ -140,6 +126,9 @@ class CardEquipamentosResultado extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
+      onTap: () {
+        context.push(AppRouterName.detalhe);
+      },
       //TODO colocar a opção de escolher qual o dado que quer copiar
       onLongPress: () {
         Clipboard.setData(ClipboardData(text: patrimonio!));
@@ -151,14 +140,15 @@ class CardEquipamentosResultado extends StatelessWidget {
             )));
         // copied successfully
       },
-      child: Padding(
-        padding: EdgeInsets.fromLTRB(8.w, 10.h, 8.w, 0),
-        child: Material(
-          color: AppColors.cWhiteColor,
-          elevation: 10,
-          borderRadius: BorderRadius.circular(10),
-          shadowColor: Colors.grey,
+      child: Material(
+        color: AppColors.cWhiteColor,
+        elevation: 10,
+        borderRadius: BorderRadius.circular(10),
+        shadowColor: Colors.grey,
+        child: Padding(
+          padding: EdgeInsets.all(3.w),
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               SizedBox(height: 3.h),
               Text(marca ?? "Sem marca", style: Styles().smallTextStyle()),
@@ -169,7 +159,7 @@ class CardEquipamentosResultado extends StatelessWidget {
               LinhaDescricao(informacao: patrimonio, nome: "Patrimônio"),
               LinhaDescricao(informacao: lotacao, nome: "Lotação"),
               LinhaDescricao(informacao: tag, nome: "TAG"),
-              SizedBox(height: 3.h)
+              SizedBox(height: 3.h),
             ],
           ),
         ),
@@ -192,7 +182,16 @@ class LinhaDescricao extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text("$nome: ", style: Styles().hintTextStyle()),
-          Text(informacao ?? "Sem número", style: Styles().smallTextStyle()),
+          Flexible(
+            child: SizedBox(
+              child: Container(
+                child: Text(
+                  informacao ?? "Sem número",
+                  style: Styles().smallTextStyle(),
+                ),
+              ),
+            ),
+          ),
         ],
       ),
     );

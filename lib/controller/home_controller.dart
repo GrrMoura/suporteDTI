@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:suporte_dti/screens/home_screen.dart';
 import 'package:suporte_dti/screens/login_screen.dart';
 import 'package:suporte_dti/screens/search_screen.dart';
+import 'package:suporte_dti/screens/delegacia_resultado_screen.dart';
 import 'package:suporte_dti/utils/app_colors.dart';
 
 class HomeControler extends StatefulWidget {
@@ -17,7 +18,9 @@ class _HomePageState extends State<HomeControler> {
   int selectedPage = 0;
 
   final _pageList = [
-    const SearchScreen(), const HomeScreen(), const LoginScreen(),
+    const SearchScreen(), QrCodeScanner(),
+    //const LoginScreen(),
+    ResultDelegacia()
     //   const PerfilPage()
   ];
 

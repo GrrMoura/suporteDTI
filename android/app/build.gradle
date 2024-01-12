@@ -24,14 +24,14 @@ if (flutterVersionName == null) {
 
 android {
     namespace "com.example.suporte_dti"
-    compileSdkVersion flutter.compileSdkVersion
-    ndkVersion flutter.ndkVersion
+     compileSdkVersion localProperties.getProperty('flutter.compileSdkVersion').toInteger()
+     ndkVersion flutter.ndkVersion
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
-
+1
     kotlinOptions {
         jvmTarget = '1.8'
     }
@@ -45,8 +45,8 @@ android {
         applicationId "com.example.suporte_dti"
         // You can update the following values to match your application needs.
         // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
-        minSdkVersion flutter.minSdkVersion
-        targetSdkVersion flutter.targetSdkVersion
+        minSdkVersion localProperties.getProperty('flutter.minSdkVersion').toInteger()
+        targetSdkVersion localProperties.getProperty('flutter.targetSdkVersion').toInteger()
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
     }

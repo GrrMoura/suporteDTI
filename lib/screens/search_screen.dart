@@ -2,11 +2,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 
 import 'package:suporte_dti/data/delegacia_data.dart';
 import 'package:suporte_dti/data/equipamentos_data.dart';
 import 'package:suporte_dti/model/equipamentos_historico_model.dart';
 import 'package:suporte_dti/model/equipamentos_model.dart';
+import 'package:suporte_dti/navegacao/app_screens_string.dart';
 import 'package:suporte_dti/services/sqlite_service.dart';
 import 'package:suporte_dti/utils/app_colors.dart';
 import 'package:suporte_dti/utils/app_styles.dart';
@@ -35,6 +37,7 @@ class _SearchScreenState extends State<SearchScreen> {
     delegaciaList = delegaciaData;
     todosOsEquipamentos = equipamentosData;
     teste = EquipamentosHistoricoModel(
+        id: 1,
         marca: "DELL",
         patrimonio: "123",
         tag: "BH2239",
@@ -54,26 +57,30 @@ class _SearchScreenState extends State<SearchScreen> {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              // TextButton(
-              //     onPressed: () {
-              //       db.deletarTabela();
-              //       print("apaguei");
-              //     },
-              //     child: Text("Apagar tabela")),
+              //TODO fazer o remover do histórico
+
               heading(),
 
               pesquisaRapida(),
               SearchBarr(model: historicoModel),
               SizedBox(height: 25.h),
+              // TextButton(
+              //     onPressed: () {
+              //       db.deletarEquipamento(teste!.patrimonio.toString());
+              //       print("apaguei");
+              //       setState(() {});
+              //     },
+              //     child: const Text("Apagar tabela")),
+
               BuilderDosCards(db: db),
             ],
           ),
         ),
       ),
       floatingActionButton: FloatingActionButton(onPressed: () {
-        db.add(teste!);
-
-        print("clIQUEI");
+        setState(() {
+          db.add(teste!);
+        });
       }),
     );
   }
@@ -104,40 +111,45 @@ class _SearchScreenState extends State<SearchScreen> {
   Container heading() {
     return Container(
       color: AppColors.cSecondaryColor,
-      height: 200.h,
+      height: 160.h,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          SizedBox(height: 5.h),
+          SizedBox(height: 10.h),
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               CircleAvatar(
-                radius: 55.h,
+                radius: 45.h,
                 backgroundColor: AppColors.cWhiteColor,
                 child: CircleAvatar(
-                    radius: 50.h,
-                    backgroundImage:
-                        const AssetImage("assets/images/people1.jpg")),
+                  radius: 40.h,
+                  backgroundImage:
+                      const AssetImage("assets/images/people1.jpg"),
+                  backgroundColor: AppColors.cSecondaryColor,
+                ),
               ),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    "Fabiana Maria",
-                    style: Styles().titleStyle(),
-                  ),
-                  Row(
-                    children: [
-                      Text("DESENVOLVEDORA", style: Styles().subTitleStyle()),
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 2.w),
-                        child: Text("-", style: Styles().subTitleStyle()),
-                      ),
-                      Text("1023322", style: Styles().subTitleStyle())
-                    ],
-                  )
-                ],
+              Padding(
+                padding: EdgeInsets.only(left: 5.w, right: 5.w, top: 5.w),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      "Fabiana Maria",
+                      style: Styles().titleStyle(),
+                    ),
+                    Row(
+                      children: [
+                        Text("DESENVOLVEDORA", style: Styles().subTitleStyle()),
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 2.w),
+                          child: Text("-", style: Styles().subTitleStyle()),
+                        ),
+                        Text("1023322", style: Styles().subTitleStyle())
+                      ],
+                    )
+                  ],
+                ),
               )
             ],
           ),
@@ -176,7 +188,10 @@ class BuilderDosCards extends StatelessWidget {
                         String patrimonio = data![index].patrimonio;
                         String lotacao = data[index].lotacao;
                         return CardUltimasConsultas(
-                            patrimonio: patrimonio, lotacao: lotacao);
+                          patrimonio: patrimonio,
+                          lotacao: lotacao,
+                          db: db,
+                        );
                       }),
                 );
         });
@@ -191,6 +206,7 @@ class SearchBarr extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     void _runFilter(String enteredKeyword) {
+      //toDO  Fazer filtro
       // List<EquipamentosModel> results = [];
       // if (enteredKeyword.isEmpty) {
       //   results = todosOsEquipamentos;
@@ -219,10 +235,14 @@ class SearchBarr extends StatelessWidget {
           color: AppColors.cSecondaryColor,
         ),
         padding: const EdgeInsets.all(8),
-        child: TextField(
+        child: TextFormField(
           style: Styles().mediumTextStyle(),
           onChanged: _runFilter,
-          onSubmitted: (value) {},
+          keyboardType: TextInputType.visiblePassword,
+          textInputAction: TextInputAction.search,
+          onFieldSubmitted: ((value) {
+            context.push(AppRouterName.resultado);
+          }),
           decoration: InputDecoration(
             fillColor: AppColors.cWhiteColor,
             filled: true,
@@ -239,17 +259,23 @@ class SearchBarr extends StatelessWidget {
   }
 }
 
-class CardUltimasConsultas extends StatelessWidget {
-  const CardUltimasConsultas({this.lotacao, this.patrimonio, Key? key})
+class CardUltimasConsultas extends StatefulWidget {
+  const CardUltimasConsultas({this.lotacao, this.patrimonio, this.db, Key? key})
       : super(key: key);
 
   final String? patrimonio, lotacao;
+  final SqliteService? db;
 
+  @override
+  State<CardUltimasConsultas> createState() => _CardUltimasConsultasState();
+}
+
+class _CardUltimasConsultasState extends State<CardUltimasConsultas> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onLongPress: () {
-        Clipboard.setData(ClipboardData(text: patrimonio!));
+        Clipboard.setData(ClipboardData(text: widget.patrimonio!));
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             backgroundColor: Colors.orange,
             content: Text(
@@ -274,14 +300,18 @@ class CardUltimasConsultas extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     InkWell(
-                        onTap: () {},
+                        onTap: () {
+                          setState(() {
+                            widget.db!.deletarEquipamento(widget.patrimonio!);
+                          });
+                        },
                         child: const Icon(Icons.remove_circle_outline,
                             color: Colors.red))
                   ],
                 ),
                 Image.asset("assets/images/impressora.png", height: 70.h),
-                Text(patrimonio!, style: Styles().smallTextStyle()),
-                Text(lotacao!, style: Styles().hintTextStyle()),
+                Text(widget.patrimonio!, style: Styles().smallTextStyle()),
+                Text(widget.lotacao!, style: Styles().hintTextStyle()),
                 SizedBox(
                   height: 3.h,
                 )
@@ -345,6 +375,7 @@ class SearchBar2 extends StatefulWidget {
   const SearchBar2({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _SearchBarState createState() => _SearchBarState();
 }
 
@@ -354,7 +385,6 @@ class _SearchBarState extends State<SearchBar2> {
 
   void onQueryChanged(String newQuery) {
     setState(() {
-      print(newQuery);
       query = newQuery;
     });
   }

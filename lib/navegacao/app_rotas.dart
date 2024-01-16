@@ -1,6 +1,7 @@
 import 'package:go_router/go_router.dart';
 import 'package:suporte_dti/controller/home_controller.dart';
 import 'package:suporte_dti/navegacao/app_screens_string.dart';
+import 'package:suporte_dti/screens/edite_screen.dart';
 import 'package:suporte_dti/screens/equipamento_detalhe_screen.dart';
 import 'package:suporte_dti/screens/login_screen.dart';
 import 'package:suporte_dti/screens/qrcode_resultado_screen.dart';
@@ -11,7 +12,7 @@ import 'package:suporte_dti/screens/delegacia_resultado_screen.dart';
 class Rotas {
   Rotas();
   static final routers = GoRouter(
-    initialLocation: AppRouterName.qrCodeResult,
+    initialLocation: AppRouterName.login,
     routes: [
       GoRoute(
         name: 'login',
@@ -51,7 +52,12 @@ class Rotas {
       GoRoute(
         name: 'qrcCodeResult',
         path: AppRouterName.qrCodeResult,
-        builder: (context, state) => (QrCodeResult()),
+        builder: (context, state) => (const QrCodeResult()),
+      ),
+      GoRoute(
+        name: 'updateScreen',
+        path: AppRouterName.updateScreen,
+        builder: (context, state) => (const UpdateScreen()),
       ),
     ],
   );

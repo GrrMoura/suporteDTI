@@ -61,7 +61,7 @@ class _SearchScreenState extends State<SearchScreen> {
 
               heading(),
 
-              pesquisaRapida(),
+              FastSearch(delegaciaList: delegaciaList),
               SearchBarr(model: historicoModel),
               SizedBox(height: 25.h),
               // TextButton(
@@ -82,29 +82,6 @@ class _SearchScreenState extends State<SearchScreen> {
           db.add(teste!);
         });
       }),
-    );
-  }
-
-  Padding pesquisaRapida() {
-    return Padding(
-      padding: EdgeInsets.only(top: 20.h),
-      child: SizedBox(
-        height: 107.h,
-        width: double.infinity,
-        child: ListView.builder(
-          itemCount: delegaciaList.length,
-          itemBuilder: (context, index) {
-            final delegacia = delegaciaList[index];
-
-            return DelegaciasIcones(
-                path: delegacia.path,
-                id: delegacia.id,
-                name: delegacia.name,
-                region: delegacia.region);
-          },
-          scrollDirection: Axis.horizontal,
-        ),
-      ),
     );
   }
 
@@ -154,6 +131,39 @@ class _SearchScreenState extends State<SearchScreen> {
             ],
           ),
         ],
+      ),
+    );
+  }
+}
+
+class FastSearch extends StatelessWidget {
+  const FastSearch({
+    super.key,
+    required this.delegaciaList,
+  });
+
+  final List<DelegaciaModel> delegaciaList;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.only(top: 20.h),
+      child: SizedBox(
+        height: 107.h,
+        width: double.infinity,
+        child: ListView.builder(
+          itemCount: delegaciaList.length,
+          itemBuilder: (context, index) {
+            final delegacia = delegaciaList[index];
+
+            return DelegaciasIcones(
+                path: delegacia.path,
+                id: delegacia.id,
+                name: delegacia.name,
+                region: delegacia.region);
+          },
+          scrollDirection: Axis.horizontal,
+        ),
       ),
     );
   }
@@ -342,7 +352,9 @@ class DelegaciasIcones extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 5),
       child: InkWell(
-        onTap: () {},
+        onTap: () {
+          context.push(AppRouterName.resultDelegacias);
+        },
         child: Column(
           children: [
             Container(

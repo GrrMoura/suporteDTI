@@ -29,9 +29,10 @@ class ResultDelegaciaState extends State {
     return Scaffold(
         appBar: AppBar(
           title: Text("CAPELA",
-              style: Styles()
-                  .titleStyle()
-                  .copyWith(color: AppColors.cWhiteColor, fontSize: 22.sp)),
+              style: Styles().titleStyle().copyWith(
+                  color: AppColors.cWhiteColor,
+                  fontSize: 22.sp,
+                  fontWeight: FontWeight.normal)),
           centerTitle: true,
           backgroundColor: AppColors.cSecondaryColor,
         ),
@@ -41,6 +42,15 @@ class ResultDelegaciaState extends State {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               SizedBox(height: 10.h),
+              Padding(
+                padding: const EdgeInsets.only(left: 8.0),
+                child: Text(
+                  "Quantidade",
+                  style: Styles().titleStyle().copyWith(
+                        color: Colors.black,
+                      ),
+                ),
+              ),
               Row(
                 children: <Widget>[
                   Expanded(
@@ -67,7 +77,7 @@ class ResultDelegaciaState extends State {
                             show: false,
                           ),
                           sectionsSpace: 2,
-                          centerSpaceRadius: 40,
+                          centerSpaceRadius: 30,
                           sections: showingSections(),
                         ),
                       ),
@@ -158,7 +168,7 @@ class ResultDelegaciaState extends State {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      "Ítens",
+                      "Equipamentos",
                       style:
                           Styles().titleStyle().copyWith(color: Colors.black),
                     ),

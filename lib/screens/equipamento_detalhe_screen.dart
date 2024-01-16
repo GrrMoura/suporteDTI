@@ -10,6 +10,7 @@ import 'package:path_provider/path_provider.dart';
 
 import 'package:screenshot/screenshot.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:suporte_dti/screens/widgets/widget_informacao.dart';
 import 'package:suporte_dti/utils/app_colors.dart';
 import 'package:suporte_dti/utils/app_dimens.dart';
 import 'package:suporte_dti/utils/app_styles.dart';
@@ -221,27 +222,6 @@ class DetalhesDetalhes extends StatelessWidget {
             padding: EdgeInsets.fromLTRB(20.w, 5.h, 20.w, 0),
             child: const InformacaoDetalhes(
                 informacao: "149892", titulo: "Patrimônio")),
-      ],
-    );
-  }
-}
-
-class InformacaoDetalhes extends StatelessWidget {
-  const InformacaoDetalhes({
-    required this.informacao,
-    required this.titulo,
-    super.key,
-  });
-
-  final String titulo, informacao;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(titulo, style: Styles().subTitleDetail()),
-        Text(informacao, style: Styles().descriptionDetail()),
       ],
     );
   }

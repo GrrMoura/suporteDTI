@@ -8,7 +8,7 @@ class Styles {
 
   TextStyle titleStyle() {
     return TextStyle(
-        fontWeight: FontWeight.w800,
+        fontWeight: FontWeight.w500,
         fontStyle: FontStyle.normal,
         letterSpacing: AppDimens.espacamentoMedio,
         color: AppColors.cWhiteColor,
@@ -80,5 +80,15 @@ class Styles {
         fontSize: AppDimens.largeTextSize,
         fontWeight: FontWeight.w500,
         letterSpacing: AppDimens.espacamentoMedio);
+  }
+
+  TextStyle descriptionRestulScan() {
+    return TextStyle(
+        color: AppColors.cSecondaryColor,
+        fontSize: AppDimens.pSize,
+        fontFamily: AppFonts.poppinsRegular,
+        overflow: TextOverflow.ellipsis,
+        fontWeight: FontWeight.w500,
+        letterSpacing: AppDimens.espacamentoPequeno);
   }
 }

@@ -2,7 +2,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:suporte_dti/navegacao/app_screens_string.dart';
 import 'package:suporte_dti/utils/app_colors.dart';
 
 class QrCodeScanner extends StatefulWidget {
@@ -36,7 +38,7 @@ class _QrCodeScannerState extends State<QrCodeScanner> {
 
       if (codigo!.isNotEmpty) {
         // context.push(AppRouterName.resultado);
-        //CÓDIGO PARA PEGAR A INFORMAÇÃO E IR PARA O RESULTADO
+        context.push(AppRouterName.qrCodeResult);
         return;
       }
 
@@ -99,16 +101,6 @@ class _QrCodeScannerState extends State<QrCodeScanner> {
                 CustomPaint(
                   painter: ScannerOverlay(scanWindow),
                 ),
-                Align(
-                    alignment: Alignment.topCenter,
-                    child: Padding(
-                      padding: EdgeInsets.only(bottom: 10.h),
-                      child: TextButton(
-                          onPressed: () {
-                            print(codigo);
-                          },
-                          child: const Text("Capturar")),
-                    )),
                 Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Align(

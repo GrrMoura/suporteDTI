@@ -16,7 +16,7 @@ class AppDimens {
 
   static const double largeSize = 32.0;
   static const double mediumSize = 16.5;
-  static double smallSize = 14.sp;
+  static double smallSize = 11.sp;
   static double minSmallTextSize = 10.sp;
 
   // -- Theme Font Size -- //
@@ -26,7 +26,7 @@ class AppDimens {
   static const double h4Size = 14.0;
   static const double h5Size = 13.0;
   static const double h6Size = 10.0;
-  static const double pSize = 12.0;
+  static double pSize = 12.sp;
 
   // -- Theme  porcentagem -- //
 

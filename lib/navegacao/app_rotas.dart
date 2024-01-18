@@ -12,7 +12,7 @@ import 'package:suporte_dti/screens/delegacia_resultado_screen.dart';
 class Rotas {
   Rotas();
   static final routers = GoRouter(
-    initialLocation: AppRouterName.login,
+    initialLocation: AppRouterName.qrCodeResult,
     routes: [
       GoRoute(
         name: 'login',
@@ -57,8 +57,13 @@ class Rotas {
       GoRoute(
         name: 'updateScreen',
         path: AppRouterName.updateScreen,
-        builder: (context, state) => (const UpdateScreen()),
+        builder: (context, state) => (UpdateScreen()),
       ),
+      // GoRoute(
+      //   name: 'levantamentoScreen',
+      //   path: AppRouterName.levantamentoScreen,
+      //   builder: (context, state) => (LevantamentoScreen()),
+      // ),
     ],
   );
 }

@@ -144,10 +144,7 @@ class _LoginScreenState extends State<LoginScreen> {
       children: [
         Padding(
           padding: EdgeInsets.only(left: 10.w, top: 10.h, bottom: 5.h),
-          child: Text(
-            "Senha",
-            style: TextStyle(fontSize: 14.sp),
-          ),
+          child: Text("Senha", style: TextStyle(fontSize: 14.sp)),
         ),
         SizedBox(
           width: 230.w,
@@ -164,10 +161,7 @@ class _LoginScreenState extends State<LoginScreen> {
               contentPadding: const EdgeInsets.fromLTRB(10, 15, 10, 0),
               errorStyle: TextStyle(fontSize: 10.sp),
               suffixIcon: Icon(Icons.remove_red_eye, size: 18.sp),
-              prefixIcon: Icon(
-                Icons.lock,
-                size: 18.sp,
-              ),
+              prefixIcon: Icon(Icons.lock, size: 18.sp),
               hintText: "********",
               hintStyle: TextStyle(fontSize: 12.sp),
               border: const OutlineInputBorder(

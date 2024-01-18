@@ -28,6 +28,7 @@ class ResultDelegaciaState extends State {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
+          automaticallyImplyLeading: false,
           title: Text("CAPELA",
               style: Styles().titleStyle().copyWith(
                   color: AppColors.cWhiteColor,

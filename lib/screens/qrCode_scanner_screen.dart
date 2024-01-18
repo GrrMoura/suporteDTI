@@ -38,14 +38,15 @@ class _QrCodeScannerState extends State<QrCodeScanner> {
 
       if (codigo!.isNotEmpty) {
         // context.push(AppRouterName.resultado);
+
         context.push(AppRouterName.qrCodeResult);
+
         return;
       }
 
       overlayText = barcodeCapture.barcodes.last.displayValue ??
           barcode.rawValue ??
           'O código de barras não tem valor exibível';
-      print("to aqui");
     });
   }
 

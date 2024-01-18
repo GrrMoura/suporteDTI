@@ -129,10 +129,6 @@ class EquipamentoDetalhe extends StatelessWidget {
       final directory = await getApplicationDocumentsDirectory();
       final imagePath = await File('${directory.path}/captured.png').create();
       await imagePath.writeAsBytes(image);
-
-      /// Share Plugin
-
-      //    await Share.shareFiles([imagePath.path]);
       XFile imageFileAsXFile = XFile(imagePath.path);
       await Share.shareXFiles([imageFileAsXFile]);
     });

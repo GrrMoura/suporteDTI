@@ -7,4 +7,6 @@ abstract class AppRouterName {
   static const String search = '/search';
   static const String qrCodeResult = '/qrCodeResult';
   static const String resultDelegacias = '/resultDelegacias';
+  static const String updateScreen = '/updateScreen';
+  static const String levantamentoScreen = '/levantamentoScreen';
 }

@@ -1,6 +1,15 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
+// ignore_for_file: public_member_api_docs, sort_constructors_first, must_be_immutable
+import 'dart:io';
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:screenshot/screenshot.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:suporte_dti/navegacao/app_screens_string.dart';
+import 'package:suporte_dti/screens/equipamento_detalhe_screen.dart';
 import 'package:suporte_dti/screens/widgets/widget_informacao.dart';
 import 'package:suporte_dti/utils/app_colors.dart';
 import 'package:suporte_dti/utils/app_styles.dart';
@@ -15,22 +24,30 @@ class QrCodeResult extends StatefulWidget {
 class _QrCodeResultState extends State<QrCodeResult> {
   @override
   Widget build(BuildContext context) {
+    double heigth = MediaQuery.of(context).size.height;
+
     return Scaffold(
-        body: Column(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        const HeadingScanResult(),
-        const TopoScanResult(),
-        const CardEbotoes(),
-        const botoesScanResult(),
-        SizedBox(height: 5.h)
-      ],
+        body: SingleChildScrollView(
+      child: SizedBox(
+        height: heigth,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const HeadingScanResult(),
+            const TopoScanResult(),
+            CardEbotoes(),
+            Expanded(child: SizedBox(height: 5.h)),
+            const BotoesScanResult(),
+            Expanded(child: SizedBox(height: 5.h)),
+          ],
+        ),
+      ),
     ));
   }
 }
 
-class botoesScanResult extends StatelessWidget {
-  const botoesScanResult({
+class BotoesScanResult extends StatelessWidget {
+  const BotoesScanResult({
     super.key,
   });
 
@@ -44,7 +61,9 @@ class botoesScanResult extends StatelessWidget {
                 backgroundColor: AppColors.cSecondaryColor,
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10))),
-            onPressed: () {},
+            onPressed: () {
+              context.go(AppRouterName.homeController);
+            },
             child: Row(
               children: [
                 const Icon(
@@ -63,12 +82,14 @@ class botoesScanResult extends StatelessWidget {
             style: OutlinedButton.styleFrom(
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10))),
-            onPressed: () {},
+            onPressed: () {
+              context.push(AppRouterName.homeController);
+            },
             child: Row(
               children: [
                 const Icon(Icons.arrow_back),
                 Container(width: 10.w),
-                Text("Voltar", style: Styles().mediumTextStyle().copyWith())
+                Text("Voltar", style: Styles().mediumTextStyle())
               ],
             )),
       ],
@@ -77,10 +98,10 @@ class botoesScanResult extends StatelessWidget {
 }
 
 class CardEbotoes extends StatelessWidget {
-  const CardEbotoes({
+  CardEbotoes({
     super.key,
   });
-
+  ScreenshotController screenshotController = ScreenshotController();
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -95,10 +116,9 @@ class CardEbotoes extends StatelessWidget {
         ),
         SizedBox(
           height: 230.h,
-          child: const Column(
+          child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              ButtonScanResult(icone: Icons.add, type: "Outro"),
               ButtonScanResult(icone: Icons.search, type: "Consultar"),
               ButtonScanResult(icone: Icons.share, type: "Partilhar"),
               ButtonScanResult(icone: Icons.upload, type: "Atualizar"),
@@ -119,31 +139,56 @@ class TopoScanResult extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        const Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            InformacaoDetalhes(informacao: "1232314", titulo: "Patrimônio"),
-            InformacaoDetalhes(informacao: "DAGV", titulo: "Lotação"),
-            InformacaoDetalhes(informacao: "Cartório", titulo: "Setor")
-          ],
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            const InformacaoDetalhes(
-                informacao: "BH2239BH2239BH2239", titulo: "TAG"),
-            Container(width: 10.w)
-          ],
+        Padding(
+          padding: EdgeInsets.only(left: 40.w),
+          child: Row(
+            children: [
+              WidgetQrCodeScreen(
+                  titulo: "Patrimônio", valor: "123456", width: 100.w),
+              SizedBox(width: 5.w),
+              WidgetQrCodeScreen(
+                titulo: "Lotação",
+                valor: "DAGV",
+                width: 100.w,
+                readOnly: false,
+              ),
+              SizedBox(width: 5.w),
+              WidgetQrCodeScreen(
+                titulo: "Setor",
+                valor: "Cartório",
+                width: 100.w,
+                readOnly: false,
+              ),
+            ],
+          ),
         ),
         Padding(
-          padding: EdgeInsets.only(top: 8.h, bottom: 8.h),
-          child: const Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
+          padding: EdgeInsets.only(left: 40.w),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              InformacaoDetalhes(informacao: "16/10/22", titulo: "Levantado"),
-              InformacaoDetalhes(informacao: "288/13", titulo: "Convênio"),
-              InformacaoDetalhes(informacao: "1212", titulo: "LACRE"),
-              SizedBox()
+              WidgetQrCodeScreen(
+                  titulo: "TAG", valor: "BH2239BH2239BH2239", width: 300.w)
+            ],
+          ),
+        ),
+        Padding(
+          padding: EdgeInsets.only(left: 40.w, bottom: 8.h),
+          child: Row(
+            children: [
+              WidgetQrCodeScreen(
+                  titulo: "Levantamento", valor: "16/10/22", width: 90.w),
+              Padding(
+                padding: EdgeInsets.only(left: 30.w),
+                child: WidgetQrCodeScreen(
+                    titulo: "Convênio", valor: "288/13", width: 100.w),
+              ),
+              WidgetQrCodeScreen(
+                titulo: "Lacre",
+                valor: "1212",
+                width: 90.w,
+                readOnly: false,
+              ),
             ],
           ),
         ),
@@ -152,8 +197,41 @@ class TopoScanResult extends StatelessWidget {
   }
 }
 
+class WidgetQrCodeScreen extends StatelessWidget {
+  WidgetQrCodeScreen({
+    super.key,
+    required this.width,
+    required this.valor,
+    required this.titulo,
+    this.readOnly,
+    this.ctrl,
+  });
+
+  final double width;
+  bool? readOnly;
+  final String valor, titulo;
+  final TextEditingController? ctrl;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: width,
+      child: TextFormField(
+          readOnly: readOnly ?? true,
+          style: Styles().mediumTextStyle(),
+          initialValue: valor,
+          decoration: InputDecoration(
+              border: InputBorder.none,
+              label: Text(
+                titulo,
+                style: Styles().subTitleDetail().copyWith(fontSize: 15.sp),
+              ))),
+    );
+  }
+}
+
 class ButtonScanResult extends StatelessWidget {
-  const ButtonScanResult({
+  ButtonScanResult({
     super.key,
     required this.type,
     required this.icone,
@@ -161,6 +239,7 @@ class ButtonScanResult extends StatelessWidget {
 
   final String type;
   final IconData icone;
+  ScreenshotController screenshotController1 = ScreenshotController();
 
   @override
   Widget build(BuildContext context) {
@@ -170,13 +249,62 @@ class ButtonScanResult extends StatelessWidget {
           style: OutlinedButton.styleFrom(
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10))),
-          onPressed: () {},
+          onPressed: () {
+            switch (type) {
+              case "Consultar":
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                      content: Text(
+                        'Consultar para saber se existe mesmo esse produto',
+                        style: Styles().errorTextStyle(),
+                      ),
+                      backgroundColor: AppColors.cErrorColor),
+                );
+                break;
+
+              case "Partilhar":
+                print(screenshotController1.toString());
+                screenShotShare(screenshotController1);
+                break;
+
+              case "Atualizar":
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                      content: Text(
+                        'Mudança de lotação, setor ou lacre',
+                        style: Styles().errorTextStyle(),
+                      ),
+                      backgroundColor: AppColors.cErrorColor),
+                );
+                break;
+
+              default:
+            }
+          },
           icon: Icon(icone),
           label: Text(
             type,
             style: Styles().mediumTextStyle(),
           )),
     );
+  }
+
+  void screenShotShare(ScreenshotController screenshotController) async {
+    await screenshotController
+        .captureFromWidget(const ScreenShoti())
+        .then((value) async {
+      Uint8List image = value;
+
+      final directory = await getApplicationDocumentsDirectory();
+      final imagePath = await File('${directory.path}/captured.png').create();
+      await imagePath.writeAsBytes(image);
+
+      /// Share Plugin
+
+      //    await Share.shareFiles([imagePath.path]);
+      XFile imageFileAsXFile = XFile(imagePath.path);
+      await Share.shareXFiles([imageFileAsXFile]);
+    });
   }
 }
 

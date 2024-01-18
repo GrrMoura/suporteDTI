@@ -28,7 +28,10 @@ class ResultDelegaciaState extends State {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          automaticallyImplyLeading: false,
+          iconTheme: const IconThemeData(
+            color: Colors.white, //change your color here
+          ),
+          automaticallyImplyLeading: true,
           title: Text("CAPELA",
               style: Styles().titleStyle().copyWith(
                   color: AppColors.cWhiteColor,

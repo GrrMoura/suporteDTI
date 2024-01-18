@@ -1,8 +1,13 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:suporte_dti/data/delegacia_data.dart';
 import 'package:suporte_dti/data/equipamentos_data.dart';
@@ -30,9 +35,15 @@ class _SearchScreenState extends State<SearchScreen> {
   // ignore: prefer_typing_uninitialized_variables
   EquipamentosHistoricoModel? teste;
 
+  String? semFoto = "assets/images/people1.jpg";
+  Uint8List? bytes;
+  bool temFoto = false;
+
   @override
   initState() {
     super.initState();
+
+    pegarFoto();
 
     delegaciaList = delegaciaData;
     todosOsEquipamentos = equipamentosData;
@@ -43,6 +54,34 @@ class _SearchScreenState extends State<SearchScreen> {
         tag: "BH2239",
         tipo: "monitor",
         lotacao: "ARACAJU");
+  }
+
+  pegarFoto() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    bytes = base64Decode(prefs.getString("foto")!);
+    temFoto = prefs.getBool("temFoto")!;
+
+    setState(() {});
+  }
+
+  _pickImagefromGallery() async {
+    try {
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+      final pickedImage =
+          await ImagePicker().pickImage(source: ImageSource.gallery);
+      if (pickedImage != null) {
+        File? imageFile = File(pickedImage.path);
+        bytes = imageFile.readAsBytesSync();
+        String imageString = base64Encode(bytes!);
+        prefs.setString("foto", imageString);
+        prefs.setBool("temFoto", true);
+
+        setState(() {});
+      } else {}
+    } catch (e) {
+      return null;
+    }
   }
 
   List<EquipamentosModel> todosOsEquipamentos = [];
@@ -58,26 +97,18 @@ class _SearchScreenState extends State<SearchScreen> {
           child: Column(
             children: [
               //TODO fazer o remover do histórico
-
               heading(),
-
               FastSearch(delegaciaList: delegaciaList),
               SearchBarr(model: historicoModel),
               SizedBox(height: 25.h),
-              // TextButton(
-              //     onPressed: () {
-              //       db.deletarEquipamento(teste!.patrimonio.toString());
-              //       print("apaguei");
-              //       setState(() {});
-              //     },
-              //     child: const Text("Apagar tabela")),
-
               BuilderDosCards(db: db),
             ],
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(onPressed: () {
+      floatingActionButton: FloatingActionButton(onPressed: () async {
+        SharedPreferences preferences = await SharedPreferences.getInstance();
+        await preferences.clear();
         setState(() {
           db.add(teste!);
         });
@@ -99,11 +130,20 @@ class _SearchScreenState extends State<SearchScreen> {
               CircleAvatar(
                 radius: 45.h,
                 backgroundColor: AppColors.cWhiteColor,
-                child: CircleAvatar(
-                  radius: 40.h,
-                  backgroundImage:
-                      const AssetImage("assets/images/people1.jpg"),
-                  backgroundColor: AppColors.cSecondaryColor,
+                child: InkWell(
+                  onTap: () async {
+                    await _pickImagefromGallery();
+                    setState(() {
+                      temFoto = true;
+                    });
+                  },
+                  child: CircleAvatar(
+                    radius: 40.h,
+                    backgroundImage: temFoto == false
+                        ? AssetImage(semFoto!)
+                        // ? AssetImage("assets/images/people1.jpg")
+                        : MemoryImage(bytes!) as ImageProvider<Object>,
+                  ),
                 ),
               ),
               Padding(

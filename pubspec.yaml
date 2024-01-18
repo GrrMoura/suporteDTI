@@ -44,8 +44,11 @@ dependencies:
   screenshot: ^2.1.0
   path_provider: ^2.1.1
   fl_chart: ^0.66.0
+  image_picker: ^1.0.7
   flutter_svg: ^2.0.9
-  mobile_scanner: ^3.5.6 #ler os qrcodes
+  shared_preferences: ^2.2.2
+  mobile_scanner: ^3.5.6  #ler os qrcodes
+ 
  
 
 

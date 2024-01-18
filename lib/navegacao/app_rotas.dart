@@ -12,7 +12,7 @@ import 'package:suporte_dti/screens/delegacia_resultado_screen.dart';
 class Rotas {
   Rotas();
   static final routers = GoRouter(
-    initialLocation: AppRouterName.qrCodeResult,
+    initialLocation: AppRouterName.homeController,
     routes: [
       GoRoute(
         name: 'login',

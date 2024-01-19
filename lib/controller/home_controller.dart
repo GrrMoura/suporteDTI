@@ -1,11 +1,8 @@
 import 'package:convex_bottom_bar/convex_bottom_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:suporte_dti/screens/qrCode_scanner_screen.dart';
-import 'package:suporte_dti/screens/login_screen.dart';
-import 'package:suporte_dti/screens/qrcode_resultado_screen.dart';
+import 'package:suporte_dti/screens/qr_code_scanner_screen.dart';
 import 'package:suporte_dti/screens/search_screen.dart';
-import 'package:suporte_dti/screens/delegacia_resultado_screen.dart';
 import 'package:suporte_dti/utils/app_colors.dart';
 
 class HomeControler extends StatefulWidget {
@@ -19,7 +16,7 @@ class _HomePageState extends State<HomeControler> {
   int selectedPage = 0;
 
   final _pageList = [
-    const SearchScreen(), QrCodeScanner(),
+    const SearchScreen(), const QrCodeScanner(),
     //const LoginScreen(),
 
     //   const PerfilPage()

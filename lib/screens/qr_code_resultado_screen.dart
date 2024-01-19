@@ -10,7 +10,6 @@ import 'package:screenshot/screenshot.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:suporte_dti/navegacao/app_screens_string.dart';
 import 'package:suporte_dti/screens/equipamento_detalhe_screen.dart';
-import 'package:suporte_dti/screens/widgets/widget_informacao.dart';
 import 'package:suporte_dti/utils/app_colors.dart';
 import 'package:suporte_dti/utils/app_styles.dart';
 
@@ -263,7 +262,6 @@ class ButtonScanResult extends StatelessWidget {
                 break;
 
               case "Partilhar":
-                print(screenshotController1.toString());
                 screenShotShare(screenshotController1);
                 break;
 
@@ -385,7 +383,7 @@ class CardViewResultScan extends StatelessWidget {
                 padding: EdgeInsets.symmetric(vertical: 3.h),
                 child: Image.asset("assets/images/nobreak.jpg", height: 70.h),
               ),
-              infomacaoScanResult(informacao: patrimonio, tipo: "Patrimônio"),
+              InfomacaoScanResult(informacao: patrimonio, tipo: "Patrimônio"),
               Padding(
                 padding: EdgeInsets.fromLTRB(2.w, 2.h, 2.w, 2.h),
                 child: Column(
@@ -400,7 +398,7 @@ class CardViewResultScan extends StatelessWidget {
                   ],
                 ),
               ),
-              infomacaoScanResult(informacao: lotacao, tipo: "Lotação"),
+              InfomacaoScanResult(informacao: lotacao, tipo: "Lotação"),
             ],
           ),
         ),
@@ -409,8 +407,8 @@ class CardViewResultScan extends StatelessWidget {
   }
 }
 
-class infomacaoScanResult extends StatelessWidget {
-  const infomacaoScanResult({
+class InfomacaoScanResult extends StatelessWidget {
+  const InfomacaoScanResult({
     super.key,
     required this.informacao,
     required this.tipo,

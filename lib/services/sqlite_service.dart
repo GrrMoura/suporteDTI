@@ -61,7 +61,7 @@ class SqliteService {
     final db = await database;
 
     await db.delete('Equipamentos',
-        where: 'patrimonio==?', whereArgs: [patrimonio]);
+        where: 'patrimonio = ?', whereArgs: [patrimonio]);
   }
 
   Future<void> deletarTabela() async {

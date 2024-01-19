@@ -48,9 +48,9 @@ class _SearchScreenState extends State<SearchScreen> {
     delegaciaList = delegaciaData;
     todosOsEquipamentos = equipamentosData;
     teste = EquipamentosHistoricoModel(
-        id: 1,
+        id: 7,
         marca: "DELL",
-        patrimonio: "123",
+        patrimonio: "777777",
         tag: "BH2239",
         tipo: "monitor",
         lotacao: "ARACAJU");
@@ -96,24 +96,105 @@ class _SearchScreenState extends State<SearchScreen> {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              //TODO fazer o remover do histórico
               heading(),
               FastSearch(delegaciaList: delegaciaList),
               SearchBarr(model: historicoModel),
+              // ElevatedButton(
+              //     onPressed: () {
+              //       setState(() {});
+              //     },
+              //     child: Text("SET STATE")),
               SizedBox(height: 25.h),
-              BuilderDosCards(db: db),
+              builderHistorico(),
             ],
           ),
         ),
       ),
       floatingActionButton: FloatingActionButton(onPressed: () async {
-        SharedPreferences preferences = await SharedPreferences.getInstance();
-        await preferences.clear();
-        setState(() {
-          db.add(teste!);
-        });
+        // SharedPreferences preferences = await SharedPreferences.getInstance();
+        // await preferences.clear();
+        db.add(teste!);
+        setState(() {});
       }),
     );
+  }
+
+  FutureBuilder<List<dynamic>> builderHistorico() {
+    return FutureBuilder(
+        initialData: const [],
+        future: db.getEquipamentos(),
+        builder: (context, AsyncSnapshot<List> snapshot) {
+          var data = snapshot.data;
+          var datalength = data?.length;
+
+          return datalength == 0
+              ? const Center(child: Text("Sem Histórico"))
+              : SizedBox(
+                  height: 160.h,
+                  width: double.infinity,
+                  child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: datalength,
+                      itemBuilder: (context, index) {
+                        String patrimonio = data![index].patrimonio;
+                        String lotacao = data[index].lotacao;
+                        String marca = data[index].marca;
+                        return GestureDetector(
+                          onLongPress: () {
+                            Clipboard.setData(ClipboardData(text: patrimonio));
+                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                backgroundColor: Colors.orange,
+                                content: Text(
+                                  "copiado para area de transferencia",
+                                  style: Styles().mediumTextStyle(),
+                                )));
+                          },
+                          child: Padding(
+                            padding: EdgeInsets.fromLTRB(8.w, 10.h, 8.w, 5.h),
+                            child: SizedBox(
+                              width: 100.w,
+                              child: Material(
+                                color: AppColors.cWhiteColor,
+                                elevation: 4,
+                                borderRadius: BorderRadius.circular(10),
+                                shadowColor: Colors.grey,
+                                child: Column(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      children: [
+                                        InkWell(
+                                            onTap: () {
+                                              db.deletarEquipamento(patrimonio);
+                                              setState(() {});
+                                            },
+                                            child: const Icon(
+                                                Icons.remove_circle_outline,
+                                                color: Colors.red))
+                                      ],
+                                    ),
+                                    Text(marca,
+                                        style: Styles().smallTextStyle()),
+                                    Image.asset("assets/images/impressora.png",
+                                        height: 70.h),
+                                    Text(patrimonio,
+                                        style: Styles().smallTextStyle()),
+                                    Text(lotacao,
+                                        style: Styles().hintTextStyle()),
+                                    SizedBox(
+                                      height: 3.h,
+                                    )
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      }),
+                );
+        });
   }
 
   Container heading() {
@@ -209,45 +290,6 @@ class FastSearch extends StatelessWidget {
   }
 }
 
-class BuilderDosCards extends StatelessWidget {
-  const BuilderDosCards({
-    super.key,
-    required this.db,
-  });
-
-  final SqliteService db;
-
-  @override
-  Widget build(BuildContext context) {
-    return FutureBuilder(
-        initialData: const [],
-        future: db.getEquipamentos(),
-        builder: (context, AsyncSnapshot<List> snapshot) {
-          var data = snapshot.data;
-          var datalength = data?.length;
-
-          return datalength == 0
-              ? const Center(child: Text("Sem Histórico"))
-              : SizedBox(
-                  height: 160.h,
-                  width: double.infinity,
-                  child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: datalength,
-                      itemBuilder: (context, index) {
-                        String patrimonio = data![index].patrimonio;
-                        String lotacao = data[index].lotacao;
-                        return CardUltimasConsultas(
-                          patrimonio: patrimonio,
-                          lotacao: lotacao,
-                          db: db,
-                        );
-                      }),
-                );
-        });
-  }
-}
-
 class SearchBarr extends StatelessWidget {
   SearchBarr({super.key, required this.model});
   final EquipamentosHistoricoModel model;
@@ -255,7 +297,7 @@ class SearchBarr extends StatelessWidget {
   final SqliteService db = SqliteService();
   @override
   Widget build(BuildContext context) {
-    void _runFilter(String enteredKeyword) {
+    void runFilter(String enteredKeyword) {
       //toDO  Fazer filtro
       // List<EquipamentosModel> results = [];
       // if (enteredKeyword.isEmpty) {
@@ -287,7 +329,7 @@ class SearchBarr extends StatelessWidget {
         padding: const EdgeInsets.all(8),
         child: TextFormField(
           style: Styles().mediumTextStyle(),
-          onChanged: _runFilter,
+          onChanged: runFilter,
           keyboardType: TextInputType.visiblePassword,
           textInputAction: TextInputAction.search,
           onFieldSubmitted: ((value) {
@@ -310,8 +352,8 @@ class SearchBarr extends StatelessWidget {
 }
 
 class CardUltimasConsultas extends StatefulWidget {
-  const CardUltimasConsultas({this.lotacao, this.patrimonio, this.db, Key? key})
-      : super(key: key);
+  const CardUltimasConsultas(
+      {this.lotacao, this.patrimonio, this.db, super.key});
 
   final String? patrimonio, lotacao;
   final SqliteService? db;
@@ -351,9 +393,8 @@ class _CardUltimasConsultasState extends State<CardUltimasConsultas> {
                   children: [
                     InkWell(
                         onTap: () {
-                          setState(() {
-                            widget.db!.deletarEquipamento(widget.patrimonio!);
-                          });
+                          widget.db!.deletarEquipamento(widget.patrimonio!);
+                          setState(() {});
                         },
                         child: const Icon(Icons.remove_circle_outline,
                             color: Colors.red))

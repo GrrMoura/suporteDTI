@@ -118,8 +118,7 @@ class CardEquipamentosResultado extends StatelessWidget {
       required this.patrimonio,
       required this.marca,
       required this.tag,
-      Key? key})
-      : super(key: key);
+      super.key});
 
   final String? patrimonio, lotacao, marca, tag;
 
@@ -184,11 +183,9 @@ class LinhaDescricao extends StatelessWidget {
           Text("$nome: ", style: Styles().hintTextStyle()),
           Flexible(
             child: SizedBox(
-              child: Container(
-                child: Text(
-                  informacao ?? "Sem número",
-                  style: Styles().smallTextStyle(),
-                ),
+              child: Text(
+                informacao ?? "Sem número",
+                style: Styles().smallTextStyle(),
               ),
             ),
           ),

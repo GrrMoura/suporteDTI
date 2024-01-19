@@ -4,7 +4,7 @@ import 'package:suporte_dti/navegacao/app_screens_string.dart';
 import 'package:suporte_dti/screens/edite_screen.dart';
 import 'package:suporte_dti/screens/equipamento_detalhe_screen.dart';
 import 'package:suporte_dti/screens/login_screen.dart';
-import 'package:suporte_dti/screens/qrcode_resultado_screen.dart';
+import 'package:suporte_dti/screens/qr_code_resultado_screen.dart';
 import 'package:suporte_dti/screens/resultado_screen.dart';
 import 'package:suporte_dti/screens/search_screen.dart';
 import 'package:suporte_dti/screens/delegacia_resultado_screen.dart';
@@ -47,7 +47,7 @@ class Rotas {
       GoRoute(
         name: 'resultDelegacia',
         path: AppRouterName.resultDelegacias,
-        builder: (context, state) => (ResultDelegacia()),
+        builder: (context, state) => (const ResultDelegacia()),
       ),
       GoRoute(
         name: 'qrcCodeResult',

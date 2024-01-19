@@ -8,7 +8,7 @@ import 'package:suporte_dti/utils/app_colors.dart';
 import 'package:suporte_dti/utils/app_styles.dart';
 
 class ResultDelegacia extends StatefulWidget {
-  ResultDelegacia({super.key});
+  const ResultDelegacia({super.key});
 
   @override
   State<StatefulWidget> createState() => ResultDelegaciaState();
@@ -347,8 +347,7 @@ class ResultDelegaciaState extends State {
 
 class CardItensDelegacia extends StatefulWidget {
   const CardItensDelegacia(
-      {this.lotacao, this.patrimonio, this.marcaModelo, Key? key})
-      : super(key: key);
+      {this.lotacao, this.patrimonio, this.marcaModelo, super.key});
 
   final String? patrimonio, lotacao, marcaModelo;
 

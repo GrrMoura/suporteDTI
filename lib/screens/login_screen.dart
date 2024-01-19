@@ -1,9 +1,14 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:suporte_dti/controller/login_controller.dart';
 import 'package:suporte_dti/navegacao/app_screens_string.dart';
 import 'package:suporte_dti/utils/app_colors.dart';
 import 'package:suporte_dti/utils/app_styles.dart';
+import 'package:suporte_dti/viewModel/login_view_model.dart';
+import 'dart:developer' as developer;
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -15,11 +20,46 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   //final _formKey = GlobalKey<FormState>();
 
-  TextEditingController loginController = TextEditingController();
-
+  TextEditingController usuarioCtrl = TextEditingController();
   TextEditingController passController = TextEditingController();
+  LoginViewModel loginViewModel = LoginViewModel();
 
   var isShowPass = false;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _login();
+  }
+
+  Future<void> _login() async {
+    try {
+      SharedPreferences prefes = await SharedPreferences.getInstance();
+
+      bool isEntrarComBiometria = prefes.getBool("leitorBiometrico") ?? true;
+      loginViewModel.leitorBiometrico = isEntrarComBiometria;
+      bool lembrarMe = prefes.getBool("lembrar_me") ?? false;
+      String usuario = prefes.getString("cpf") ?? "";
+      //  loginViewModel.token = (await FirebaseMessaging.instance.getToken())!;
+      loginViewModel.lembrarMe = lembrarMe;
+
+      setState(() {});
+
+      if (isEntrarComBiometria) {
+        LoginController.loginBiometrico(context);
+        if (lembrarMe) {
+          usuarioCtrl.text = usuario;
+        }
+      } else if (lembrarMe) {
+        usuarioCtrl.text = usuario;
+      }
+    } catch (e) {
+      //  Loader.hide();
+      developer.log("Não foi possível realizar o login", name: "Erro de login");
+      return null;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -190,7 +230,7 @@ class _LoginScreenState extends State<LoginScreen> {
           child: TextFormField(
             style: TextStyle(fontSize: 14.sp),
             onChanged: (newValue) {
-              loginController.text = newValue;
+              usuarioCtrl.text = newValue;
             },
             keyboardType: TextInputType.text,
             decoration: InputDecoration(

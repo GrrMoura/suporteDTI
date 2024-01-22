@@ -35,7 +35,7 @@ class _SearchScreenState extends State<SearchScreen> {
   // ignore: prefer_typing_uninitialized_variables
   EquipamentosHistoricoModel? teste;
 
-  String? semFoto = "assets/images/people1.jpg";
+  String? semFoto = "assets/images/semfoto.png";
   Uint8List? bytes;
   bool temFoto = false;
 
@@ -59,7 +59,7 @@ class _SearchScreenState extends State<SearchScreen> {
   pegarFoto() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     bytes = base64Decode(prefs.getString("foto")!);
-    temFoto = prefs.getBool("temFoto")!;
+    temFoto = prefs.getBool("temFoto") ?? false;
 
     setState(() {});
   }
@@ -111,10 +111,10 @@ class _SearchScreenState extends State<SearchScreen> {
         ),
       ),
       floatingActionButton: FloatingActionButton(onPressed: () async {
-        // SharedPreferences preferences = await SharedPreferences.getInstance();
-        // await preferences.clear();
-        db.add(teste!);
-        setState(() {});
+        SharedPreferences preferences = await SharedPreferences.getInstance();
+        await preferences.clear();
+        // db.add(teste!);
+        // setState(() {});
       }),
     );
   }
@@ -202,9 +202,9 @@ class _SearchScreenState extends State<SearchScreen> {
       color: AppColors.cSecondaryColor,
       height: 160.h,
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          SizedBox(height: 10.h),
+          Expanded(child: SizedBox(height: 1.h)),
+          Expanded(child: SizedBox(height: 1.h)),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
@@ -219,11 +219,14 @@ class _SearchScreenState extends State<SearchScreen> {
                     });
                   },
                   child: CircleAvatar(
+                    backgroundColor: AppColors.cSecondaryColor,
                     radius: 40.h,
                     backgroundImage: temFoto == false
                         ? AssetImage(semFoto!)
                         // ? AssetImage("assets/images/people1.jpg")
-                        : MemoryImage(bytes!) as ImageProvider<Object>,
+                        : bytes != null
+                            ? MemoryImage(bytes!) as ImageProvider<Object>
+                            : AssetImage(semFoto!),
                   ),
                 ),
               ),
@@ -251,6 +254,7 @@ class _SearchScreenState extends State<SearchScreen> {
               )
             ],
           ),
+          Expanded(child: SizedBox(height: 1.h)),
         ],
       ),
     );

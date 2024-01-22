@@ -30,7 +30,7 @@ class _LoginScreenState extends State<LoginScreen> {
   void initState() {
     super.initState();
 
-    _login();
+    // _login();
   }
 
   Future<void> _login() async {

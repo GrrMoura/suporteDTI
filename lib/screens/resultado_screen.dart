@@ -2,17 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:suporte_dti/model/equipamentos_model.dart';
 import 'package:suporte_dti/navegacao/app_screens_string.dart';
 import 'package:suporte_dti/screens/widgets/widget_gridview_itens.dart';
 import 'package:suporte_dti/utils/app_colors.dart';
 import 'package:suporte_dti/utils/app_styles.dart';
 
 class ResultadoScreen extends StatelessWidget {
-  ResultadoScreen({super.key});
+  ResultadoScreen({super.key, this.model});
   final List<Map> myProducts =
       List.generate(10, (index) => {"id": index, "name": "Produto $index"})
           .toList();
-
+  final EquipamentosModel? model;
   @override
   Widget build(BuildContext context) {
     return Scaffold(

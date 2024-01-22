@@ -8,6 +8,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:suporte_dti/controller/consulta_controller.dart';
 
 import 'package:suporte_dti/data/delegacia_data.dart';
 import 'package:suporte_dti/data/equipamentos_data.dart';
@@ -17,6 +18,7 @@ import 'package:suporte_dti/navegacao/app_screens_string.dart';
 import 'package:suporte_dti/services/sqlite_service.dart';
 import 'package:suporte_dti/utils/app_colors.dart';
 import 'package:suporte_dti/utils/app_styles.dart';
+import 'package:suporte_dti/viewModel/consulta_view_model.dart';
 
 import '../model/delegacia_model.dart';
 
@@ -30,7 +32,10 @@ class SearchScreen extends StatefulWidget {
 class _SearchScreenState extends State<SearchScreen> {
   late List<DelegaciaModel> delegaciaList;
   late List<EquipamentosModel> equipamentoList;
+  final ConsultaController consultaController = ConsultaController();
   EquipamentosHistoricoModel historicoModel = EquipamentosHistoricoModel();
+  ConsultaViewModel? model;
+
   SqliteService db = SqliteService();
   // ignore: prefer_typing_uninitialized_variables
   EquipamentosHistoricoModel? teste;
@@ -98,12 +103,7 @@ class _SearchScreenState extends State<SearchScreen> {
             children: [
               heading(),
               FastSearch(delegaciaList: delegaciaList),
-              SearchBarr(model: historicoModel),
-              // ElevatedButton(
-              //     onPressed: () {
-              //       setState(() {});
-              //     },
-              //     child: Text("SET STATE")),
+              searchBar(context),
               SizedBox(height: 25.h),
               builderHistorico(),
             ],
@@ -116,6 +116,44 @@ class _SearchScreenState extends State<SearchScreen> {
         // db.add(teste!);
         // setState(() {});
       }),
+    );
+  }
+
+  Padding searchBar(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.only(top: 15.h, left: 10.w, right: 10.w),
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          color: AppColors.cSecondaryColor,
+        ),
+        padding: const EdgeInsets.all(8),
+        child: TextFormField(
+          style: Styles().mediumTextStyle(),
+          keyboardType: TextInputType.visiblePassword,
+          textInputAction: TextInputAction.search,
+          onFieldSubmitted: ((value) {
+            if (value.isNotEmpty) {
+              consultaController.consultar(context, model!).then((value) {
+                setState(() {});
+              });
+            } else {
+              ScaffoldMessenger.of(context)
+                  .showSnackBar(const SnackBar(content: Text("TA VAIZO")));
+            }
+          }),
+          decoration: InputDecoration(
+            fillColor: AppColors.cWhiteColor,
+            filled: true,
+            isDense: true,
+            hintText: 'Patrimônio, Marca, Tipo, Modelo, Tag...',
+            hintStyle: Styles().hintTextStyle(),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(30)),
+            prefixIcon: Icon(Icons.search,
+                size: 25.sp, color: AppColors.cDescriptionIconColor),
+          ),
+        ),
+      ),
     );
   }
 
@@ -288,67 +326,6 @@ class FastSearch extends StatelessWidget {
                 region: delegacia.region);
           },
           scrollDirection: Axis.horizontal,
-        ),
-      ),
-    );
-  }
-}
-
-class SearchBarr extends StatelessWidget {
-  SearchBarr({super.key, required this.model});
-  final EquipamentosHistoricoModel model;
-
-  final SqliteService db = SqliteService();
-  @override
-  Widget build(BuildContext context) {
-    void runFilter(String enteredKeyword) {
-      //toDO  Fazer filtro
-      // List<EquipamentosModel> results = [];
-      // if (enteredKeyword.isEmpty) {
-      //   results = todosOsEquipamentos;
-      // } else {
-      //   results = todosOsEquipamentos
-      //       .where((equipamento) => equipamento.patrimonio
-      //           .toLowerCase()
-      //           .contains(enteredKeyword.toLowerCase()))
-      //       .toList();
-      // }
-
-      // setState(() {
-      //   _acharEquipamentos = results;
-      // });
-    }
-
-    // void addEquipamento(EquipamentosHistoricoModel equipamento) {
-    //   db.add(equipamento);
-    // }
-
-    return Padding(
-      padding: EdgeInsets.only(top: 15.h, left: 10.w, right: 10.w),
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
-          color: AppColors.cSecondaryColor,
-        ),
-        padding: const EdgeInsets.all(8),
-        child: TextFormField(
-          style: Styles().mediumTextStyle(),
-          onChanged: runFilter,
-          keyboardType: TextInputType.visiblePassword,
-          textInputAction: TextInputAction.search,
-          onFieldSubmitted: ((value) {
-            context.push(AppRouterName.resultado);
-          }),
-          decoration: InputDecoration(
-            fillColor: AppColors.cWhiteColor,
-            filled: true,
-            isDense: true,
-            hintText: 'Patrimônio, Marca, Tipo, Modelo, Tag...',
-            hintStyle: Styles().hintTextStyle(),
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(30)),
-            prefixIcon: Icon(Icons.search,
-                size: 25.sp, color: AppColors.cDescriptionIconColor),
-          ),
         ),
       ),
     );

@@ -34,7 +34,7 @@ class _SearchScreenState extends State<SearchScreen> {
   late List<EquipamentosModel> equipamentoList;
   final ConsultaController consultaController = ConsultaController();
   EquipamentosHistoricoModel historicoModel = EquipamentosHistoricoModel();
-  ConsultaViewModel? model;
+  ConsultaViewModel? model = ConsultaViewModel();
 
   SqliteService db = SqliteService();
   // ignore: prefer_typing_uninitialized_variables

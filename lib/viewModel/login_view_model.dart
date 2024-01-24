@@ -2,6 +2,7 @@ class LoginViewModel {
   String? login;
   String? senha;
   bool? lembrarMe;
+  bool? ocupado = false;
   bool? leitorBiometrico;
   String? token;
 

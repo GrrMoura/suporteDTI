@@ -38,7 +38,10 @@ class ConsultaController {
 
   Future<void> regraDeAcesso(Sessao usuarioSessao, BuildContext context,
       ConsultaViewModel model) async {
-    if (usuarioSessao.regrasAcesso!.contains("ConsultaIntegrada")) {
+    //      if (usuarioSessao.regrasAcesso!.contains("ConsultaIntegrada")) {
+    //   return await consulta(context, model);
+    // }
+    if (usuarioSessao.regrasAcesso!.contains("")) {
       return await consulta(context, model);
     }
 

@@ -2,6 +2,7 @@
 
 import 'dart:async';
 import 'package:dio/dio.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -12,19 +13,21 @@ import 'package:suporte_dti/services/autenticacao_service.dart';
 import 'package:suporte_dti/services/dispositivo_service.dart';
 import 'package:suporte_dti/utils/app_colors.dart';
 import 'package:suporte_dti/utils/app_styles.dart';
+import 'package:suporte_dti/utils/configuracoes_global_utils.dart';
 import 'package:suporte_dti/viewModel/login_view_model.dart';
 
 class AutenticacaoController {
   Future<void> logar(BuildContext context, LoginViewModel model) async {
     await DispositivoServices.verificarConexao().then((conectado) async {
+      model.ocupado = true;
       if (!conectado) {
-        //model.ocupado = false;
-        SnackBar(
+        model.ocupado = false;
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             content: Text(
-              'em conexão com a internet. Estabeleça uma conexão e tente novamente',
+              'Sem conexão com a internet. Estabeleça uma conexão e tente novamente',
               style: Styles().errorTextStyle(),
             ),
-            backgroundColor: AppColors.cErrorColor);
+            backgroundColor: AppColors.cErrorColor));
 
         return null;
       }
@@ -32,35 +35,33 @@ class AutenticacaoController {
       Response response = await AutenticacaoService.logar(model);
 
       if (response.statusCode != 200) {
-        //  model.ocupado = false;
+        model.ocupado = false;
         if (response.statusCode == 422) {
-          SnackBar(
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
               content: Text(
                 ' Erro - ${response.data[0]}',
                 style: Styles().errorTextStyle(),
               ),
-              backgroundColor: AppColors.cErrorColor);
+              backgroundColor: AppColors.cErrorColor));
 
           return null;
         }
 
-        SnackBar(
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             content: Text(
-              ' Erro - ${response.statusMessage}}',
+              ' Erro - ${response.statusMessage}',
               style: Styles().errorTextStyle(),
             ),
-            backgroundColor: AppColors.cErrorColor);
+            backgroundColor: AppColors.cErrorColor));
 
         return null;
       }
+
       SharedPreferences prefs = await SharedPreferences.getInstance();
 
       Sessao.fromJson(response.data).setSession(prefs, model);
 
-      // await FirebaseMessaging.instance
-      //     .subscribeToTopic(ConfiguracoesGlobalUtils.getTopicFirebase());
-
-      // model.ocupado = false;
+      model.ocupado = false;
 
       LoginController.setCpf(model.login!);
       LoginController.setSenha(model.senha!);

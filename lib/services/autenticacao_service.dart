@@ -2,43 +2,30 @@ import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:suporte_dti/model/sessao_model.dart';
 import 'package:suporte_dti/services/api_services.dart';
+import 'package:suporte_dti/services/dispositivo_service.dart';
 import 'package:suporte_dti/services/requests_services.dart';
 import 'package:suporte_dti/utils/configuracoes_global_utils.dart';
+import 'package:suporte_dti/viewModel/dispositivo_view_model.dart';
 import 'package:suporte_dti/viewModel/login_view_model.dart';
 
 class AutenticacaoService {
   static Future<Response> logar(LoginViewModel loginViewModel) async {
-    // var dispositivo =
-    //     await DispositivoServices.carregarInformacoesDispositivo();
-    // if (dispositivo.so == null)
-    //   return Response(
-    //       statusCode: 403,
-    //       statusMessage:
-    //           "Não foi possível carregar informações do dispositivo.\nPor favor, contate os administradores.",
-    //       requestOptions: RequestOptions(path: ""));
+    var dispositivo =
+        await DispositivoServices.carregarInformacoesDispositivo();
+    if (dispositivo.so == null) {
+      return Response(
+          statusCode: 403,
+          statusMessage:
+              "Não foi possível carregar informações do dispositivo.\nPor favor, contate os administradores.",
+          requestOptions: RequestOptions(path: ""));
+    }
 
     // Montagem do cabeçalho com informações do dispositivo
     var options = Options(
-        headers: {"MobileInformation": ConfiguracoesGlobalUtils.ID_SISTEMA});
-
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    //var dispositivoModels = DispositivoModels.getPreferences(prefs);
-
-    // if (!dispositivoModels.cadastrado!) {
-    //   var responseCadastro = await validarCadastroDispositivo(
-    //       loginViewModel, dispositivoModels, prefs, options);
-    //   if (responseCadastro.statusCode != 200) return responseCadastro;
-    // }
-
-    // if (!dispositivoModels.liberado!) {
-    //   var responseLiberar =
-    //       await validarLiberacaoDispositivo(dispositivoModels, prefs, options);
-    //   if (responseLiberar.statusCode != 200) return responseLiberar;
-    // }
+        headers: {dispositivo.getHeader(): dispositivo.getHeaderData()});
 
     // Iniciar Sessao do aplicativo
-    //var responseSessaoIniciar = await iniciarSessao(loginViewModel, options);
-    var responseSessaoIniciar = await iniciarSessao(loginViewModel);
+    var responseSessaoIniciar = await iniciarSessao(loginViewModel, options);
     if (responseSessaoIniciar.statusCode != 200) {
       return responseSessaoIniciar;
     }
@@ -54,11 +41,12 @@ class AutenticacaoService {
         : responseSessaoAcessoAoSistema;
   }
 
-  static Future<Response> iniciarSessao(LoginViewModel loginViewModel) async {
+  static Future<Response> iniciarSessao(
+      LoginViewModel loginViewModel, Options options) async {
     var url = ApiServices.concatIntranetUrl("Sessoes/Iniciar");
 
-    var responseIniciarSessao =
-        await RequestsServices.post(url, loginViewModel.toJson());
+    var responseIniciarSessao = await RequestsServices.postOptions(
+        url, loginViewModel.toJson(), options);
 
     return responseIniciarSessao;
   }
@@ -69,10 +57,8 @@ class AutenticacaoService {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['IdSistema'] = ConfiguracoesGlobalUtils.ID_SISTEMA;
 
-    var responseIniciarSessao = await RequestsServices.post(
-      url,
-      data,
-    );
+    var responseIniciarSessao =
+        await RequestsServices.postOptions(url, data, options);
 
     return responseIniciarSessao;
   }

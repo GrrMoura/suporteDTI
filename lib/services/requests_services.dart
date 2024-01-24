@@ -5,7 +5,6 @@ import 'package:dio/dio.dart';
 class RequestsServices {
   static Future<Response> post(String url, Map<String, dynamic>? data) async {
     try {
-      // CancelToken token = CancelToken();
       Dio dio = Dio(BaseOptions(
           connectTimeout: const Duration(seconds: 60),
           receiveTimeout: const Duration(seconds: 60)));

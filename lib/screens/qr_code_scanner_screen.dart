@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
-import 'package:suporte_dti/navegacao/app_screens_string.dart';
+import 'package:suporte_dti/navegacao/app_screens_path.dart';
 import 'package:suporte_dti/utils/app_colors.dart';
 
 class QrCodeScanner extends StatefulWidget {
@@ -15,7 +15,7 @@ class QrCodeScanner extends StatefulWidget {
 }
 
 class _QrCodeScannerState extends State<QrCodeScanner> {
-  String overlayText = "Por favor, escanei QR Code";
+  String overlayText = "Por favor, Escanei o QRCode";
 
   bool isScanCompleted = false;
   String? codigo;

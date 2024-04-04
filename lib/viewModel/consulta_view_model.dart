@@ -2,7 +2,7 @@ class ConsultaViewModel {
   final String tipoConsulta = "";
 
   String? identificacao;
-  bool? ocupado;
+  bool ocupado = false;
 
   ConsultaViewModel({this.identificacao, this.ocupado = false});
 

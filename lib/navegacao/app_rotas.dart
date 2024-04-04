@@ -1,43 +1,58 @@
 import 'package:go_router/go_router.dart';
 import 'package:suporte_dti/controller/home_controller.dart';
-import 'package:suporte_dti/navegacao/app_screens_string.dart';
+import 'package:suporte_dti/navegacao/app_screens_path.dart';
 import 'package:suporte_dti/screens/edite_screen.dart';
 import 'package:suporte_dti/screens/equipamento_detalhe_screen.dart';
+import 'package:suporte_dti/screens/levantamento_escrito_screen.dart';
 import 'package:suporte_dti/screens/login_screen.dart';
 import 'package:suporte_dti/screens/qr_code_resultado_screen.dart';
 import 'package:suporte_dti/screens/resultado_screen.dart';
 import 'package:suporte_dti/screens/search_screen.dart';
 import 'package:suporte_dti/screens/delegacia_resultado_screen.dart';
+import 'package:suporte_dti/viewModel/login_view_model.dart';
 
 class Rotas {
   Rotas();
   static final routers = GoRouter(
-    initialLocation: AppRouterName.login,
+    initialLocation: AppRouterName.levantamentoDigitadoScreen,
     routes: [
       GoRoute(
-        name: 'login',
         path: AppRouterName.login,
         builder: (context, state) => (const LoginScreen()),
       ),
       GoRoute(
-        name: 'homeController',
+        path: AppRouterName.searchScreen,
+        builder: (context, state) => (const SearchScreen(
+          nome: "aaaa",
+        )),
+      ),
+      GoRoute(
         path: AppRouterName.homeController,
-        builder: (context, state) => (const HomeControler()),
+        builder: (context, state) {
+          //LoginViewModel? loginViewModel = state.extra as LoginViewModel;
+          String? nome = state.extra as String;
+          return (HomeControler(nome: nome));
+        },
       ),
       GoRoute(
-        name: 'resultado',
         path: AppRouterName.resultado,
-        builder: (context, state) => (ResultadoScreen()),
+        builder: (context, state) {
+          return ResultadoScreen();
+        },
       ),
       GoRoute(
-        name: 'detalhe',
         path: AppRouterName.detalhe,
         builder: (context, state) => (const EquipamentoDetalhe()),
       ),
       GoRoute(
-        name: 'search',
         path: AppRouterName.search,
-        builder: (context, state) => (const SearchScreen()),
+        builder: (context, state) {
+          // LoginViewModel? loginViewModel = state.extra as LoginViewModel;
+          String? nome = state.extra as String;
+          return (SearchScreen(
+            nome: nome,
+          ));
+        },
       ),
       // GoRoute(
       //   name: 'qrcCodeResult',
@@ -59,11 +74,10 @@ class Rotas {
         path: AppRouterName.updateScreen,
         builder: (context, state) => (UpdateScreen()),
       ),
-      // GoRoute(
-      //   name: 'levantamentoScreen',
-      //   path: AppRouterName.levantamentoScreen,
-      //   builder: (context, state) => (LevantamentoScreen()),
-      // ),
+      GoRoute(
+        path: AppRouterName.levantamentoDigitadoScreen,
+        builder: (context, state) => (LevantamentoDigitado()),
+      ),
     ],
   );
 }

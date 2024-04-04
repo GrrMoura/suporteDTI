@@ -1,12 +1,15 @@
 import 'package:convex_bottom_bar/convex_bottom_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:suporte_dti/screens/login_screen.dart';
 import 'package:suporte_dti/screens/qr_code_scanner_screen.dart';
 import 'package:suporte_dti/screens/search_screen.dart';
 import 'package:suporte_dti/utils/app_colors.dart';
 
 class HomeControler extends StatefulWidget {
-  const HomeControler({super.key});
+  HomeControler({super.key, required this.nome});
+  // final LoginViewModel loginViewModel;
+  late String? nome;
 
   @override
   State<HomeControler> createState() => _HomePageState();
@@ -15,17 +18,27 @@ class HomeControler extends StatefulWidget {
 class _HomePageState extends State<HomeControler> {
   int selectedPage = 0;
 
-  final _pageList = [
-    const SearchScreen(), const QrCodeScanner(),
+  late List<StatefulWidget> pageList = [
+    SearchScreen(nome: widget.nome!),
+    const QrCodeScanner(),
     //const LoginScreen(),
 
     //   const PerfilPage()
   ];
 
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   print("pssei aqui !!!");
+  //   print(widget.nome);
+
+  //   name = widget.nome;
+  // }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: _pageList[selectedPage],
+        body: pageList[selectedPage],
         bottomNavigationBar: StyleProvider(
             style: StyleIconNavigator(),
             child: ConvexAppBar(

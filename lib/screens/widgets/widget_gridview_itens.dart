@@ -15,7 +15,9 @@ class GridviewEquipamentos extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: EdgeInsets.all(8.w),
-      child: GridView.builder(
+      child: 
+      
+      GridView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(

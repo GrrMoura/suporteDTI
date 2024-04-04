@@ -2,10 +2,10 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:suporte_dti/screens/widgets/indicator.dart';
 import 'package:suporte_dti/screens/widgets/widget_gridview_itens.dart';
 import 'package:suporte_dti/utils/app_colors.dart';
 import 'package:suporte_dti/utils/app_styles.dart';
+import 'package:suporte_dti/utils/snack_bar_generic.dart';
 
 class ResultDelegacia extends StatefulWidget {
   const ResultDelegacia({super.key});
@@ -45,147 +45,46 @@ class ResultDelegaciaState extends State {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SizedBox(height: 10.h),
-              Padding(
-                padding: const EdgeInsets.only(left: 8.0),
-                child: Text(
-                  "Quantidade",
-                  style: Styles().titleStyle().copyWith(
-                        color: Colors.black,
-                      ),
-                ),
-              ),
-              Row(
-                children: <Widget>[
-                  Expanded(
-                    child: AspectRatio(
-                      aspectRatio: 1.5,
-                      child: PieChart(
-                        PieChartData(
-                          pieTouchData: PieTouchData(
-                            touchCallback:
-                                (FlTouchEvent event, pieTouchResponse) {
-                              setState(() {
-                                if (!event.isInterestedForInteractions ||
-                                    pieTouchResponse == null ||
-                                    pieTouchResponse.touchedSection == null) {
-                                  touchedIndex = -1;
-                                  return;
-                                }
-                                touchedIndex = pieTouchResponse
-                                    .touchedSection!.touchedSectionIndex;
-                              });
-                            },
-                          ),
-                          borderData: FlBorderData(
-                            show: false,
-                          ),
-                          sectionsSpace: 2,
-                          centerSpaceRadius: 30,
-                          sections: showingSections(),
-                        ),
-                      ),
-                    ),
-                  ),
-                  const Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Indicator(
-                        color: AppColors.contentColorBlue,
-                        text: 'Monitor',
-                        isSquare: true,
-                      ),
-                      SizedBox(
-                        height: 4,
-                      ),
-                      Indicator(
-                        color: AppColors.contentColorYellow,
-                        text: 'CPU',
-                        isSquare: true,
-                      ),
-                      SizedBox(
-                        height: 4,
-                      ),
-                      Indicator(
-                        color: AppColors.contentColorPurple,
-                        text: 'Impressora',
-                        isSquare: true,
-                      ),
-                      SizedBox(
-                        height: 4,
-                      ),
-                      Indicator(
-                        color: AppColors.contentColorGreen,
-                        text: 'Webcam',
-                        isSquare: true,
-                      ),
-                      SizedBox(
-                        height: 4,
-                      ),
-                      Indicator(
-                        color: AppColors.contentColorCyan,
-                        text: 'Nobreak',
-                        isSquare: true,
-                      ),
-                      SizedBox(
-                        height: 4,
-                      ),
-                      Indicator(
-                        color: AppColors.contentColorPink,
-                        text: 'CPU/Servidor',
-                        isSquare: true,
-                      ),
-                      // SizedBox(
-                      //   height: 4,
-                      // ),
-                      // Indicator(
-                      //   color: AppColors.contentColorRed,
-                      //   text: 'Estabilizador',
-                      //   isSquare: true,
-                      // ),
-                      // SizedBox(
-                      //   height: 4,
-                      // ),
-                      // Indicator(
-                      //   color: AppColors.contentColorBlack,
-                      //   text: 'Switch',
-                      //   isSquare: true,
-                      // ),
-                      // SizedBox(
-                      //   height: 4,
-                      // ),
-                      // Indicator(
-                      //   color: AppColors.contentColorOrange,
-                      //   text: 'Scanner',
-                      //   isSquare: true,
-                      // ),
-                      // SizedBox(
-                    ],
-                  ),
-                  const SizedBox(width: 28),
+              const Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Titulos(nome: "  Levantamentos  "),
+                  addBotao(),
                 ],
               ),
-              Padding(
-                padding: EdgeInsets.only(top: 15.h, left: 10.w, right: 15.w),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      "Equipamentos",
-                      style:
-                          Styles().titleStyle().copyWith(color: Colors.black),
-                    ),
-                    IconButton(
-                        onPressed: () {},
-                        icon: Icon(
-                          Icons.filter_alt,
-                          size: 25.sp,
-                          color: Colors.black,
-                        ))
+              Container(
+                height: 350.h,
+                child: ListView(
+                  children: const [
+                    DelegaciasCardLevantamento(
+                        nome: "Juan Matos Silva",
+                        id: "02",
+                        data: "12/10/2023",
+                        delegacia: "Delegacia de Capela"),
+                    DelegaciasCardLevantamento(
+                        nome: "Juan Matos Silva",
+                        id: "01",
+                        data: "12/10/2023",
+                        delegacia: "Delegacia de Capela"),
+                    DelegaciasCardLevantamento(
+                        nome: "Juan Matos Silva",
+                        id: "02",
+                        data: "12/10/2023",
+                        delegacia: "Delegacia de Capela"),
+                    DelegaciasCardLevantamento(
+                        nome: "Juan Matos Silva",
+                        id: "01",
+                        data: "12/10/2023",
+                        delegacia: "Delegacia de Capela"),
+                    DelegaciasCardLevantamento(
+                        nome: "Juan Matos Silva",
+                        id: "02",
+                        data: "12/10/2023",
+                        delegacia: "Delegacia de Capela"),
                   ],
                 ),
               ),
+              Titulos(nome: "  Equipamentos  "),
               GridviewEquipamentos(
                 myProducts: myProducts2,
                 widget: const CardItensDelegacia(
@@ -198,150 +97,194 @@ class ResultDelegaciaState extends State {
           ),
         ));
   }
+}
 
-  List<PieChartSectionData> showingSections() {
-    return List.generate(6, (i) {
-      final isTouched = i == touchedIndex;
-      final fontSize = isTouched ? 25.0 : 16.0;
-      final radius = isTouched ? 60.0 : 50.0;
-      const shadows = [Shadow(color: Colors.black, blurRadius: 2)];
-      switch (i) {
-        case 0:
-          return PieChartSectionData(
-            //CPU
-            color: AppColors.contentColorYellow,
-            value: 6,
-            title: '6',
-            radius: radius,
-            titleStyle: TextStyle(
-              fontSize: fontSize,
-              fontWeight: FontWeight.bold,
-              color: AppColors.mainTextColor1,
-              shadows: shadows,
+class addBotao extends StatelessWidget {
+  const addBotao({super.key});
+// Função que mostra o AlertDialog com imagens como botões
+  void mostrarAlertaComImagens(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Colors.white,
+          title: Center(child: Text('Forma de criação')),
+          content: Text('Selecione como quer iniciar.'),
+          actions: <Widget>[
+            // Botão com imagem 1
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                Container(
+                  height: 85,
+                  width: 85,
+                  child: InkWell(
+                    onTap: () {
+                      // Ação para a imagem 1
+                      Navigator.of(context).pop();
+                    },
+                    child: Image.asset(
+                      'assets/images/teclado.png',
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
+                Container(
+                  width: 90,
+                  child: InkWell(
+                    onTap: () {
+                      // Ação para a imagem 2
+                      Navigator.of(context).pop();
+                    },
+                    child: Image.asset('assets/images/qrCode.png'),
+                  ),
+                ),
+              ],
             ),
-          );
-        case 1:
-          return PieChartSectionData(
-            //MONITOR
-            color: AppColors.contentColorBlue,
-            value: 5,
-            title: '5',
-            radius: radius,
-            titleStyle: TextStyle(
-              fontSize: fontSize,
-              fontWeight: FontWeight.bold,
-              color: AppColors.mainTextColor1,
-              shadows: shadows,
+            // Botão com imagem 2
+          ],
+        );
+      },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      highlightColor: Colors.transparent,
+      splashColor: Colors.transparent,
+      onTap: () {
+        mostrarAlertaComImagens(context);
+      },
+      child: Padding(
+        padding: EdgeInsets.only(right: 20.w),
+        child: Container(
+          height: 30.h,
+          width: 30.w,
+          decoration: const BoxDecoration(
+              color: AppColors.cSecondaryColor,
+              boxShadow: [
+                BoxShadow(
+                    color: Colors.black54,
+                    offset: Offset(0.0, 2.0), //(x,y)
+                    blurRadius: 6.0)
+              ],
+              shape: BoxShape.circle,
+              image: DecorationImage(
+                  image: AssetImage("assets/images/add.png"),
+                  colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                  fit: BoxFit.contain)),
+        ),
+      ),
+    );
+  }
+}
+
+class DelegaciasCardLevantamento extends StatelessWidget {
+  const DelegaciasCardLevantamento({
+    super.key,
+    required this.nome,
+    required this.id,
+    required this.data,
+    required this.delegacia,
+  });
+
+  final String nome;
+  final String id;
+  final String data;
+  final String delegacia;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 5.h, horizontal: 10.w),
+      child: Material(
+        borderRadius: id == "02"
+            ? const BorderRadius.only(
+                topLeft: Radius.circular(40), topRight: Radius.circular(40))
+            : const BorderRadius.only(
+                bottomLeft: Radius.circular(40),
+                bottomRight: Radius.circular(40)),
+        elevation: 5,
+        color: id == "02"
+            ? AppColors.cSecondaryColor
+            : AppColors.cSecondaryColor.withOpacity(0.8),
+        child: Column(
+          children: [
+            Padding(
+              padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 20.w),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    id,
+                    style:
+                        Styles().DescriptionDelegaciasLevantamentoTextStyle(),
+                  ),
+                  Text(
+                    delegacia,
+                    style: Styles()
+                        .mediumTextStyle()
+                        .copyWith(color: AppColors.cWhiteColor),
+                  ),
+                  const Icon(Icons.remove_red_eye, color: Colors.white70)
+                ],
+              ),
             ),
-          );
-        case 2:
-          return PieChartSectionData(
-            color: AppColors.contentColorPurple,
-            value: 1,
-            title: '1',
-            radius: radius,
-            titleStyle: TextStyle(
-              fontSize: fontSize,
-              fontWeight: FontWeight.bold,
-              color: AppColors.mainTextColor1,
-              shadows: shadows,
+            Padding(
+              padding: EdgeInsets.only(top: 10.h, bottom: 10.h, right: 20.w),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  Text(
+                    data,
+                    style:
+                        Styles().DescriptionDelegaciasLevantamentoTextStyle(),
+                  ),
+                  Text(
+                    nome,
+                    style:
+                        Styles().DescriptionDelegaciasLevantamentoTextStyle(),
+                  ),
+                ],
+              ),
             ),
-          );
-        case 3:
-          return PieChartSectionData(
-            color: AppColors.contentColorGreen,
-            value: 5,
-            title: '5',
-            radius: radius,
-            titleStyle: TextStyle(
-              fontSize: fontSize,
-              fontWeight: FontWeight.bold,
-              color: AppColors.mainTextColor1,
-              shadows: shadows,
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class Titulos extends StatelessWidget {
+  const Titulos({required this.nome, super.key});
+  final String nome;
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.only(top: 10.h, bottom: 10.h),
+      child: IntrinsicWidth(
+        child: Container(
+          decoration: const BoxDecoration(
+            color: Colors.green,
+            borderRadius: BorderRadius.only(
+              topRight: Radius.circular(10),
+              bottomRight: Radius.circular(10),
             ),
-          );
-        case 4:
-          return PieChartSectionData(
-            color: AppColors.contentColorCyan,
-            value: 6,
-            title: '6',
-            radius: radius,
-            titleStyle: TextStyle(
-              fontSize: fontSize,
-              fontWeight: FontWeight.bold,
-              color: AppColors.mainTextColor1,
-              shadows: shadows,
-            ),
-          );
-        case 5:
-          return PieChartSectionData(
-            color: AppColors.contentColorPink,
-            value: 1,
-            title: '1',
-            radius: radius,
-            titleStyle: TextStyle(
-              fontSize: fontSize,
-              fontWeight: FontWeight.bold,
-              color: AppColors.mainTextColor1,
-              shadows: shadows,
-            ),
-          );
-        case 6:
-          return PieChartSectionData(
-            color: AppColors.contentColorBlue,
-            value: 40,
-            title: '40%',
-            radius: radius,
-            titleStyle: TextStyle(
-              fontSize: fontSize,
-              fontWeight: FontWeight.bold,
-              color: AppColors.mainTextColor1,
-              shadows: shadows,
-            ),
-          );
-        case 7:
-          return PieChartSectionData(
-            color: AppColors.contentColorBlue,
-            value: 40,
-            title: '40%',
-            radius: radius,
-            titleStyle: TextStyle(
-              fontSize: fontSize,
-              fontWeight: FontWeight.bold,
-              color: AppColors.mainTextColor1,
-              shadows: shadows,
-            ),
-          );
-        // case 0:
-        //   return PieChartSectionData(
-        //     color: AppColors.contentColorBlue,
-        //     value: 40,
-        //     title: '40%',
-        //     radius: radius,
-        //     titleStyle: TextStyle(
-        //       fontSize: fontSize,
-        //       fontWeight: FontWeight.bold,
-        //       color: AppColors.mainTextColor1,
-        //       shadows: shadows,
-        //     ),
-        //   );
-        // case 0:
-        //   return PieChartSectionData(
-        //     color: AppColors.contentColorBlue,
-        //     value: 40,
-        //     title: '40%',
-        //     radius: radius,
-        //     titleStyle: TextStyle(
-        //       fontSize: fontSize,
-        //       fontWeight: FontWeight.bold,
-        //       color: AppColors.mainTextColor1,
-        //       shadows: shadows,
-        //     ),
-        //   );
-        default:
-          throw Error();
-      }
-    });
+          ),
+          child: Row(
+            children: [
+              Icon(Icons.fiber_manual_record, size: 12.sp),
+              Text(
+                nome,
+                style: Styles().mediumTextStyle().copyWith(color: Colors.black),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }
 
@@ -361,13 +304,10 @@ class _CardItensDelegaciaState extends State<CardItensDelegacia> {
     return GestureDetector(
       onLongPress: () {
         Clipboard.setData(ClipboardData(text: widget.patrimonio!));
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            backgroundColor: Colors.orange,
-            content: Text(
-              "copiado para area de transferencia",
-              style: Styles().mediumTextStyle(),
-            )));
-        // copied successfully
+        Generic.snackBar(
+            color: AppColors.cSecondaryColor,
+            context: context,
+            conteudo: "Copiado para área de transferência!");
       },
       child: Material(
         color: AppColors.cWhiteColor,

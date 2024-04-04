@@ -3,10 +3,11 @@ import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:suporte_dti/model/equipamentos_model.dart';
-import 'package:suporte_dti/navegacao/app_screens_string.dart';
+import 'package:suporte_dti/navegacao/app_screens_path.dart';
 import 'package:suporte_dti/screens/widgets/widget_gridview_itens.dart';
 import 'package:suporte_dti/utils/app_colors.dart';
 import 'package:suporte_dti/utils/app_styles.dart';
+import 'package:suporte_dti/utils/snack_bar_generic.dart';
 
 class ResultadoScreen extends StatelessWidget {
   ResultadoScreen({super.key, this.model});
@@ -132,13 +133,11 @@ class CardEquipamentosResultado extends StatelessWidget {
       //TODO colocar a opção de escolher qual o dado que quer copiar
       onLongPress: () {
         Clipboard.setData(ClipboardData(text: patrimonio!));
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            backgroundColor: Colors.orange,
-            content: Text(
-              "copiado para area de transferencia",
-              style: Styles().mediumTextStyle(),
-            )));
-        // copied successfully
+        Generic.snackBar(
+            color: Colors.blue,
+            context: context,
+            conteudo: "Copiado para área de transferência",
+            barBehavior: SnackBarBehavior.floating);
       },
       child: Material(
         color: AppColors.cWhiteColor,

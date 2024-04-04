@@ -57,6 +57,15 @@ class Styles {
         letterSpacing: AppDimens.espacamentoPequeno);
   }
 
+  TextStyle DescriptionDelegaciasLevantamentoTextStyle() {
+    return TextStyle(
+        color: Colors.white70,
+        fontSize: AppDimens.smallTextSize,
+        fontFamily: AppFonts.poppinsRegular,
+        fontWeight: FontWeight.w400,
+        letterSpacing: AppDimens.espacamentoPequeno);
+  }
+
   TextStyle titleDetail() {
     return const TextStyle(
         fontStyle: FontStyle.normal,

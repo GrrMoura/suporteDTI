@@ -1,4 +1,4 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
+// ignore_for_file: public_member_api_docs, sort_constructors_first, no_leading_underscores_for_local_identifiers
 import 'dart:convert';
 import 'dart:io';
 
@@ -14,16 +14,22 @@ import 'package:suporte_dti/data/delegacia_data.dart';
 import 'package:suporte_dti/data/equipamentos_data.dart';
 import 'package:suporte_dti/model/equipamentos_historico_model.dart';
 import 'package:suporte_dti/model/equipamentos_model.dart';
-import 'package:suporte_dti/navegacao/app_screens_string.dart';
+import 'package:suporte_dti/navegacao/app_screens_path.dart';
+import 'package:suporte_dti/screens/widgets/loading_default.dart';
+import 'package:suporte_dti/services/requests_services.dart';
 import 'package:suporte_dti/services/sqlite_service.dart';
 import 'package:suporte_dti/utils/app_colors.dart';
 import 'package:suporte_dti/utils/app_styles.dart';
+import 'package:suporte_dti/utils/snack_bar_generic.dart';
 import 'package:suporte_dti/viewModel/consulta_view_model.dart';
+import 'package:suporte_dti/viewModel/login_view_model.dart';
 
 import '../model/delegacia_model.dart';
 
 class SearchScreen extends StatefulWidget {
-  const SearchScreen({super.key});
+  const SearchScreen({super.key, required this.nome});
+
+  final String nome;
 
   @override
   State<SearchScreen> createState() => _SearchScreenState();
@@ -36,11 +42,13 @@ class _SearchScreenState extends State<SearchScreen> {
   EquipamentosHistoricoModel historicoModel = EquipamentosHistoricoModel();
   ConsultaViewModel? model = ConsultaViewModel();
 
+  late String name, cpf;
+
   SqliteService db = SqliteService();
   // ignore: prefer_typing_uninitialized_variables
   EquipamentosHistoricoModel? teste;
 
-  String? semFoto = "assets/images/semfoto.png";
+  String? semFoto = "assets/images/semfotos.png";
   Uint8List? bytes;
   bool temFoto = false;
 
@@ -49,6 +57,7 @@ class _SearchScreenState extends State<SearchScreen> {
     super.initState();
 
     pegarFoto();
+    pegarIdentificacao();
 
     delegaciaList = delegaciaData;
     todosOsEquipamentos = equipamentosData;
@@ -59,6 +68,16 @@ class _SearchScreenState extends State<SearchScreen> {
         tag: "BH2239",
         tipo: "monitor",
         lotacao: "ARACAJU");
+  }
+
+  void pegarIdentificacao() {
+    String informacoes = widget.nome;
+
+    List names = informacoes.split(' ');
+    String _nome = "${names[0]} ${names[1]}";
+    String _cpf = "${names[2]}";
+    name = _nome;
+    cpf = _cpf;
   }
 
   pegarFoto() async {
@@ -93,33 +112,40 @@ class _SearchScreenState extends State<SearchScreen> {
   @override
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
+    double width = MediaQuery.of(context).size.width;
 
-    return Scaffold(
-      backgroundColor: AppColors.cPrimaryColor,
-      body: SizedBox(
-        height: height,
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              heading(),
-              FastSearch(delegaciaList: delegaciaList),
-              searchBar(context),
-              SizedBox(height: 25.h),
-              builderHistorico(),
-            ],
-          ),
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(onPressed: () async {
-        SharedPreferences preferences = await SharedPreferences.getInstance();
-        await preferences.clear();
-        // db.add(teste!);
-        // setState(() {});
-      }),
-    );
+    return model!.ocupado == false
+        ? Scaffold(
+            backgroundColor: AppColors.cPrimaryColor,
+            body: SizedBox(
+              height: height,
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    heading(),
+                    FastSearch(delegaciaList: delegaciaList),
+                    searchBar(context, model!.ocupado),
+                    SizedBox(height: 25.h),
+                    builderHistorico(),
+                  ],
+                ),
+              ),
+            ),
+            floatingActionButton: FloatingActionButton(onPressed: () async {
+              model!.identificacao = "123";
+              await RequestsServices.post(
+                  "http://intradev.ssp.gov-se/SISTEMA/SGIDTIv3/Equipamentos",
+                  model?.toJson());
+              // // SharedPreferences preferences = await SharedPreferences.getInstance();
+              // // await preferences.clear();
+              // db.add(teste!);
+              // setState(() {});
+            }),
+          )
+        : const LoadingDefault();
   }
 
-  Padding searchBar(BuildContext context) {
+  Padding searchBar(BuildContext context, bool ocupado) {
     return Padding(
       padding: EdgeInsets.only(top: 15.h, left: 10.w, right: 10.w),
       child: Container(
@@ -134,12 +160,15 @@ class _SearchScreenState extends State<SearchScreen> {
           textInputAction: TextInputAction.search,
           onFieldSubmitted: ((value) {
             if (value.isNotEmpty) {
+              model!.identificacao = value;
               consultaController.consultar(context, model!).then((value) {
                 setState(() {});
               });
             } else {
-              ScaffoldMessenger.of(context)
-                  .showSnackBar(const SnackBar(content: Text("TA VAIZO")));
+              Generic.snackBar(
+                  context: context,
+                  conteudo: "O campo \"pesquisa\" precisa ser preenchido!",
+                  barBehavior: SnackBarBehavior.floating);
             }
           }),
           decoration: InputDecoration(
@@ -180,12 +209,12 @@ class _SearchScreenState extends State<SearchScreen> {
                         return GestureDetector(
                           onLongPress: () {
                             Clipboard.setData(ClipboardData(text: patrimonio));
-                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                backgroundColor: Colors.orange,
-                                content: Text(
-                                  "copiado para area de transferencia",
-                                  style: Styles().mediumTextStyle(),
-                                )));
+
+                            Generic.snackBar(
+                                context: context,
+                                conteudo: "Copiado para área de transferência",
+                                color: Colors.blue,
+                                barBehavior: SnackBarBehavior.floating);
                           },
                           child: Padding(
                             padding: EdgeInsets.fromLTRB(8.w, 10.h, 8.w, 5.h),
@@ -273,19 +302,16 @@ class _SearchScreenState extends State<SearchScreen> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(
-                      "Fabiana Maria",
-                      style: Styles().titleStyle(),
+                    FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(
+                        "${name}",
+                        style: Styles().titleStyle().copyWith(
+                            fontSize: name.length >= 17 ? 16.sp : 22.sp),
+                      ),
                     ),
                     Row(
-                      children: [
-                        Text("DESENVOLVEDORA", style: Styles().subTitleStyle()),
-                        Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 2.w),
-                          child: Text("-", style: Styles().subTitleStyle()),
-                        ),
-                        Text("1023322", style: Styles().subTitleStyle())
-                      ],
+                      children: [Text(cpf, style: Styles().subTitleStyle())],
                     )
                   ],
                 ),
@@ -315,17 +341,62 @@ class FastSearch extends StatelessWidget {
         height: 107.h,
         width: double.infinity,
         child: ListView.builder(
-          itemCount: delegaciaList.length,
+          itemCount: delegaciaList.length + 1,
           itemBuilder: (context, index) {
-            final delegacia = delegaciaList[index];
-
-            return DelegaciasIcones(
-                path: delegacia.path,
-                id: delegacia.id,
-                name: delegacia.name,
-                region: delegacia.region);
+            if (index < delegaciaList.length) {
+              final delegacia = delegaciaList[index];
+              return DelegaciasIcones(
+                  path: delegacia.path,
+                  id: delegacia.id,
+                  name: delegacia.name,
+                  region: delegacia.region);
+            } else {
+              return PesquisarDelegacias();
+            }
           },
           scrollDirection: Axis.horizontal,
+        ),
+      ),
+    );
+  }
+}
+
+class PesquisarDelegacias extends StatelessWidget {
+  const PesquisarDelegacias({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 5),
+      child: InkWell(
+        onTap: () {
+          context.push(AppRouterName.resultDelegacias);
+        },
+        child: Column(
+          children: [
+            Container(
+              height: 80.h,
+              width: 80.w,
+              decoration: const BoxDecoration(
+                  color: AppColors.cSecondaryColor,
+                  boxShadow: [
+                    BoxShadow(
+                        color: Colors.black54,
+                        offset: Offset(0.0, 2.0), //(x,y)
+                        blurRadius: 6.0)
+                  ],
+                  shape: BoxShape.circle,
+                  image: DecorationImage(
+                      image: AssetImage("assets/images/add.png"),
+                      colorFilter:
+                          ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                      fit: BoxFit.contain)),
+            ),
+            SizedBox(height: 5.h),
+            Text("OUTRA", style: Styles().smallTextStyle())
+          ],
         ),
       ),
     );
@@ -349,13 +420,10 @@ class _CardUltimasConsultasState extends State<CardUltimasConsultas> {
     return GestureDetector(
       onLongPress: () {
         Clipboard.setData(ClipboardData(text: widget.patrimonio!));
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            backgroundColor: Colors.orange,
-            content: Text(
-              "copiado para area de transferencia",
-              style: Styles().mediumTextStyle(),
-            )));
-        // copied successfully
+        Generic.snackBar(
+            context: context,
+            conteudo: "Copiado para área de transferência",
+            barBehavior: SnackBarBehavior.floating);
       },
       child: Padding(
         padding: EdgeInsets.fromLTRB(8.w, 10.h, 8.w, 0),
@@ -384,9 +452,7 @@ class _CardUltimasConsultasState extends State<CardUltimasConsultas> {
                 Image.asset("assets/images/impressora.png", height: 70.h),
                 Text(widget.patrimonio!, style: Styles().smallTextStyle()),
                 Text(widget.lotacao!, style: Styles().hintTextStyle()),
-                SizedBox(
-                  height: 3.h,
-                )
+                SizedBox(height: 3.h),
               ],
             ),
           ),
@@ -439,58 +505,6 @@ class DelegaciasIcones extends StatelessWidget {
             SizedBox(height: 5.h),
             Text(name!, style: Styles().smallTextStyle())
           ],
-        ),
-      ),
-    );
-  }
-}
-
-class SearchBar2 extends StatefulWidget {
-  const SearchBar2({super.key});
-
-  @override
-  // ignore: library_private_types_in_public_api
-  _SearchBarState createState() => _SearchBarState();
-}
-
-class _SearchBarState extends State<SearchBar2> {
-  SqliteService db = SqliteService();
-  String? query = '';
-
-  void onQueryChanged(String newQuery) {
-    setState(() {
-      query = newQuery;
-    });
-  }
-
-  void addEquipamento(EquipamentosHistoricoModel equipamento) {
-    db.add(equipamento);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.only(top: 15.h, left: 10.w, right: 10.w),
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
-          color: AppColors.cSecondaryColor,
-        ),
-        padding: const EdgeInsets.all(8),
-        child: TextField(
-          style: Styles().mediumTextStyle(),
-          onSubmitted: (value) {},
-          // onChanged: onQueryChanged,
-          decoration: InputDecoration(
-            fillColor: AppColors.cWhiteColor,
-            filled: true,
-            isDense: true,
-            hintText: 'Patrimônio, Marca, Tipo, Modelo, Tag...',
-            hintStyle: Styles().hintTextStyle(),
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(30)),
-            prefixIcon: Icon(Icons.search,
-                size: 25.sp, color: AppColors.cDescriptionIconColor),
-          ),
         ),
       ),
     );

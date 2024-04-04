@@ -4,8 +4,11 @@ class ApiServices {
   //produção
   static const String intranetUrl =
       "https://intranet.ssp.se.gov.br/API/Intranet/";
+  // static const String suporteDti =
+  //     "https://intranet.ssp.se.gov.br/API/sgi/dti/v3";
+
   static const String suporteDti =
-      "https://intranet.ssp.se.gov.br/API/sgi/dti/v3";
+      "https://intranet.ssp.se.gov.br/API/sgi/dti/v3/sGIDTI/Equipamentos/Cadastrados";
 
   //maquina local
   // static final String intranetUrl = "http://10.10.1.71:3071/";

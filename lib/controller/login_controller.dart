@@ -10,15 +10,15 @@ import 'package:suporte_dti/viewModel/login_view_model.dart';
 
 class LoginController {
   static final LocalAuthentication _localAuth = LocalAuthentication();
-  static LoginViewModel? model = LoginViewModel();
+
   static bool deviceSupported = false;
 
   static final _autenticacaoController = AutenticacaoController();
 
-  static Future<void> loginBiometrico(BuildContext context) async {
+  static Future<void> loginBiometrico(BuildContext context,
+      {required LoginViewModel model}) async {
     bool authenticated = false;
     try {
-      //   Loader.show(context);
       authenticated = await _localAuth.authenticate(
           options: const AuthenticationOptions(
               biometricOnly: true, stickyAuth: true, useErrorDialogs: true),
@@ -27,15 +27,17 @@ class LoginController {
       if (authenticated) {
         SharedPreferences prefs = await SharedPreferences.getInstance();
 
-        model!.login = prefs.getString("cpf") ?? "000.000.00.00";
-        model!.senha = prefs.getString("senha") ?? "000001";
-        model!.leitorBiometrico = prefs.getBool("leitorBiometrico") ?? true;
+        model.login = prefs.getString("cpf") ?? "000.000.00.00";
+        model.senha = prefs.getString("senha") ?? "000001";
+        model.leitorBiometrico = prefs.getBool("leitorBiometrico") ?? true;
 
-        _autenticacaoController.logar(context, model!).then((value) {
+        _autenticacaoController.logar(context, model).then((value) {
+          return model.ocupado = false;
+
           //     return Loader.hide();
         });
       } else {
-        //    Loader.hide();
+        model.ocupado = false;
       }
     } on PlatformException catch (e) {
       developer.log("Erro no método loginBiometrico em loginController ",
@@ -48,7 +50,6 @@ class LoginController {
           backgroundColor: AppColors.cErrorColor);
 
       ///  Loader.hide();
-      return null;
     }
   }
 

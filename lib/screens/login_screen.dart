@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -8,6 +10,7 @@ import 'package:suporte_dti/utils/app_colors.dart';
 import 'package:suporte_dti/utils/app_mask.dart';
 import 'package:suporte_dti/utils/app_styles.dart';
 import 'package:suporte_dti/utils/app_validator.dart';
+import 'package:suporte_dti/utils/snack_bar_generic.dart';
 import 'package:suporte_dti/viewModel/login_view_model.dart';
 import 'dart:developer' as developer;
 
@@ -19,39 +22,39 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  //final _formKey = GlobalKey<FormState>();
-
   TextEditingController usuarioCtrl = TextEditingController();
   TextEditingController passController = TextEditingController();
   LoginViewModel loginViewModel = LoginViewModel();
-  late AutenticacaoController _autenticacaoController =
-      AutenticacaoController();
-  bool isOcupado = false;
 
-  var isShowPass = false;
+  late AutenticacaoController autenticacaoController = AutenticacaoController();
+
+  bool isOcupado = false;
+  bool isShowPass = true;
 
   @override
   void initState() {
     super.initState();
 
-    // _login();
+    login();
   }
 
-  Future<void> _login() async {
+  Future<void> login() async {
     try {
       SharedPreferences prefes = await SharedPreferences.getInstance();
 
-      bool isEntrarComBiometria = prefes.getBool("leitorBiometrico") ?? true;
+      bool isEntrarComBiometria = prefes.getBool("leitorBiometrico") ?? false;
       loginViewModel.leitorBiometrico = isEntrarComBiometria;
       bool lembrarMe = prefes.getBool("lembrar_me") ?? false;
       String usuario = prefes.getString("cpf") ?? "";
-      //  loginViewModel.token = (await FirebaseMessaging.instance.getToken())!;
       loginViewModel.lembrarMe = lembrarMe;
 
       setState(() {});
 
       if (isEntrarComBiometria) {
-        LoginController.loginBiometrico(context);
+        loginViewModel.ocupado = true;
+
+        await LoginController.loginBiometrico(context, model: loginViewModel);
+        setState(() {});
         if (lembrarMe) {
           usuarioCtrl.text = usuario;
         }
@@ -59,7 +62,9 @@ class _LoginScreenState extends State<LoginScreen> {
         usuarioCtrl.text = usuario;
       }
     } catch (e) {
-      //  Loader.hide();
+      loginViewModel.ocupado = false;
+
+      setState(() {});
       developer.log("Não foi possível realizar o login", name: "Erro de login");
       return;
     }
@@ -130,6 +135,61 @@ class _LoginScreenState extends State<LoginScreen> {
                             ],
                           )),
                       Positioned(
+                          top: 450.h,
+                          bottom: 60.h,
+                          left: 30.w,
+                          right: 40.w,
+                          child: Row(
+                            children: [
+                              Transform.scale(
+                                scale: 0.7,
+                                child: Switch(
+                                    activeColor: AppColors.cWhiteColor,
+                                    activeTrackColor: AppColors.cSecondaryColor,
+                                    value: loginViewModel.leitorBiometrico ??
+                                        false,
+                                    onChanged: (value) async {
+                                      loginViewModel.leitorBiometrico = value;
+                                      setState(() {});
+                                      testarBiometria(value);
+                                    }),
+                              ),
+                              SizedBox(width: 3.w),
+                              Text(
+                                "Biometria",
+                                style: Styles().smallTextStyle(),
+                              ),
+                              Expanded(child: SizedBox(width: 1.w)),
+                              Transform.scale(
+                                scale: 0.7,
+                                child: Switch(
+                                    activeColor: AppColors.cWhiteColor,
+                                    activeTrackColor: AppColors.cSecondaryColor,
+                                    value: loginViewModel.lembrarMe ?? false,
+                                    onChanged: (value) async {
+                                      SharedPreferences prefes =
+                                          await SharedPreferences.getInstance();
+                                      prefes.setBool("lembrar_me", value);
+                                      loginViewModel.lembrarMe = value;
+
+                                      if (value) {
+                                        Generic.snackBar(
+                                            color: Colors.blue,
+                                            context: context,
+                                            conteudo:
+                                                'Seu usuário será lembrado no próximo login.');
+                                      }
+                                      setState(() {});
+                                    }),
+                              ),
+                              SizedBox(width: 3.w),
+                              Text(
+                                "Lembrar-me",
+                                style: Styles().smallTextStyle(),
+                              ),
+                            ],
+                          )),
+                      Positioned(
                           key: const Key("botaoEntrar"),
                           top: 580.h,
                           bottom: 60.h,
@@ -146,8 +206,16 @@ class _LoginScreenState extends State<LoginScreen> {
 
   ElevatedButton bottonEnter(BuildContext context) {
     return ElevatedButton(
-      onPressed: () {
-        validateUserAndSenhaTextfield(usuarioCtrl.text, passController.text);
+      onPressed: () async {
+        if (validateUserAndSenhaTextfield(
+            usuarioCtrl.text, passController.text)) {
+          setState(() {});
+          await autenticacaoController
+              .logar(context, loginViewModel)
+              .then((value) {
+            setState(() {});
+          });
+        } else {}
       },
       style: ElevatedButton.styleFrom(
         backgroundColor: AppColors.cSecondaryColor,
@@ -193,21 +261,27 @@ class _LoginScreenState extends State<LoginScreen> {
         SizedBox(
           width: 230.w,
           child: TextFormField(
+            controller: passController,
             onChanged: (newValue) {
               passController.text = newValue;
             },
+            keyboardType: TextInputType.visiblePassword,
             style: TextStyle(fontSize: 15.sp),
-            obscureText: true,
+            obscureText: isShowPass,
             decoration: InputDecoration(
               filled: true,
               fillColor: Colors.black.withOpacity(0.1),
               isDense: true,
               contentPadding: const EdgeInsets.fromLTRB(10, 15, 10, 0),
               errorStyle: TextStyle(fontSize: 10.sp),
-              suffixIcon: Icon(Icons.remove_red_eye, size: 18.sp),
+              suffixIcon: IconButton(
+                icon: Icon(Icons.remove_red_eye_outlined, size: 18.sp),
+                onPressed: () {
+                  isShowPass = !isShowPass;
+                  setState(() {});
+                },
+              ),
               prefixIcon: Icon(Icons.lock, size: 18.sp),
-              hintText: "********",
-              hintStyle: TextStyle(fontSize: 12.sp),
               border: const OutlineInputBorder(
                 borderRadius: BorderRadius.all(Radius.circular(20)),
               ),
@@ -229,17 +303,17 @@ class _LoginScreenState extends State<LoginScreen> {
         SizedBox(
           width: 230.w,
           child: TextFormField(
+            controller: usuarioCtrl,
             style: TextStyle(fontSize: 14.sp),
             onChanged: (newValue) {
               usuarioCtrl.text = newValue;
             },
+            textInputAction: TextInputAction.next,
             inputFormatters: [MaskUtils.maskFormatterCpf()],
             keyboardType: TextInputType.text,
             decoration: InputDecoration(
               suffixIcon:
                   Icon(Icons.lock, size: 18.sp, color: Colors.transparent),
-              hintText: "111.222.333-44",
-              hintStyle: TextStyle(fontSize: 12.sp),
               isDense: true,
               contentPadding: EdgeInsets.fromLTRB(10.w, 15.h, 10.w, 0),
               filled: true,
@@ -254,48 +328,58 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  validateUserAndSenhaTextfield(String cpf, String senha) {
+  bool validateUserAndSenhaTextfield(String cpf, String senha) {
     if (cpf.isEmpty) {
-      return ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text(
-              'O campo "CPF" precisa ser preenchido',
-              style: Styles().errorTextStyle(),
-            ),
-            backgroundColor: AppColors.cErrorColor),
-      );
+      return Generic.snackBar(
+          context: context, conteudo: 'O campo "CPF" precisa ser preenchido');
     } else if (!Validador.cpfIsValid(cpf)) {
-      print(Validador.cpfIsValid(cpf));
-      return ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text(
-            'CPF inválido',
-            style: Styles().errorTextStyle(),
-          ),
-          backgroundColor: AppColors.cErrorColor));
+      return Generic.snackBar(context: context, conteudo: 'CPF inválido');
     }
 
     if (senha.isEmpty) {
-      return ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text(
-            'O campo "senha" precisa ser preenchido',
-            style: Styles().errorTextStyle(),
-          ),
-          backgroundColor: AppColors.cErrorColor));
+      return Generic.snackBar(
+          context: context, conteudo: 'O campo "senha" precisa ser preenchido');
     } else if (senha.length < 8) {
-      return ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text(
-            'O campo "senha" está muito curto! Entre 8 e 20 caracteres',
-            style: Styles().errorTextStyle(),
-          ),
-          backgroundColor: AppColors.cErrorColor));
+      return Generic.snackBar(
+          context: context,
+          conteudo:
+              'O campo "senha" está muito curto! Entre 8 e 20 caracteres');
     }
 
-    loginViewModel.login = cpf;
-    loginViewModel.senha = senha;
+    // loginViewModel.login = cpf;
+    // loginViewModel.senha = senha;
+    loginViewModel.login = '093.472.924-78';
+    loginViewModel.senha = "Muebom10";
     loginViewModel.ocupado = true;
-    setState(() {});
-    _autenticacaoController.logar(context, loginViewModel).then((value) {
-      setState(() {});
-    });
+
+    return true;
+  }
+
+  Future<void> testarBiometria(bool value) async {
+    if (value) {
+      bool funciona =
+          await LoginController.testandoSeBiometriaFunciona(context);
+      if (funciona) {
+        Generic.snackBar(
+            context: context,
+            conteudo: "O leitor biométrico será utilizado no próximo login.",
+            color: Colors.blue);
+      } else {
+        Generic.snackBar(
+            context: context,
+            conteudo:
+                "Desculpe. Seu dispositivo não suporta leitura biométrica.");
+
+        await Future.delayed(const Duration(seconds: 2)).then((_) => {
+              setState(() {
+                loginViewModel.leitorBiometrico = false;
+
+                LoginController.setValorDaOpcaoDeLeituraBiometrica(false);
+              })
+            });
+      }
+    } else {
+      LoginController.setValorDaOpcaoDeLeituraBiometrica(value);
+    }
   }
 }

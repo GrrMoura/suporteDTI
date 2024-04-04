@@ -8,10 +8,11 @@ import 'package:go_router/go_router.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:screenshot/screenshot.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:suporte_dti/navegacao/app_screens_string.dart';
+import 'package:suporte_dti/navegacao/app_screens_path.dart';
 import 'package:suporte_dti/screens/equipamento_detalhe_screen.dart';
 import 'package:suporte_dti/utils/app_colors.dart';
 import 'package:suporte_dti/utils/app_styles.dart';
+import 'package:suporte_dti/utils/snack_bar_generic.dart';
 
 class QrCodeResult extends StatefulWidget {
   const QrCodeResult({super.key});
@@ -251,14 +252,11 @@ class ButtonScanResult extends StatelessWidget {
           onPressed: () {
             switch (type) {
               case "Consultar":
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                      content: Text(
-                        'Consultar para saber se existe mesmo esse produto',
-                        style: Styles().errorTextStyle(),
-                      ),
-                      backgroundColor: AppColors.cErrorColor),
-                );
+                Generic.snackBar(
+                    context: context,
+                    conteudo:
+                        'Consultar para saber se existe mesmo esse produto');
+
                 break;
 
               case "Partilhar":
@@ -266,14 +264,10 @@ class ButtonScanResult extends StatelessWidget {
                 break;
 
               case "Atualizar":
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                      content: Text(
-                        'Mudança de lotação, setor ou lacre',
-                        style: Styles().errorTextStyle(),
-                      ),
-                      backgroundColor: AppColors.cErrorColor),
-                );
+                Generic.snackBar(
+                    context: context,
+                    conteudo: 'Mudança de lotação, setor ou lacre');
+
                 break;
 
               default:

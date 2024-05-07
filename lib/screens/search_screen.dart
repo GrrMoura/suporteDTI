@@ -9,9 +9,9 @@ import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:suporte_dti/controller/consulta_controller.dart';
-
 import 'package:suporte_dti/data/delegacia_data.dart';
 import 'package:suporte_dti/data/equipamentos_data.dart';
+import 'package:suporte_dti/model/delegacia_model.dart';
 import 'package:suporte_dti/model/equipamentos_historico_model.dart';
 import 'package:suporte_dti/model/equipamentos_model.dart';
 import 'package:suporte_dti/navegacao/app_screens_path.dart';
@@ -19,12 +19,10 @@ import 'package:suporte_dti/screens/widgets/loading_default.dart';
 import 'package:suporte_dti/services/requests_services.dart';
 import 'package:suporte_dti/services/sqlite_service.dart';
 import 'package:suporte_dti/utils/app_colors.dart';
+import 'package:suporte_dti/utils/app_name.dart';
 import 'package:suporte_dti/utils/app_styles.dart';
 import 'package:suporte_dti/utils/snack_bar_generic.dart';
 import 'package:suporte_dti/viewModel/consulta_view_model.dart';
-import 'package:suporte_dti/viewModel/login_view_model.dart';
-
-import '../model/delegacia_model.dart';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key, required this.nome});
@@ -82,7 +80,7 @@ class _SearchScreenState extends State<SearchScreen> {
 
   pegarFoto() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    bytes = base64Decode(prefs.getString("foto")!);
+    bytes = base64Decode(prefs.getString("foto") ?? "");
     temFoto = prefs.getBool("temFoto") ?? false;
 
     setState(() {});
@@ -166,9 +164,9 @@ class _SearchScreenState extends State<SearchScreen> {
               });
             } else {
               Generic.snackBar(
-                  context: context,
-                  conteudo: "O campo \"pesquisa\" precisa ser preenchido!",
-                  barBehavior: SnackBarBehavior.floating);
+                context: context,
+                mensagem: "O campo \"pesquisa\" precisa ser preenchido!",
+              );
             }
           }),
           decoration: InputDecoration(
@@ -211,10 +209,10 @@ class _SearchScreenState extends State<SearchScreen> {
                             Clipboard.setData(ClipboardData(text: patrimonio));
 
                             Generic.snackBar(
-                                context: context,
-                                conteudo: "Copiado para área de transferência",
-                                color: Colors.blue,
-                                barBehavior: SnackBarBehavior.floating);
+                              context: context,
+                              mensagem: "Copiado para área de transferência",
+                              tipo: AppName.sucesso,
+                            );
                           },
                           child: Padding(
                             padding: EdgeInsets.fromLTRB(8.w, 10.h, 8.w, 5.h),
@@ -422,8 +420,8 @@ class _CardUltimasConsultasState extends State<CardUltimasConsultas> {
         Clipboard.setData(ClipboardData(text: widget.patrimonio!));
         Generic.snackBar(
             context: context,
-            conteudo: "Copiado para área de transferência",
-            barBehavior: SnackBarBehavior.floating);
+            mensagem: "Copiado para área de transferência",
+            tipo: AppName.sucesso);
       },
       child: Padding(
         padding: EdgeInsets.fromLTRB(8.w, 10.h, 8.w, 0),
@@ -480,6 +478,7 @@ class DelegaciasIcones extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 5),
       child: InkWell(
+        borderRadius: BorderRadius.zero,
         onTap: () {
           context.push(AppRouterName.resultDelegacias);
         },

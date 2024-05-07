@@ -6,6 +6,7 @@ import 'package:suporte_dti/model/equipamentos_model.dart';
 import 'package:suporte_dti/navegacao/app_screens_path.dart';
 import 'package:suporte_dti/screens/widgets/widget_gridview_itens.dart';
 import 'package:suporte_dti/utils/app_colors.dart';
+import 'package:suporte_dti/utils/app_name.dart';
 import 'package:suporte_dti/utils/app_styles.dart';
 import 'package:suporte_dti/utils/snack_bar_generic.dart';
 
@@ -134,10 +135,10 @@ class CardEquipamentosResultado extends StatelessWidget {
       onLongPress: () {
         Clipboard.setData(ClipboardData(text: patrimonio!));
         Generic.snackBar(
-            color: Colors.blue,
-            context: context,
-            conteudo: "Copiado para área de transferência",
-            barBehavior: SnackBarBehavior.floating);
+          tipo: AppName.sucesso,
+          context: context,
+          mensagem: "Copiado para área de transferência",
+        );
       },
       child: Material(
         color: AppColors.cWhiteColor,

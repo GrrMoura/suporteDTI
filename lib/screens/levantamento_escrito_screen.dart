@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-
+import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:suporte_dti/utils/app_colors.dart';
 import 'package:suporte_dti/utils/app_styles.dart';
@@ -38,24 +39,8 @@ class _LevantamentoDigitadoState extends State<LevantamentoDigitado> {
             children: [
               SizedBox(height: 10.sp),
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  Text(
-                    "Possui lacre?",
-                    style: Styles().mediumTextStyle(),
-                  ),
-                  Switch(
-                      value: isConvenio,
-                      onChanged: (value) {
-                        setState(() {
-                          isConvenio = value;
-                        });
-                      }),
-                ],
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
+                  SizedBox(width: 10.w),
                   Text(
                     "Possui convênio?",
                     style: Styles().smallTextStyle(),
@@ -63,6 +48,7 @@ class _LevantamentoDigitadoState extends State<LevantamentoDigitado> {
                   Transform.scale(
                     scale: 0.8,
                     child: Switch(
+                        activeColor: AppColors.cSecondaryColor,
                         value: isConvenio,
                         onChanged: (value) {
                           setState(() {
@@ -70,20 +56,37 @@ class _LevantamentoDigitadoState extends State<LevantamentoDigitado> {
                           });
                         }),
                   ),
+                  const Expanded(child: SizedBox(width: 30)),
+                  Text(
+                    "Possui Lacre?",
+                    style: Styles().smallTextStyle(),
+                  ),
+                  Transform.scale(
+                    scale: 0.8,
+                    child: Switch(
+                        activeColor: AppColors.cSecondaryColor,
+                        value: isLacre,
+                        onChanged: (value) {
+                          setState(() {
+                            isLacre = value;
+                          });
+                        }),
+                  ),
+                  SizedBox(width: 10.w),
                 ],
               ),
               FieldsLevantamentoDigitado(
-                  lotacaoCtrl: lotacaoCtrl,
-                  tipo: "Lotação",
-                  keyboardType: TextInputType.name),
+                lotacaoCtrl: lotacaoCtrl,
+                tipo: "Lotação",
+              ),
               FieldsLevantamentoDigitado(
-                  lotacaoCtrl: setorCtrl,
-                  tipo: "Setor",
-                  keyboardType: TextInputType.name),
+                lotacaoCtrl: setorCtrl,
+                tipo: "Setor",
+              ),
               FieldsLevantamentoDigitado(
-                  lotacaoCtrl: equipamentoCtrl,
-                  tipo: "Equipamento",
-                  keyboardType: TextInputType.name),
+                lotacaoCtrl: equipamentoCtrl,
+                tipo: "Equipamento",
+              ),
               FieldsLevantamentoDigitado(
                   lotacaoCtrl: marcaCtrl,
                   tipo: "Marca-Modelo",
@@ -91,7 +94,7 @@ class _LevantamentoDigitadoState extends State<LevantamentoDigitado> {
               FieldsLevantamentoDigitado(
                   lotacaoCtrl: patrimonioCtrl,
                   tipo: "Patrimônio",
-                  keyboardType: TextInputType.number),
+                  keyboardType: TextInputType.visiblePassword),
               FieldsLevantamentoDigitado(
                   lotacaoCtrl: serviceTagCtrl,
                   tipo: "Sn - Service Tag",
@@ -161,20 +164,20 @@ class FieldsLevantamentoDigitado extends StatelessWidget {
       {super.key,
       required this.lotacaoCtrl,
       required this.tipo,
-      required this.keyboardType});
+      this.keyboardType});
 
   final TextEditingController lotacaoCtrl;
   final String tipo;
-  final TextInputType keyboardType;
+  final TextInputType? keyboardType;
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(8.0),
+      padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 10.w),
       child: TextFormField(
         textInputAction: TextInputAction.next,
         controller: lotacaoCtrl,
-        keyboardType: keyboardType,
+        keyboardType: keyboardType ?? TextInputType.name,
         decoration: InputDecoration(
             alignLabelWithHint: true,
             labelText: tipo,

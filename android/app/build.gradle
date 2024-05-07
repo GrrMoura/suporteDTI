@@ -24,7 +24,7 @@ if (flutterVersionName == null) {
 
 android {
     namespace "com.example.suporte_dti"
-     compileSdkVersion localProperties.getProperty('flutter.compileSdkVersion').toInteger()
+     compileSdkVersion flutter.compileSdkVersion
      ndkVersion flutter.ndkVersion
 
     compileOptions {

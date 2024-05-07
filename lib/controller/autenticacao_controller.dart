@@ -22,7 +22,7 @@ class AutenticacaoController {
 
         Generic.snackBar(
             context: context,
-            conteudo:
+            mensagem:
                 'Sem conexão com a internet. Estabeleça uma conexão e tente novamente');
 
         return null;
@@ -34,13 +34,13 @@ class AutenticacaoController {
         model.ocupado = false;
         if (response.statusCode == 422) {
           Generic.snackBar(
-              context: context, conteudo: ' Erro - ${response.data[0]}');
+              context: context, mensagem: ' Erro - ${response.data[0]}');
 
           return null;
         }
 
         Generic.snackBar(
-            context: context, conteudo: ' Erro - ${response.statusMessage}');
+            context: context, mensagem: ' Erro - ${response.statusMessage}');
 
         return null;
       }

@@ -23,7 +23,7 @@ class ConsultaController {
         consultaViewModel.ocupado = false;
         Generic.snackBar(
             context: context,
-            conteudo:
+            mensagem:
                 'Sem conexão com a internet. Estabeleça uma conexão e tente novamente');
 
         return null;
@@ -48,9 +48,9 @@ class ConsultaController {
     }
 
     Generic.snackBar(
-        context: context,
-        conteudo: "Erro - O usuário não possui permissões para essa ação.",
-        barBehavior: SnackBarBehavior.floating);
+      context: context,
+      mensagem: "Erro - O usuário não possui permissões para essa ação.",
+    );
   }
 
   Future<void> consulta(BuildContext context, ConsultaViewModel model) async {
@@ -61,9 +61,9 @@ class ConsultaController {
 
       if (responseConsulta.statusCode == 401) {
         Generic.snackBar(
-            context: context,
-            conteudo: "Erro - ${responseConsulta.statusMessage}",
-            barBehavior: SnackBarBehavior.floating);
+          context: context,
+          mensagem: "Erro - ${responseConsulta.statusMessage}",
+        );
 
         return await Future.delayed(const Duration(seconds: 3))
             .then((_) => context.push(AppRouterName.login));
@@ -71,14 +71,14 @@ class ConsultaController {
 
       if (responseConsulta.statusCode == 422) {
         Generic.snackBar(
-            context: context,
-            conteudo: "Este Dado não existe na base de dados.",
-            barBehavior: SnackBarBehavior.floating);
+          context: context,
+          mensagem: "Este Dado não existe na base de dados.",
+        );
       }
       Generic.snackBar(
-          context: context,
-          conteudo: "Erro - ${responseConsulta.statusMessage}",
-          barBehavior: SnackBarBehavior.floating);
+        context: context,
+        mensagem: "Erro - ${responseConsulta.statusMessage}",
+      );
     }
     EquipamentosModel equipamentosModel =
         EquipamentosModel.fromJson(responseConsulta.data);

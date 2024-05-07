@@ -1,9 +1,13 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
+import 'package:suporte_dti/navegacao/app_screens_path.dart';
 import 'package:suporte_dti/screens/widgets/widget_gridview_itens.dart';
 import 'package:suporte_dti/utils/app_colors.dart';
+import 'package:suporte_dti/utils/app_name.dart';
 import 'package:suporte_dti/utils/app_styles.dart';
 import 'package:suporte_dti/utils/snack_bar_generic.dart';
 
@@ -49,10 +53,10 @@ class ResultDelegaciaState extends State {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Titulos(nome: "  Levantamentos  "),
-                  addBotao(),
+                  AddBotao(),
                 ],
               ),
-              Container(
+              SizedBox(
                 height: 350.h,
                 child: ListView(
                   children: const [
@@ -84,7 +88,7 @@ class ResultDelegaciaState extends State {
                   ],
                 ),
               ),
-              Titulos(nome: "  Equipamentos  "),
+              const Titulos(nome: "  Equipamentos  "),
               GridviewEquipamentos(
                 myProducts: myProducts2,
                 widget: const CardItensDelegacia(
@@ -99,8 +103,8 @@ class ResultDelegaciaState extends State {
   }
 }
 
-class addBotao extends StatelessWidget {
-  const addBotao({super.key});
+class AddBotao extends StatelessWidget {
+  const AddBotao({super.key});
 // Função que mostra o AlertDialog com imagens como botões
   void mostrarAlertaComImagens(BuildContext context) {
     showDialog(
@@ -108,35 +112,41 @@ class addBotao extends StatelessWidget {
       builder: (BuildContext context) {
         return AlertDialog(
           backgroundColor: Colors.white,
-          title: Center(child: Text('Forma de criação')),
-          content: Text('Selecione como quer iniciar.'),
+          title: const Center(child: Text('Forma de criação')),
+          content: const Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text('Selecione como quer iniciar.'),
+            ],
+          ),
           actions: <Widget>[
-            // Botão com imagem 1
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 Container(
+                  decoration:
+                      BoxDecoration(borderRadius: BorderRadius.circular(20)),
                   height: 85,
                   width: 85,
                   child: InkWell(
+                    borderRadius: BorderRadius.circular(10),
                     onTap: () {
-                      // Ação para a imagem 1
-                      Navigator.of(context).pop();
+                      context.push(AppRouterName.levantamentoDigitadoScreen);
                     },
                     child: Image.asset(
-                      'assets/images/teclado.png',
-                      fit: BoxFit.cover,
+                      AppName.teclado!,
+                      fit: BoxFit.fitHeight,
                     ),
                   ),
                 ),
-                Container(
+                SizedBox(
                   width: 90,
                   child: InkWell(
+                    borderRadius: BorderRadius.circular(10),
                     onTap: () {
-                      // Ação para a imagem 2
-                      Navigator.of(context).pop();
+                      context.push(AppRouterName.qrCodeScanner);
                     },
-                    child: Image.asset('assets/images/qrCode.png'),
+                    child: Image.asset(AppName.qrCode!),
                   ),
                 ),
               ],
@@ -305,9 +315,9 @@ class _CardItensDelegaciaState extends State<CardItensDelegacia> {
       onLongPress: () {
         Clipboard.setData(ClipboardData(text: widget.patrimonio!));
         Generic.snackBar(
-            color: AppColors.cSecondaryColor,
+            tipo: AppName.sucesso,
             context: context,
-            conteudo: "Copiado para área de transferência!");
+            mensagem: "Copiado para área de transferência!");
       },
       child: Material(
         color: AppColors.cWhiteColor,

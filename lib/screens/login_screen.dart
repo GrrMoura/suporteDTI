@@ -8,6 +8,7 @@ import 'package:suporte_dti/controller/login_controller.dart';
 import 'package:suporte_dti/screens/widgets/loading_default.dart';
 import 'package:suporte_dti/utils/app_colors.dart';
 import 'package:suporte_dti/utils/app_mask.dart';
+import 'package:suporte_dti/utils/app_name.dart';
 import 'package:suporte_dti/utils/app_styles.dart';
 import 'package:suporte_dti/utils/app_validator.dart';
 import 'package:suporte_dti/utils/snack_bar_generic.dart';
@@ -174,9 +175,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
                                       if (value) {
                                         Generic.snackBar(
-                                            color: Colors.blue,
+                                            tipo: AppName.sucesso,
                                             context: context,
-                                            conteudo:
+                                            mensagem:
                                                 'Seu usuário será lembrado no próximo login.');
                                       }
                                       setState(() {});
@@ -205,17 +206,21 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   ElevatedButton bottonEnter(BuildContext context) {
+    String msg;
     return ElevatedButton(
       onPressed: () async {
-        if (validateUserAndSenhaTextfield(
-            usuarioCtrl.text, passController.text)) {
+        msg = validateUserAndSenhaTextfield(
+            usuarioCtrl.text, passController.text);
+        if (msg == "OK") {
           setState(() {});
           await autenticacaoController
               .logar(context, loginViewModel)
               .then((value) {
             setState(() {});
           });
-        } else {}
+        } else {
+          Generic.snackBar(context: context, mensagem: msg);
+        }
       },
       style: ElevatedButton.styleFrom(
         backgroundColor: AppColors.cSecondaryColor,
@@ -310,7 +315,7 @@ class _LoginScreenState extends State<LoginScreen> {
             },
             textInputAction: TextInputAction.next,
             inputFormatters: [MaskUtils.maskFormatterCpf()],
-            keyboardType: TextInputType.text,
+            keyboardType: TextInputType.number,
             decoration: InputDecoration(
               suffixIcon:
                   Icon(Icons.lock, size: 18.sp, color: Colors.transparent),
@@ -328,22 +333,16 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  bool validateUserAndSenhaTextfield(String cpf, String senha) {
+  String validateUserAndSenhaTextfield(String cpf, String senha) {
     if (cpf.isEmpty) {
-      return Generic.snackBar(
-          context: context, conteudo: 'O campo "CPF" precisa ser preenchido');
+      return 'O campo "CPF" precisa ser preenchido';
     } else if (!Validador.cpfIsValid(cpf)) {
-      return Generic.snackBar(context: context, conteudo: 'CPF inválido');
+      return 'CPF inválido';
     }
-
     if (senha.isEmpty) {
-      return Generic.snackBar(
-          context: context, conteudo: 'O campo "senha" precisa ser preenchido');
+      return 'O campo "senha" precisa ser preenchido';
     } else if (senha.length < 8) {
-      return Generic.snackBar(
-          context: context,
-          conteudo:
-              'O campo "senha" está muito curto! Entre 8 e 20 caracteres');
+      return 'O campo "senha" está muito curto! Entre 8 e 20 caracteres';
     }
 
     // loginViewModel.login = cpf;
@@ -352,7 +351,7 @@ class _LoginScreenState extends State<LoginScreen> {
     loginViewModel.senha = "Muebom10";
     loginViewModel.ocupado = true;
 
-    return true;
+    return "OK";
   }
 
   Future<void> testarBiometria(bool value) async {
@@ -362,12 +361,12 @@ class _LoginScreenState extends State<LoginScreen> {
       if (funciona) {
         Generic.snackBar(
             context: context,
-            conteudo: "O leitor biométrico será utilizado no próximo login.",
-            color: Colors.blue);
+            mensagem: "O leitor biométrico será utilizado no próximo login.",
+            tipo: AppName.sucesso);
       } else {
         Generic.snackBar(
             context: context,
-            conteudo:
+            mensagem:
                 "Desculpe. Seu dispositivo não suporta leitura biométrica.");
 
         await Future.delayed(const Duration(seconds: 2)).then((_) => {

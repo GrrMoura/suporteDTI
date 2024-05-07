@@ -1,22 +1,36 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:suporte_dti/utils/app_styles.dart';
+import 'package:top_snackbar_flutter/custom_snack_bar.dart';
+import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 class Generic {
-  static snackBar({
-    required BuildContext context,
-    required String conteudo,
-    Color? color,
-    SnackBarBehavior? barBehavior,
-  }) {
-    return ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text(conteudo, style: Styles().errorTextStyle()),
-        padding: EdgeInsets.only(bottom: 5.h, left: 10.w, top: 5.w, right: 0),
-        elevation: 30,
-        margin: barBehavior == SnackBarBehavior.floating
-            ? EdgeInsets.fromLTRB(20.w, 1, 20.w, 30.h)
-            : null,
-        backgroundColor: color ?? Colors.red,
-        behavior: barBehavior ?? SnackBarBehavior.fixed));
+  static void snackBar(
+      {required BuildContext context,
+      required String mensagem,
+      String? tipo = "erro",
+      int duracaoFixa = 3,
+      int? duracao}) {
+    switch (tipo) {
+      case "erro":
+        showTopSnackBar(
+            displayDuration: Duration(seconds: duracao ?? duracaoFixa),
+            Overlay.of(context),
+            CustomSnackBar.error(message: mensagem));
+        break;
+
+      case "sucesso":
+        showTopSnackBar(
+            displayDuration: Duration(seconds: duracao ?? duracaoFixa),
+            Overlay.of(context),
+            CustomSnackBar.success(message: mensagem));
+        break;
+      case "info":
+        showTopSnackBar(
+            displayDuration: Duration(seconds: duracao ?? duracaoFixa),
+            Overlay.of(context),
+            CustomSnackBar.info(message: mensagem));
+        break;
+      default:
+    }
+    //tipo == sucesso, info ou erro
   }
 }

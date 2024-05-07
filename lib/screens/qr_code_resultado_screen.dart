@@ -253,9 +253,9 @@ class ButtonScanResult extends StatelessWidget {
             switch (type) {
               case "Consultar":
                 Generic.snackBar(
-                    context: context,
-                    conteudo:
-                        'Consultar para saber se existe mesmo esse produto');
+                  mensagem: 'Consultar para saber se existe mesmo esse produto',
+                  context: context,
+                );
 
                 break;
 
@@ -266,7 +266,7 @@ class ButtonScanResult extends StatelessWidget {
               case "Atualizar":
                 Generic.snackBar(
                     context: context,
-                    conteudo: 'Mudança de lotação, setor ou lacre');
+                    mensagem: 'Mudança de lotação, setor ou lacre');
 
                 break;
 

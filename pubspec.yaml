@@ -56,6 +56,7 @@ dependencies:
   mask_text_input_formatter: ^2.8.0
   device_info_plus: ^9.1.1
   android_id: ^0.3.6
+  top_snackbar_flutter: ^3.1.0
  
  
 

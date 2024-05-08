@@ -8,13 +8,14 @@ import 'package:suporte_dti/screens/login_screen.dart';
 import 'package:suporte_dti/screens/qr_code_resultado_screen.dart';
 import 'package:suporte_dti/screens/qr_code_scanner_screen.dart';
 import 'package:suporte_dti/screens/resultado_screen.dart';
+import 'package:suporte_dti/screens/resumo_levantamento.dart';
 import 'package:suporte_dti/screens/search_screen.dart';
 import 'package:suporte_dti/screens/delegacia_resultado_screen.dart';
 
 class Rotas {
   Rotas();
   static final routers = GoRouter(
-    initialLocation: AppRouterName.login,
+    initialLocation: AppRouterName.resumoLevantamento,
     routes: [
       GoRoute(
         path: AppRouterName.login,
@@ -63,6 +64,11 @@ class Rotas {
         name: 'resultDelegacia',
         path: AppRouterName.resultDelegacias,
         builder: (context, state) => (const ResultDelegacia()),
+      ),
+      GoRoute(
+        name: 'resumoLevantamento',
+        path: AppRouterName.resumoLevantamento,
+        builder: (context, state) => (const ResumoLevantamento()),
       ),
       GoRoute(
         name: 'qrcCodeResult',

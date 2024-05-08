@@ -1,4 +1,5 @@
 import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
@@ -124,10 +125,10 @@ class AddBotao extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 Container(
+                  height: 100.w,
+                  width: 95.w,
                   decoration:
                       BoxDecoration(borderRadius: BorderRadius.circular(20)),
-                  height: 85,
-                  width: 85,
                   child: InkWell(
                     borderRadius: BorderRadius.circular(10),
                     onTap: () {
@@ -140,7 +141,7 @@ class AddBotao extends StatelessWidget {
                   ),
                 ),
                 SizedBox(
-                  width: 90,
+                  width: 90.w,
                   child: InkWell(
                     borderRadius: BorderRadius.circular(10),
                     onTap: () {

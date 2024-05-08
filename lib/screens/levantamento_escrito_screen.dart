@@ -125,12 +125,12 @@ class _LevantamentoDigitadoState extends State<LevantamentoDigitado> {
                       child: Row(
                         children: [
                           const Icon(
-                            Icons.qr_code,
+                            Icons.plus_one,
                             color: Colors.white,
                           ),
                           Container(width: 10.w),
                           Text(
-                            "Scan",
+                            "Outro",
                             style: Styles()
                                 .mediumTextStyle()
                                 .copyWith(color: Colors.white),
@@ -146,13 +146,14 @@ class _LevantamentoDigitadoState extends State<LevantamentoDigitado> {
                       },
                       child: Row(
                         children: [
-                          const Icon(Icons.arrow_back),
+                          const Icon(Icons.check),
                           Container(width: 10.w),
-                          Text("Voltar", style: Styles().mediumTextStyle())
+                          Text("Concluir", style: Styles().mediumTextStyle())
                         ],
                       )),
                 ],
               ),
+              Container(height: 20.h)
             ],
           ),
         ));

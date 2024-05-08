@@ -13,4 +13,5 @@ abstract class AppRouterName {
   static const String searchScreen = '/searchScreen';
   static const String levantamentoDigitadoScreen =
       '/levantamentoDigitadoScreen';
+  static const String resumoLevantamento = '/resumoLevantamento';
 }

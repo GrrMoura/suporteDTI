@@ -12,7 +12,7 @@ class AppDimens {
   static const double minTextSize = 20.0;
   static const double headingSize = 28.0;
   static const double pageTitleSize = 25.0;
-  static const double subHeadingSize = 26.0;
+  static double subHeadingSize = 26.sp;
 
   static const double largeSize = 32.0;
   static const double mediumSize = 16.5;

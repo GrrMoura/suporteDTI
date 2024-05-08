@@ -10,6 +10,8 @@ class AppName {
       " Tempo para tentativa de conexão foi excedido, tente novamente.";
 
 // imagens
-  static String? teclado = 'assets/images/teclado.png';
+  static String? teclado = 'assets/images/qwerty.png';
+  static String? sspLogo = 'assets/images/ssp_logo.png';
   static String? qrCode = 'assets/images/qrCode.png';
+  static String? logoDti = 'assets/images/logo_azul.png';
 }

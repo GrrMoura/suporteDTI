@@ -2,9 +2,11 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:suporte_dti/controller/autenticacao_controller.dart';
 import 'package:suporte_dti/controller/login_controller.dart';
+import 'package:suporte_dti/navegacao/app_screens_path.dart';
 import 'package:suporte_dti/screens/widgets/loading_default.dart';
 import 'package:suporte_dti/utils/app_colors.dart';
 import 'package:suporte_dti/utils/app_mask.dart';
@@ -237,20 +239,25 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Padding recoverPassword() {
-    return Padding(
-      padding: EdgeInsets.only(right: 20.w, top: 20.h, bottom: 25.h),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          Text(
-            "Recuperar senha?",
-            style: TextStyle(
-              fontSize: 12.sp,
-              color: AppColors.cSecondaryColor,
+  InkWell recoverPassword() {
+    return InkWell(
+      onTap: () {
+        context.push(AppRouterName.recuperarSenhaScreen);
+      },
+      child: Padding(
+        padding: EdgeInsets.only(right: 20.w, top: 20.h, bottom: 25.h),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            Text(
+              "Recuperar senha?",
+              style: TextStyle(
+                fontSize: 12.sp,
+                color: AppColors.cSecondaryColor,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -264,35 +271,42 @@ class _LoginScreenState extends State<LoginScreen> {
           child: Text("Senha", style: TextStyle(fontSize: 14.sp)),
         ),
         SizedBox(
-          width: 230.w,
-          child: TextFormField(
-            controller: passController,
-            onChanged: (newValue) {
-              passController.text = newValue;
-            },
-            keyboardType: TextInputType.visiblePassword,
-            style: TextStyle(fontSize: 15.sp),
-            obscureText: isShowPass,
-            decoration: InputDecoration(
-              filled: true,
-              fillColor: Colors.black.withOpacity(0.1),
-              isDense: true,
-              contentPadding: const EdgeInsets.fromLTRB(10, 15, 10, 0),
-              errorStyle: TextStyle(fontSize: 10.sp),
-              suffixIcon: IconButton(
-                icon: Icon(Icons.remove_red_eye_outlined, size: 18.sp),
-                onPressed: () {
-                  isShowPass = !isShowPass;
-                  setState(() {});
-                },
+            width: 230.w,
+            child: TextFormField(
+              controller: passController,
+              onChanged: (newValue) {
+                passController.text = newValue;
+              },
+              keyboardType: TextInputType.visiblePassword,
+              style: TextStyle(fontSize: 15.sp),
+              obscureText: isShowPass,
+              decoration: InputDecoration(
+                filled: true,
+                fillColor: Colors.black.withOpacity(0.1),
+                isDense: true,
+                contentPadding: const EdgeInsets.fromLTRB(10, 15, 10, 0),
+                errorStyle: TextStyle(fontSize: 10.sp),
+                suffixIcon: IconButton(
+                  icon: Icon(Icons.remove_red_eye_outlined, size: 18.sp),
+                  onPressed: () {
+                    isShowPass = !isShowPass;
+                    setState(() {});
+                  },
+                ),
+                prefixIcon: Icon(Icons.lock, size: 18.sp),
+                border: const OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(20)),
+                ),
+                focusedBorder: const OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(20)),
+                  borderSide: BorderSide(
+                    color: AppColors
+                        .cSecondaryColor, // Cor da borda quando o campo está ativo
+                    width: 2.0,
+                  ),
+                ),
               ),
-              prefixIcon: Icon(Icons.lock, size: 18.sp),
-              border: const OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(20)),
-              ),
-            ),
-          ),
-        ),
+            )),
       ],
     );
   }
@@ -316,6 +330,8 @@ class _LoginScreenState extends State<LoginScreen> {
             textInputAction: TextInputAction.next,
             inputFormatters: [MaskUtils.maskFormatterCpf()],
             keyboardType: TextInputType.number,
+            cursorColor: Colors.black, // Define a cor da barra de inserção
+
             decoration: InputDecoration(
               suffixIcon:
                   Icon(Icons.lock, size: 18.sp, color: Colors.transparent),
@@ -325,6 +341,14 @@ class _LoginScreenState extends State<LoginScreen> {
               fillColor: Colors.black.withOpacity(0.1),
               border: const OutlineInputBorder(
                 borderRadius: BorderRadius.all(Radius.circular(20)),
+              ),
+              focusedBorder: const OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(20)),
+                borderSide: BorderSide(
+                  color: AppColors
+                      .cSecondaryColor, // Cor da borda quando o campo está ativo
+                  width: 2.0,
+                ),
               ),
             ),
           ),

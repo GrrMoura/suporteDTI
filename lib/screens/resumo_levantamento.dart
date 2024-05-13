@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
+import 'package:suporte_dti/navegacao/app_screens_path.dart';
 import 'package:suporte_dti/utils/app_colors.dart';
 import 'package:suporte_dti/utils/app_dimens.dart';
 import 'package:suporte_dti/utils/app_name.dart';
 import 'package:suporte_dti/utils/app_styles.dart';
+import 'package:suporte_dti/utils/snack_bar_generic.dart';
 
 class ResumoLevantamento extends StatelessWidget {
   const ResumoLevantamento({super.key});
@@ -16,7 +19,7 @@ class ResumoLevantamento extends StatelessWidget {
       ),
       body: Column(
         children: [
-          header(),
+          const Header(),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -26,9 +29,9 @@ class ResumoLevantamento extends StatelessWidget {
               )
             ],
           ),
-          ultimoLevantamento(),
-          levantamentoAtual(),
-          BoxEquipamentos()
+          const UltimoLevantamento(),
+          const LevantamentoAtual(),
+          const BoxEquipamentos()
         ],
       ),
     );
@@ -76,8 +79,8 @@ class BoxEquipamentos extends StatelessWidget {
   }
 }
 
-class levantamentoAtual extends StatelessWidget {
-  const levantamentoAtual({
+class LevantamentoAtual extends StatelessWidget {
+  const LevantamentoAtual({
     super.key,
   });
 
@@ -113,8 +116,8 @@ class levantamentoAtual extends StatelessWidget {
   }
 }
 
-class ultimoLevantamento extends StatelessWidget {
-  const ultimoLevantamento({
+class UltimoLevantamento extends StatelessWidget {
+  const UltimoLevantamento({
     super.key,
   });
 
@@ -150,8 +153,8 @@ class ultimoLevantamento extends StatelessWidget {
   }
 }
 
-class header extends StatelessWidget {
-  const header({
+class Header extends StatelessWidget {
+  const Header({
     super.key,
   });
 
@@ -213,30 +216,38 @@ class CardEquipametos extends StatelessWidget {
   final String lacre;
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 10.h),
-        child: Card(
-          child: Padding(
-            padding: EdgeInsets.only(left: 10.w, right: 10.w),
-            child: Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    SizedBox(width: 50.w, child: Text(id)),
-                    SizedBox(
-                        width: 100.w,
-                        child: Text(titulo, textAlign: TextAlign.center)),
-                    SizedBox(
-                      width: 50.w,
-                      child: IconButton(
-                          onPressed: () {},
-                          icon: Icon(Icons.edit, size: 15.sp)),
-                    ),
-                  ],
-                ),
-                Row(
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 10.h),
+      child: Card(
+        child: Padding(
+          padding: EdgeInsets.only(left: 10.w, right: 5.w),
+          child: Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  SizedBox(width: 50.w, child: Text(id)),
+                  SizedBox(
+                      width: 100.w,
+                      child: Text(titulo, textAlign: TextAlign.center)),
+                  SizedBox(
+                    width: 50.w,
+                    child: IconButton(
+                        onPressed: () {
+                          Generic.snackBar(
+                              tipo: AppName.info,
+                              context: context,
+                              mensagem: "Vai para a tela edit");
+                        },
+                        icon: Icon(Icons.edit, size: 15.sp)),
+                  ),
+                ],
+              ),
+              InkWell(
+                onTap: () {
+                  context.push(AppRouterName.detalhe);
+                },
+                child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Column(
@@ -253,7 +264,7 @@ class CardEquipametos extends StatelessWidget {
                     Column(
                       children: [
                         Text(
-                          "Patrimonio",
+                          "Patrimônio",
                           style: Styles().descriptionRestulScan(),
                         ),
                         SizedBox(
@@ -276,9 +287,9 @@ class CardEquipametos extends StatelessWidget {
                     ),
                   ],
                 ),
-                SizedBox(height: 10.h)
-              ],
-            ),
+              ),
+              SizedBox(height: 10.h)
+            ],
           ),
         ),
       ),

@@ -9,4 +9,6 @@ class MaskUtils {
 
   static MaskTextInputFormatter maskFormatterPhone() => MaskTextInputFormatter(
       mask: '(##) # ####-####', filter: {"#": RegExp(r'[0-9-]')});
+
+  static MaskTextInputFormatter padrao() => MaskTextInputFormatter();
 }

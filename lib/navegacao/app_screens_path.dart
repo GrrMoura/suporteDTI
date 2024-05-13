@@ -11,6 +11,7 @@ abstract class AppRouterName {
   static const String updateScreen = '/updateScreen';
   static const String levantamentoScreen = '/levantamentoScreen';
   static const String searchScreen = '/searchScreen';
+  static const String recuperarSenhaScreen = '/recuperarSenhaScreen';
   static const String levantamentoDigitadoScreen =
       '/levantamentoDigitadoScreen';
   static const String resumoLevantamento = '/resumoLevantamento';

@@ -7,6 +7,7 @@ import 'package:suporte_dti/screens/levantamento_escrito_screen.dart';
 import 'package:suporte_dti/screens/login_screen.dart';
 import 'package:suporte_dti/screens/qr_code_resultado_screen.dart';
 import 'package:suporte_dti/screens/qr_code_scanner_screen.dart';
+import 'package:suporte_dti/screens/recuperar_senha.dart';
 import 'package:suporte_dti/screens/resultado_screen.dart';
 import 'package:suporte_dti/screens/resumo_levantamento.dart';
 import 'package:suporte_dti/screens/search_screen.dart';
@@ -15,7 +16,7 @@ import 'package:suporte_dti/screens/delegacia_resultado_screen.dart';
 class Rotas {
   Rotas();
   static final routers = GoRouter(
-    initialLocation: AppRouterName.resumoLevantamento,
+    initialLocation: AppRouterName.login,
     routes: [
       GoRoute(
         path: AppRouterName.login,
@@ -82,11 +83,15 @@ class Rotas {
       ),
       GoRoute(
         path: AppRouterName.levantamentoDigitadoScreen,
-        builder: (context, state) => (LevantamentoDigitado()),
+        builder: (context, state) => (const LevantamentoDigitado()),
       ),
       GoRoute(
         path: AppRouterName.qrCodeScanner,
-        builder: (context, state) => (QrCodeScanner()),
+        builder: (context, state) => (const QrCodeScanner()),
+      ),
+      GoRoute(
+        path: AppRouterName.recuperarSenhaScreen,
+        builder: (context, state) => (const RecuperarSenha()),
       ),
     ],
   );

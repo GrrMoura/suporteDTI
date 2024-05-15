@@ -1,4 +1,5 @@
 abstract class AppRouterName {
+  static const String voltar = 'value'; // context.pop('value');
   static const String inicial = '/inicial';
   static const String homeController = '/homeController';
   static const String login = '/login';

@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
+import 'package:suporte_dti/controller/usuario_controller.dart';
+import 'package:suporte_dti/model/usuario_model.dart';
+import 'package:suporte_dti/navegacao/app_screens_path.dart';
 import 'package:suporte_dti/utils/app_colors.dart';
 import 'package:suporte_dti/utils/app_dimens.dart';
 import 'package:suporte_dti/utils/app_mask.dart';
@@ -8,6 +12,7 @@ import 'package:suporte_dti/utils/app_name.dart';
 import 'package:suporte_dti/utils/app_styles.dart';
 import 'package:suporte_dti/utils/app_validator.dart';
 import 'package:suporte_dti/utils/snack_bar_generic.dart';
+import 'package:suporte_dti/viewModel/resetar_senha_view_model.dart';
 
 class RecuperarSenha extends StatefulWidget {
   const RecuperarSenha({super.key});
@@ -20,10 +25,10 @@ class _RecuperarSenhaState extends State<RecuperarSenha> {
   TextEditingController cpfCtrl = TextEditingController();
   TextEditingController dtNascimentoCtrl = TextEditingController();
   TextEditingController emailCtrl = TextEditingController();
+  ResetarSenhaViewModel model = ResetarSenhaViewModel();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
@@ -75,7 +80,9 @@ class _RecuperarSenhaState extends State<RecuperarSenha> {
                                 10), // Define o raio desejado
                           ),
                           backgroundColor: Colors.red),
-                      onPressed: () {},
+                      onPressed: () {
+                        context.pop(AppRouterName.voltar);
+                      },
                       child: Text(
                         "Voltar",
                         style: TextStyle(
@@ -100,7 +107,9 @@ class _RecuperarSenhaState extends State<RecuperarSenha> {
                           Generic.snackBar(
                               context: context,
                               tipo: AppName.sucesso,
-                              mensagem: 'Sua senha foi enviada para email');
+                              mensagem:
+                                  'Sua senha foi enviada para email ${emailCtrl.text}');
+                          UsuarioController.resetarSenha(context, model);
                         } else {
                           Generic.snackBar(context: context, mensagem: result);
                         }
@@ -127,7 +136,15 @@ String testarform({
   required String email,
 }) {
   if (Validador.cpfIsValid(cpf)) {
-    return "OK";
+    if (Validador.dataNascimentoIsValid(dtNascimento: dtNascimneto)) {
+      if (Validador.emailIsValid(email: email)) {
+        return "OK";
+      } else {
+        return "Email inválido";
+      }
+    } else {
+      return "Data de nascimento inválida";
+    }
   } else {
     return "CPF inválido";
   }

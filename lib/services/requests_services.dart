@@ -3,11 +3,12 @@
 import 'package:dio/dio.dart';
 
 class RequestsServices {
+  static int tempoLimite = 80; // em segundos
   static Future<Response> post(String url, Map<String, dynamic>? data) async {
     try {
       Dio dio = Dio(BaseOptions(
-          connectTimeout: const Duration(seconds: 60),
-          receiveTimeout: const Duration(seconds: 60)));
+          connectTimeout: Duration(seconds: tempoLimite),
+          receiveTimeout: Duration(seconds: tempoLimite)));
       //  Response response = await dio.post("rl", data: data, options: options);
       Response response = await dio.post(url, data: data);
       return response;
@@ -40,12 +41,11 @@ class RequestsServices {
   static Future<Response> postOptions(
       String url, Map<String, dynamic>? data, Options options) async {
     try {
-      // CancelToken token = CancelToken();
       Dio dio = Dio(BaseOptions(
-          connectTimeout: const Duration(seconds: 60),
-          receiveTimeout: const Duration(seconds: 60)));
-      //  Response response = await dio.post("rl", data: data, options: options);
+          connectTimeout: Duration(seconds: tempoLimite),
+          receiveTimeout: Duration(seconds: tempoLimite)));
       Response response = await dio.post(url, data: data, options: options);
+
       return response;
     } on DioException catch (e) {
       if (e.response != null) {
@@ -77,8 +77,8 @@ class RequestsServices {
       String url, Map<String, dynamic>? data, Options options) async {
     try {
       Dio dio = Dio(BaseOptions(
-          connectTimeout: const Duration(seconds: 60),
-          receiveTimeout: const Duration(seconds: 60)));
+          connectTimeout: Duration(seconds: tempoLimite),
+          receiveTimeout: Duration(seconds: tempoLimite)));
       options.responseType = ResponseType.bytes;
       var response = await dio.post(url, data: data, options: options);
 

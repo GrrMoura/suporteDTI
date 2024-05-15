@@ -14,11 +14,9 @@ import 'package:suporte_dti/utils/snack_bar_generic.dart';
 import 'package:suporte_dti/viewModel/consulta_view_model.dart';
 
 class ConsultaController {
-  Future<void> consultar(
-      BuildContext context, ConsultaViewModel consultaViewModel) async {
+  Future<void> consultar(BuildContext context,
+      ConsultaEquipamentoViewModel consultaViewModel) async {
     await DispositivoServices.verificarConexao().then((conectado) async {
-      consultaViewModel.ocupado = true;
-
       if (!conectado) {
         consultaViewModel.ocupado = false;
         Generic.snackBar(
@@ -33,17 +31,15 @@ class ConsultaController {
       Sessao usuarioSessao = Sessao.getSession(prefs);
 
       await regraDeAcesso(usuarioSessao, context, consultaViewModel);
-
-      consultaViewModel.ocupado = false;
     });
   }
 
   Future<void> regraDeAcesso(Sessao usuarioSessao, BuildContext context,
-      ConsultaViewModel model) async {
+      ConsultaEquipamentoViewModel model) async {
     //      if (usuarioSessao.regrasAcesso!.contains("ConsultaIntegrada")) {
     //   return await consulta(context, model);
     // }
-    if (usuarioSessao.regrasAcesso!.contains("")) {
+    if (usuarioSessao.regrasAcesso!.contains("GerenciarEquipamentosSGIDTIv3")) {
       return await consulta(context, model);
     }
 
@@ -53,12 +49,11 @@ class ConsultaController {
     );
   }
 
-  Future<void> consulta(BuildContext context, ConsultaViewModel model) async {
+  Future<void> consulta(
+      BuildContext context, ConsultaEquipamentoViewModel model) async {
     Response responseConsulta = await ConsultaService.consulta(model);
 
     if (responseConsulta.statusCode != 200) {
-      model.ocupado = false;
-
       if (responseConsulta.statusCode == 401) {
         Generic.snackBar(
           context: context,
@@ -74,11 +69,14 @@ class ConsultaController {
           context: context,
           mensagem: "Este Dado não existe na base de dados.",
         );
+        return;
       }
+
       Generic.snackBar(
         context: context,
         mensagem: "Erro - ${responseConsulta.statusMessage}",
       );
+      return;
     }
     EquipamentosModel equipamentosModel =
         EquipamentosModel.fromJson(responseConsulta.data);

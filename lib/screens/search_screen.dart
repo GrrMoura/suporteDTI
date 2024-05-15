@@ -16,7 +16,6 @@ import 'package:suporte_dti/model/equipamentos_historico_model.dart';
 import 'package:suporte_dti/model/equipamentos_model.dart';
 import 'package:suporte_dti/navegacao/app_screens_path.dart';
 import 'package:suporte_dti/screens/widgets/loading_default.dart';
-import 'package:suporte_dti/services/requests_services.dart';
 import 'package:suporte_dti/services/sqlite_service.dart';
 import 'package:suporte_dti/utils/app_colors.dart';
 import 'package:suporte_dti/utils/app_name.dart';
@@ -38,7 +37,7 @@ class _SearchScreenState extends State<SearchScreen> {
   late List<EquipamentosModel> equipamentoList;
   final ConsultaController consultaController = ConsultaController();
   EquipamentosHistoricoModel historicoModel = EquipamentosHistoricoModel();
-  ConsultaViewModel? model = ConsultaViewModel();
+  ConsultaEquipamentoViewModel? model = ConsultaEquipamentoViewModel();
 
   late String name, cpf;
 
@@ -46,7 +45,7 @@ class _SearchScreenState extends State<SearchScreen> {
   // ignore: prefer_typing_uninitialized_variables
   EquipamentosHistoricoModel? teste;
 
-  String? semFoto = "assets/images/semfotos.png";
+  String? semFoto = AppName.semFoto;
   Uint8List? bytes;
   bool temFoto = false;
 
@@ -110,9 +109,8 @@ class _SearchScreenState extends State<SearchScreen> {
   @override
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
-    double width = MediaQuery.of(context).size.width;
 
-    return model!.ocupado == false
+    return model?.ocupado != true
         ? Scaffold(
             backgroundColor: AppColors.cPrimaryColor,
             body: SizedBox(
@@ -122,23 +120,13 @@ class _SearchScreenState extends State<SearchScreen> {
                   children: [
                     heading(),
                     FastSearch(delegaciaList: delegaciaList),
-                    searchBar(context, model!.ocupado),
+                    searchBar(context, model?.ocupado ?? false),
                     SizedBox(height: 25.h),
                     builderHistorico(),
                   ],
                 ),
               ),
             ),
-            floatingActionButton: FloatingActionButton(onPressed: () async {
-              model!.identificacao = "123";
-              await RequestsServices.post(
-                  "http://intradev.ssp.gov-se/SISTEMA/SGIDTIv3/Equipamentos",
-                  model?.toJson());
-              // // SharedPreferences preferences = await SharedPreferences.getInstance();
-              // // await preferences.clear();
-              // db.add(teste!);
-              // setState(() {});
-            }),
           )
         : const LoadingDefault();
   }
@@ -156,12 +144,27 @@ class _SearchScreenState extends State<SearchScreen> {
           style: Styles().mediumTextStyle(),
           keyboardType: TextInputType.visiblePassword,
           textInputAction: TextInputAction.search,
-          onFieldSubmitted: ((value) {
+          onFieldSubmitted: ((value) async {
             if (value.isNotEmpty) {
-              model!.identificacao = value;
-              consultaController.consultar(context, model!).then((value) {
-                setState(() {});
+              bool teveConflito = await checkConflict(context, value);
+              setState(() {
+                print(teveConflito);
+
+                if (!teveConflito) {
+                  validateInput(value);
+                }
+
+                // model?.ocupado = true;
               });
+
+              print("patrimonio ssp: ${model!.patrimonioSSP}");
+              print("numero de serie:  ${model!.numeroSerie}");
+              print("Sead: ${model!.patrimonioSead}");
+              // consultaController.consultar(context, model!).then((value) {
+              //   setState(() {
+              //     model?.ocupado = false;
+              //   });
+              // });
             } else {
               Generic.snackBar(
                 context: context,
@@ -321,6 +324,71 @@ class _SearchScreenState extends State<SearchScreen> {
       ),
     );
   }
+
+  void validateInput(value) {
+    if (RegExp(r'^[a-zA-Z]+$').hasMatch(value)) {
+      model!.idTipoEquipamento = value; // euqipamento
+    } else if (RegExp(r'^\d{1,7}$').hasMatch(value)) {
+      model!.patrimonioSSP = value;
+    } else if (RegExp(r'^(SEAD|\d+)(\s+)/$').hasMatch(value)) {
+      model!.patrimonioSead = value.replaceAll(RegExp(r'^SEAD\s+'), '');
+    } else if (RegExp(r'^[a-zA-Z0-9]+$').hasMatch(value)) {
+      model!.numeroSerie = value;
+    } else {
+      // inválido
+    }
+  }
+
+  Future<bool> checkConflict(BuildContext context, String input) async {
+    if (RegExp(r'^\d{1,7}$').hasMatch(input) &&
+        RegExp(r'^[a-zA-Z0-9]+$').hasMatch(input)) {
+      await showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            backgroundColor: AppColors.cWhiteColor,
+            title: const Text(
+              'Está entrada é ?',
+              textAlign: TextAlign.center,
+            ),
+            actions: <Widget>[
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
+                onPressed: () {
+                  Navigator.of(context).pop(AppName.patri);
+                },
+                child: Text(AppName.patri!,
+                    style: const TextStyle(color: AppColors.contentColorBlack)),
+              ),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
+                onPressed: () {
+                  Navigator.of(context).pop(AppName.nSerie);
+                },
+                child: Text(AppName.nSerie!,
+                    style: const TextStyle(color: AppColors.contentColorBlack)),
+              ),
+            ],
+          );
+        },
+      ).then((value) {
+        if (value != null) {
+          if (value == AppName.nSerie) {
+            model!.patrimonioSSP = "";
+            model!.numeroSerie = input;
+            model!.patrimonioSead = "";
+          } else {
+            model!.patrimonioSSP = input;
+            model!.numeroSerie = "";
+            model!.patrimonioSead = "";
+          }
+        } else {}
+      });
+      return true;
+    } else {
+      return false;
+    }
+  }
 }
 
 class FastSearch extends StatelessWidget {
@@ -349,7 +417,7 @@ class FastSearch extends StatelessWidget {
                   name: delegacia.name,
                   region: delegacia.region);
             } else {
-              return PesquisarDelegacias();
+              return const PesquisarDelegacias();
             }
           },
           scrollDirection: Axis.horizontal,
@@ -368,18 +436,20 @@ class PesquisarDelegacias extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 5),
-      child: InkWell(
-        onTap: () {
-          context.push(AppRouterName.resultDelegacias);
-        },
-        child: Column(
-          children: [
-            Container(
+      child: Column(
+        children: [
+          InkWell(
+            highlightColor: Colors.transparent,
+            splashFactory: NoSplash.splashFactory,
+            onTap: () {
+              context.push(AppRouterName.resultDelegacias);
+            },
+            child: Container(
               height: 80.h,
               width: 80.w,
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                   color: AppColors.cSecondaryColor,
-                  boxShadow: [
+                  boxShadow: const [
                     BoxShadow(
                         color: Colors.black54,
                         offset: Offset(0.0, 2.0), //(x,y)
@@ -387,15 +457,15 @@ class PesquisarDelegacias extends StatelessWidget {
                   ],
                   shape: BoxShape.circle,
                   image: DecorationImage(
-                      image: AssetImage("assets/images/add.png"),
+                      image: AssetImage(AppName.add!),
                       colorFilter:
-                          ColorFilter.mode(Colors.white, BlendMode.srcIn),
-                      fit: BoxFit.contain)),
+                          const ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                      fit: BoxFit.cover)),
             ),
-            SizedBox(height: 5.h),
-            Text("OUTRA", style: Styles().smallTextStyle())
-          ],
-        ),
+          ),
+          SizedBox(height: 5.h),
+          Text("OUTRA", style: Styles().smallTextStyle())
+        ],
       ),
     );
   }
@@ -478,7 +548,8 @@ class DelegaciasIcones extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 5),
       child: InkWell(
-        borderRadius: BorderRadius.zero,
+        highlightColor: Colors.transparent,
+        splashFactory: NoSplash.splashFactory,
         onTap: () {
           context.push(AppRouterName.resultDelegacias);
         },

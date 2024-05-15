@@ -8,7 +8,7 @@ class ApiServices {
   //     "https://intranet.ssp.se.gov.br/API/sgi/dti/v3";
 
   static const String suporteDti =
-      "https://intranet.ssp.se.gov.br/API/sgi/dti/v3/sGIDTI/Equipamentos/Cadastrados";
+      "https://intranet.ssp.se.gov.br/API/sgi/dti/v3/sGIDTI/";
 
   //maquina local
   // static final String intranetUrl = "http://10.10.1.71:3071/";

@@ -64,4 +64,14 @@ class Validador {
     }
     return false;
   }
+
+  static bool emailIsValid({String? email}) {
+    if (email!.length < 6) {
+      return (false);
+    }
+    RegExp regex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+
+    // Retorna true se o e-mail corresponder à expressão regular
+    return regex.hasMatch(email);
+  }
 }

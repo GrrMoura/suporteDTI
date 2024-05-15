@@ -37,7 +37,6 @@ class Sessao {
     return data;
   }
 
-// CRIMES VIOLENTOS NAS REGRAS DE ACESSO
   Sessao.getSession(SharedPreferences prefs) {
     token = prefs.getString("token") ?? "";
     usuario = prefs.getString('usuario') ?? "";

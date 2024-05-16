@@ -11,14 +11,14 @@ import 'package:suporte_dti/screens/resultado_screen.dart';
 import 'package:suporte_dti/services/consulta_service.dart';
 import 'package:suporte_dti/services/dispositivo_service.dart';
 import 'package:suporte_dti/utils/snack_bar_generic.dart';
-import 'package:suporte_dti/viewModel/consulta_view_model.dart';
+import 'package:suporte_dti/viewModel/equipamento_view_model.dart';
 
 class ConsultaController {
-  Future<void> consultar(BuildContext context,
-      ConsultaEquipamentoViewModel consultaViewModel) async {
+  Future<void> consultarEquipamentos(
+      BuildContext context, EquipamentoViewModel equipamentoViewModel) async {
     await DispositivoServices.verificarConexao().then((conectado) async {
       if (!conectado) {
-        consultaViewModel.ocupado = false;
+        equipamentoViewModel.ocupado = false;
         Generic.snackBar(
             context: context,
             mensagem:
@@ -27,15 +27,71 @@ class ConsultaController {
         return null;
       }
 
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      Sessao usuarioSessao = Sessao.getSession(prefs);
+      if (equipamentoViewModel.paginacao != null &&
+          !equipamentoViewModel.paginacao!.seChegouAoFinalDaPagina()) {
+        equipamentoViewModel.paginacao?.setProximaPagina();
+      }
 
-      await regraDeAcesso(usuarioSessao, context, consultaViewModel);
+      Response responseConsulta =
+          await ConsultaService.consulta(equipamentoViewModel);
+
+      if (responseConsulta.statusCode != 200) {
+        if (responseConsulta.statusCode == 401) {
+          Generic.snackBar(
+            context: context,
+            mensagem: "Erro - ${responseConsulta.statusMessage}",
+          );
+
+          return await Future.delayed(const Duration(seconds: 3))
+              .then((_) => context.push(AppRouterName.login));
+          //TODO: TESTAR SE ESTA LIMPANDO A PILHA DE PAGINA
+        }
+
+        if (responseConsulta.statusCode == 422) {
+          Generic.snackBar(
+            context: context,
+            mensagem: "Nenhum resultado encontrado.",
+          );
+          return null;
+        }
+
+        Generic.snackBar(
+          context: context,
+          mensagem: "Erro - ${responseConsulta.statusMessage}",
+        );
+        return null;
+      }
+      EquipamentosModel equipamentosModel =
+          EquipamentosModel.fromJson(responseConsulta.data);
+
+      prepararModelEquipamentosParaAView(
+          equipamentoViewModel, responseConsulta);
+
+      // Navigator.of(context).push(
+      //   MaterialPageRoute(
+      //     builder: (context) => ResultadoScreen(model: equipamentosModel),
+      //   ),
+      // );
+
+      // SharedPreferences prefs = await SharedPreferences.getInstance();
+      // Sessao usuarioSessao = Sessao.getSession(prefs);
+
+      // await regraDeAcesso(usuarioSessao, context, consultaViewModel);
     });
   }
 
+  void prepararModelEquipamentosParaAView(
+      EquipamentoViewModel model, Response response) {
+    var equipamentosConsultaModel = EquipamentosModel.fromJson(response.data);
+    if (model.equipamentos!.isEmpty) {
+      model.equipamentos = [];
+    }
+    model.equipamentos!.addAll(equipamentosConsultaModel);
+    model.paginacao = equipamentosConsultaModel.paginacao;
+  }
+
   Future<void> regraDeAcesso(Sessao usuarioSessao, BuildContext context,
-      ConsultaEquipamentoViewModel model) async {
+      EquipamentoViewModel model) async {
     //      if (usuarioSessao.regrasAcesso!.contains("ConsultaIntegrada")) {
     //   return await consulta(context, model);
     // }
@@ -50,43 +106,5 @@ class ConsultaController {
   }
 
   Future<void> consulta(
-      BuildContext context, ConsultaEquipamentoViewModel model) async {
-    Response responseConsulta = await ConsultaService.consulta(model);
-
-    if (responseConsulta.statusCode != 200) {
-      if (responseConsulta.statusCode == 401) {
-        Generic.snackBar(
-          context: context,
-          mensagem: "Erro - ${responseConsulta.statusMessage}",
-        );
-
-        return await Future.delayed(const Duration(seconds: 3))
-            .then((_) => context.push(AppRouterName.login));
-      }
-
-      if (responseConsulta.statusCode == 422) {
-        Generic.snackBar(
-          context: context,
-          mensagem: "Este Dado não existe na base de dados.",
-        );
-        return;
-      }
-
-      Generic.snackBar(
-        context: context,
-        mensagem: "Erro - ${responseConsulta.statusMessage}",
-      );
-      return;
-    }
-    EquipamentosModel equipamentosModel =
-        EquipamentosModel.fromJson(responseConsulta.data);
-    model.ocupado = false;
-
-    // context.push(AppRouterName.resultado);
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => ResultadoScreen(model: equipamentosModel),
-      ),
-    );
-  }
+      BuildContext context, EquipamentoViewModel model) async {}
 }

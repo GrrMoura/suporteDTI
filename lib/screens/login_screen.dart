@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:suporte_dti/controller/autenticacao_controller.dart';
 import 'package:suporte_dti/controller/login_controller.dart';
+import 'package:suporte_dti/controller/usuario_controller.dart';
 import 'package:suporte_dti/navegacao/app_screens_path.dart';
 import 'package:suporte_dti/screens/widgets/loading_default.dart';
 import 'package:suporte_dti/utils/app_colors.dart';
@@ -78,6 +79,9 @@ class _LoginScreenState extends State<LoginScreen> {
     double height = MediaQuery.of(context).size.height;
     return loginViewModel.ocupado == false
         ? Scaffold(
+            floatingActionButton: FloatingActionButton(onPressed: () {
+              //  UsuarioController.resetarSenha(context, model)
+            }),
             backgroundColor: AppColors.cPrimaryColor,
             body: SizedBox(
               height: height,

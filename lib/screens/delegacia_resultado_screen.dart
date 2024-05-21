@@ -1,8 +1,5 @@
-import 'package:fl_chart/fl_chart.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:suporte_dti/navegacao/app_screens_path.dart';
@@ -231,7 +228,7 @@ class DelegaciasCardLevantamento extends StatelessWidget {
                   Text(
                     id,
                     style:
-                        Styles().DescriptionDelegaciasLevantamentoTextStyle(),
+                        Styles().descriptionDelegaciasLevantamentoTextStyle(),
                   ),
                   Text(
                     delegacia,
@@ -251,12 +248,12 @@ class DelegaciasCardLevantamento extends StatelessWidget {
                   Text(
                     data,
                     style:
-                        Styles().DescriptionDelegaciasLevantamentoTextStyle(),
+                        Styles().descriptionDelegaciasLevantamentoTextStyle(),
                   ),
                   Text(
                     nome,
                     style:
-                        Styles().DescriptionDelegaciasLevantamentoTextStyle(),
+                        Styles().descriptionDelegaciasLevantamentoTextStyle(),
                   ),
                 ],
               ),

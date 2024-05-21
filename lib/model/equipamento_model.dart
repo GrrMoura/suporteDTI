@@ -1,4 +1,4 @@
-class EquipamentosModel {
+class EquipamentoModel {
   final int idEquipamento;
   final int idFabricante;
   final int idTipoEquipamento;
@@ -11,7 +11,7 @@ class EquipamentosModel {
   final String setor;
   final String descricao;
 
-  EquipamentosModel(
+  EquipamentoModel(
       {required this.descricao,
       required this.idUnidade,
       required this.idEquipamento,
@@ -24,8 +24,8 @@ class EquipamentosModel {
       required this.lotacao,
       required this.setor});
 
-  factory EquipamentosModel.fromJson(Map<String, dynamic> json) =>
-      EquipamentosModel(
+  factory EquipamentoModel.fromJson(Map<String, dynamic> json) =>
+      EquipamentoModel(
           patrimonioSsp: json['patrimonioSsp'],
           idModelo: json['idModelo'],
           idTipoEquipamento: json['idTipoEquipamento'],

@@ -57,7 +57,7 @@ class Styles {
         letterSpacing: AppDimens.espacamentoPequeno);
   }
 
-  TextStyle DescriptionDelegaciasLevantamentoTextStyle() {
+  TextStyle descriptionDelegaciasLevantamentoTextStyle() {
     return TextStyle(
         color: Colors.white70,
         fontSize: AppDimens.smallTextSize,

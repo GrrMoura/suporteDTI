@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:suporte_dti/controller/usuario_controller.dart';
-import 'package:suporte_dti/model/usuario_model.dart';
 import 'package:suporte_dti/navegacao/app_screens_path.dart';
 import 'package:suporte_dti/utils/app_colors.dart';
 import 'package:suporte_dti/utils/app_dimens.dart';

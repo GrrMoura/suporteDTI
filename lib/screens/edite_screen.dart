@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:suporte_dti/utils/app_colors.dart';
 import 'package:suporte_dti/utils/app_styles.dart';
 
+// ignore: must_be_immutable
 class UpdateScreen extends StatelessWidget {
   UpdateScreen({super.key});
 

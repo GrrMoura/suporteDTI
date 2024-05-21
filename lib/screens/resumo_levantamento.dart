@@ -245,7 +245,7 @@ class CardEquipametos extends StatelessWidget {
               ),
               InkWell(
                 onTap: () {
-                  context.push(AppRouterName.detalhe);
+                  context.push(AppRouterName.detalhesEquipamento);
                 },
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -315,7 +315,7 @@ class InfoResumo extends StatelessWidget {
           SizedBox(
             width: 160.w,
             child: Text(
-              titulo + ":",
+              "$titulo:",
               style: Styles()
                   .descriptionRestulScan()
                   .copyWith(color: const Color.fromARGB(255, 195, 197, 199)),

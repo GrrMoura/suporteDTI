@@ -39,7 +39,9 @@ class RequestsServices {
   }
 
   static Future<Response> postOptions(
-      String url, Map<String, dynamic>? data, Options options) async {
+      {required String url,
+      Map<String, dynamic>? data,
+      required Options options}) async {
     try {
       Dio dio = Dio(BaseOptions(
           connectTimeout: Duration(seconds: tempoLimite),

@@ -1,15 +1,21 @@
-class ConsultaEquipamentoViewModel {
+import 'package:suporte_dti/model/itens_equipamento_model.dart';
+import 'package:suporte_dti/model/paginacao_model.dart';
+
+class EquipamentoViewModel {
+  ItensEquipamentoModels? itensEquipamentoModels;
+  PaginacaoModels? paginacao =
+      PaginacaoModels(limite: 10, pagina: 1, registros: 6, totalPaginas: 100);
   int? idTipoEquipamento;
   String? numeroSerie;
   String? patrimonioSead;
   String? patrimonioSSP;
   String? descricao;
-  Null idFabricante;
-  Null idModelo;
-  Paginacao? paginacao;
+  int? idFabricante;
+  int? idModelo;
+
   bool? ocupado = false;
 
-  ConsultaEquipamentoViewModel(
+  EquipamentoViewModel(
       {this.idTipoEquipamento,
       this.numeroSerie,
       this.patrimonioSead,
@@ -19,17 +25,18 @@ class ConsultaEquipamentoViewModel {
       this.descricao,
       this.patrimonioSSP,
       this.ocupado});
-
-  ConsultaEquipamentoViewModel.fromJson(Map<String, dynamic> json) {
+//modelo tem um campo fabricante.
+  EquipamentoViewModel.fromJson(Map<String, dynamic> json) {
     idTipoEquipamento = json['idTipoEquipamento'];
     numeroSerie = json['numeroSerie'];
     patrimonioSead = json['patrimonioSead'];
     patrimonioSSP = json['patrimonioSsp'];
     idFabricante = json['idFabricante'];
     idModelo = json['idModelo'];
+
     paginacao = json['paginacao'] != null
-        ? Paginacao.fromJson(json['paginacao'])
-        : null;
+        ? PaginacaoModels.fromJson(json['paginacao'])
+        : PaginacaoModels(limite: 20, pagina: 1);
   }
 
   Map<String, dynamic> toJson() {
@@ -41,33 +48,8 @@ class ConsultaEquipamentoViewModel {
     data['idFabricante'] = idFabricante;
     data['idModelo'] = idModelo;
     if (paginacao != null) {
-      data['paginacao'] = paginacao!.toJson();
+      data['paginacao'] = paginacao?.toJson();
     }
-    return data;
-  }
-}
-
-class Paginacao {
-  int? limite;
-  int? pagina;
-  int? totalPaginas;
-  int? registros;
-
-  Paginacao({this.limite, this.pagina, this.totalPaginas, this.registros});
-
-  Paginacao.fromJson(Map<String, dynamic> json) {
-    limite = json['limite'];
-    pagina = json['pagina'];
-    totalPaginas = json['totalPaginas'];
-    registros = json['registros'];
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    data['limite'] = limite;
-    data['pagina'] = pagina;
-    data['totalPaginas'] = totalPaginas;
-    data['registros'] = registros;
     return data;
   }
 }

@@ -8,7 +8,7 @@ class DispositivoModels {
   String? so;
   String? versaoSo;
   bool? cadastrado;
-  bool? liberado;
+  bool? liberado = true;
 
   DispositivoModels(
       {this.idDispositivo,

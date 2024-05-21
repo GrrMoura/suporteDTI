@@ -1,9 +1,11 @@
 import 'package:go_router/go_router.dart';
 import 'package:suporte_dti/controller/home_controller.dart';
+import 'package:suporte_dti/model/equipamento_model.dart';
 import 'package:suporte_dti/navegacao/app_screens_path.dart';
 import 'package:suporte_dti/screens/edite_screen.dart';
 import 'package:suporte_dti/screens/equipamento_detalhe_screen.dart';
 import 'package:suporte_dti/screens/levantamento_escrito_screen.dart';
+import 'package:suporte_dti/screens/lista_equipamentos_consulta.dart';
 import 'package:suporte_dti/screens/login_screen.dart';
 import 'package:suporte_dti/screens/qr_code_resultado_screen.dart';
 import 'package:suporte_dti/screens/qr_code_scanner_screen.dart';
@@ -12,6 +14,7 @@ import 'package:suporte_dti/screens/resultado_screen.dart';
 import 'package:suporte_dti/screens/resumo_levantamento.dart';
 import 'package:suporte_dti/screens/search_screen.dart';
 import 'package:suporte_dti/screens/delegacia_resultado_screen.dart';
+import 'package:suporte_dti/viewModel/consulta_view_model.dart';
 
 class Rotas {
   Rotas();
@@ -43,9 +46,13 @@ class Rotas {
         },
       ),
       GoRoute(
-        path: AppRouterName.detalhe,
-        builder: (context, state) => (const EquipamentoDetalhe()),
+        path: AppRouterName.detalhesEquipamento,
+        builder: (context, state) {
+          EquipamentoModel? model = state.extra as EquipamentoModel;
+          return (EquipamentoDetalhe(equipamentoModel: model));
+        },
       ),
+
       GoRoute(
         path: AppRouterName.search,
         builder: (context, state) {
@@ -92,6 +99,14 @@ class Rotas {
       GoRoute(
         path: AppRouterName.recuperarSenhaScreen,
         builder: (context, state) => (const RecuperarSenha()),
+      ),
+      GoRoute(
+        path: AppRouterName.listaEquipamentos,
+        builder: (context, state) {
+          //LoginViewModel? loginViewModel = state.extra as LoginViewModel;
+          EquipamentoViewModel? model = state.extra as EquipamentoViewModel;
+          return (EquipamentoConsultaScreen(model: model));
+        },
       ),
     ],
   );

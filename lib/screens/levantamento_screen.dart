@@ -8,7 +8,7 @@ import 'package:suporte_dti/utils/app_colors.dart';
 import 'package:suporte_dti/utils/app_styles.dart';
 
 class LevantamentoScreen extends StatefulWidget {
-  LevantamentoScreen({super.key});
+  const LevantamentoScreen({super.key});
 
   @override
   State<LevantamentoScreen> createState() => _LevantamentoScreenState();
@@ -111,7 +111,7 @@ class CardDelegaciasLevantamento extends StatelessWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Container(
+                    SizedBox(
                       width: 150,
                       child: Text(
                         delegacia,

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:suporte_dti/model/equipamentos_model.dart';
+import 'package:suporte_dti/model/equipamento_model.dart';
 import 'package:suporte_dti/navegacao/app_screens_path.dart';
 import 'package:suporte_dti/screens/widgets/widget_gridview_itens.dart';
 import 'package:suporte_dti/utils/app_colors.dart';
@@ -15,7 +15,7 @@ class ResultadoScreen extends StatelessWidget {
   final List<Map> myProducts =
       List.generate(10, (index) => {"id": index, "name": "Produto $index"})
           .toList();
-  final EquipamentosModel? model;
+  final EquipamentoModel? model;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -129,7 +129,7 @@ class CardEquipamentosResultado extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        context.push(AppRouterName.detalhe);
+        context.push(AppRouterName.detalhesEquipamento);
       },
       //TODO colocar a opção de escolher qual o dado que quer copiar
       onLongPress: () {

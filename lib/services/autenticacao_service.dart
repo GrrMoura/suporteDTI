@@ -5,7 +5,6 @@ import 'package:suporte_dti/services/api_services.dart';
 import 'package:suporte_dti/services/dispositivo_service.dart';
 import 'package:suporte_dti/services/requests_services.dart';
 import 'package:suporte_dti/utils/configuracoes_global_utils.dart';
-import 'package:suporte_dti/viewModel/dispositivo_view_model.dart';
 import 'package:suporte_dti/viewModel/login_view_model.dart';
 
 class AutenticacaoService {
@@ -46,7 +45,7 @@ class AutenticacaoService {
     var url = ApiServices.concatIntranetUrl("Sessoes/Iniciar");
 
     var responseIniciarSessao = await RequestsServices.postOptions(
-        url, loginViewModel.toJson(), options);
+        url: url, data: loginViewModel.toJson(), options: options);
 
     return responseIniciarSessao;
   }
@@ -57,8 +56,8 @@ class AutenticacaoService {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['IdSistema'] = ConfiguracoesGlobalUtils.ID_SISTEMA;
 
-    var responseIniciarSessao =
-        await RequestsServices.postOptions(url, data, options);
+    var responseIniciarSessao = await RequestsServices.postOptions(
+        url: url, data: data, options: options);
 
     return responseIniciarSessao;
   }
@@ -68,8 +67,15 @@ class AutenticacaoService {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var token = Sessao.getSession(prefs).token;
 
-    var options = Options(
-        headers: {"MobileInformation": ConfiguracoesGlobalUtils.ID_SISTEMA});
+    var dispositivo =
+        await DispositivoServices.carregarInformacoesDispositivo();
+
+    dispositivo.liberado = true;
+    var options = Options(headers: {
+      dispositivo.getHeader(): dispositivo.getHeaderData(),
+      ConfiguracoesGlobalUtils.versao_header:
+          ConfiguracoesGlobalUtils.Versao_SISTEMA
+    });
     options.headers!.addAll({"Authorization": "Basic $token"});
     return options;
   }
@@ -91,8 +97,8 @@ class AutenticacaoService {
 
     var options = await getCabecalhoRequisicao();
 
-    var responseEncerrarSessao =
-        await RequestsServices.postOptions(url, null, options);
+    var responseEncerrarSessao = await RequestsServices.postOptions(
+        url: url, data: null, options: options);
 
     return responseEncerrarSessao;
   }

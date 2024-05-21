@@ -8,7 +8,7 @@ class ApiServices {
   //     "https://intranet.ssp.se.gov.br/API/sgi/dti/v3";
 
   static const String suporteDti =
-      "https://intranet.ssp.se.gov.br/API/sgi/dti/v3/sGIDTI/";
+      "https://intranet.ssp.se.gov.br/api/SgiDtiv3/";
 
   //maquina local
   // static final String intranetUrl = "http://10.10.1.71:3071/";

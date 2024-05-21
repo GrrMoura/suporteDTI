@@ -3,7 +3,7 @@ import 'package:suporte_dti/services/api_services.dart';
 import 'package:suporte_dti/services/autenticacao_service.dart';
 import 'package:suporte_dti/services/dispositivo_service.dart';
 import 'package:suporte_dti/services/requests_services.dart';
-import 'package:suporte_dti/viewModel/dispositivo_view_model.dart';
+import 'package:suporte_dti/model/dispositivo_model.dart';
 import 'package:suporte_dti/viewModel/resetar_senha_view_model.dart';
 
 class UsuarioService {
@@ -25,7 +25,7 @@ class UsuarioService {
         headers: {dispositivo.getHeader(): dispositivo.getHeaderData()});
 
     var response = await RequestsServices.postOptions(
-        url, resetarSenhaViewModel.toJson(), options);
+        url: url, data: resetarSenhaViewModel.toJson(), options: options);
     return response;
   }
 

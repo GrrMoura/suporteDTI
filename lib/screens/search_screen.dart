@@ -1,4 +1,4 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first, no_leading_underscores_for_local_identifiers
+// ignore_for_file: public_member_api_docs, sort_constructors_first, no_leading_underscores_for_local_identifiers, avoid_print
 import 'dart:convert';
 import 'dart:io';
 
@@ -13,7 +13,7 @@ import 'package:suporte_dti/data/delegacia_data.dart';
 import 'package:suporte_dti/data/equipamentos_data.dart';
 import 'package:suporte_dti/model/delegacia_model.dart';
 import 'package:suporte_dti/model/equipamentos_historico_model.dart';
-import 'package:suporte_dti/model/equipamentos_model.dart';
+import 'package:suporte_dti/model/equipamento_model.dart';
 import 'package:suporte_dti/navegacao/app_screens_path.dart';
 import 'package:suporte_dti/screens/widgets/loading_default.dart';
 import 'package:suporte_dti/services/sqlite_service.dart';
@@ -34,10 +34,10 @@ class SearchScreen extends StatefulWidget {
 
 class _SearchScreenState extends State<SearchScreen> {
   late List<DelegaciaModel> delegaciaList;
-  late List<EquipamentosModel> equipamentoList;
+  late List<EquipamentoModel> equipamentoList;
   final ConsultaController consultaController = ConsultaController();
   EquipamentosHistoricoModel historicoModel = EquipamentosHistoricoModel();
-  ConsultaEquipamentoViewModel? model = ConsultaEquipamentoViewModel();
+  EquipamentoViewModel? model = EquipamentoViewModel();
 
   late String name, cpf;
 
@@ -105,7 +105,7 @@ class _SearchScreenState extends State<SearchScreen> {
     }
   }
 
-  List<EquipamentosModel> todosOsEquipamentos = [];
+  List<EquipamentoModel> todosOsEquipamentos = [];
   @override
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
@@ -153,18 +153,23 @@ class _SearchScreenState extends State<SearchScreen> {
                 if (!teveConflito) {
                   validateInput(value);
                 }
-
-                // model?.ocupado = true;
+                model?.ocupado = true;
               });
 
               print("patrimonio ssp: ${model!.patrimonioSSP}");
               print("numero de serie:  ${model!.numeroSerie}");
               print("Sead: ${model!.patrimonioSead}");
-              // consultaController.consultar(context, model!).then((value) {
-              //   setState(() {
-              //     model?.ocupado = false;
-              //   });
-              // });
+              model?.idFabricante = 0;
+              model?.idModelo = 0;
+              model?.idTipoEquipamento = 0;
+              if (context.mounted) {
+                context.push(AppRouterName.listaEquipamentos, extra: model);
+              } else {
+                Generic.snackBar(
+                  context: context,
+                  mensagem: "Tente novamente",
+                );
+              }
             } else {
               Generic.snackBar(
                 context: context,
@@ -306,7 +311,7 @@ class _SearchScreenState extends State<SearchScreen> {
                     FittedBox(
                       fit: BoxFit.scaleDown,
                       child: Text(
-                        "${name}",
+                        name,
                         style: Styles().titleStyle().copyWith(
                             fontSize: name.length >= 17 ? 16.sp : 22.sp),
                       ),

@@ -1,7 +1,8 @@
+// ignore_for_file: must_be_immutable
+
 import 'package:convex_bottom_bar/convex_bottom_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:suporte_dti/screens/login_screen.dart';
 import 'package:suporte_dti/screens/qr_code_scanner_screen.dart';
 import 'package:suporte_dti/screens/search_screen.dart';
 import 'package:suporte_dti/utils/app_colors.dart';

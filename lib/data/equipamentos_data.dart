@@ -1,7 +1,7 @@
-import 'package:suporte_dti/model/equipamentos_model.dart';
+import 'package:suporte_dti/model/equipamento_model.dart';
 
-final equipamentosData = <EquipamentosModel>[
-  EquipamentosModel(
+final equipamentosData = <EquipamentoModel>[
+  EquipamentoModel(
       setor: "setor",
       lotacao: '',
       descricao: '',

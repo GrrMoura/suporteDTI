@@ -7,60 +7,23 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:path_provider/path_provider.dart';
-
 import 'package:screenshot/screenshot.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:suporte_dti/model/equipamento_model.dart';
 import 'package:suporte_dti/screens/widgets/widget_informacao.dart';
 import 'package:suporte_dti/utils/app_colors.dart';
 import 'package:suporte_dti/utils/app_dimens.dart';
 import 'package:suporte_dti/utils/app_styles.dart';
 
 class EquipamentoDetalhe extends StatelessWidget {
-  const EquipamentoDetalhe({super.key});
+  const EquipamentoDetalhe({required this.equipamentoModel, super.key});
+  final EquipamentoModel equipamentoModel;
 
   @override
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
     ScreenshotController screenshotController = ScreenshotController();
-
-    AlertDialog alert = AlertDialog(
-      backgroundColor: Colors.white,
-      iconColor: Colors.black,
-      shadowColor: Colors.grey,
-      title: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            "5 mais recentes",
-            style: Styles().titleDetail(),
-          ),
-        ],
-      ),
-      content: SizedBox(
-        height: 300,
-        width: 150.w,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text('Levantamento - 16/10/2020', style: Styles().smallTextStyle()),
-            Text('Levantamento - 16/10/2021', style: Styles().smallTextStyle()),
-            Text('Levantamento - 16/10/2022', style: Styles().smallTextStyle()),
-            Text('Levantamento - 16/10/2023', style: Styles().smallTextStyle()),
-            Text('Levantamento - 16/10/2024', style: Styles().smallTextStyle()),
-          ],
-        ),
-      ),
-      actions: <Widget>[
-        TextButton(
-          child: Text('OK',
-              style: TextStyle(color: Colors.black, fontSize: 14.sp)),
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-        ),
-      ],
-    );
 
     return SizedBox(
       height: height,
@@ -88,18 +51,6 @@ class EquipamentoDetalhe extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   IconButton(
-                    onPressed: () {
-                      showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return alert;
-                        },
-                      );
-                    },
-                    icon: Icon(Icons.history, size: 30.sp),
-                  ),
-                  SizedBox(width: 10.w),
-                  IconButton(
                       onPressed: () async {
                         screenShotShare(screenshotController);
                       },
@@ -112,7 +63,8 @@ class EquipamentoDetalhe extends StatelessWidget {
         bottomNavigationBar: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text("Levantado em: 16/10/2023", style: Styles().subTitleDetail()),
+            Text("Data da Alocação: 16/10/2023",
+                style: Styles().subTitleDetail()),
           ],
         ),
       ),
@@ -136,6 +88,7 @@ class EquipamentoDetalhe extends StatelessWidget {
 }
 
 class ScreenShoti extends StatelessWidget {
+  //nome errado pq existe método igual
   const ScreenShoti({
     super.key,
   });

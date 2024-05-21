@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:android_id/android_id.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:device_info_plus/device_info_plus.dart';
-import 'package:suporte_dti/viewModel/dispositivo_view_model.dart';
+import 'package:suporte_dti/model/dispositivo_model.dart';
 
 class DispositivoServices {
   static Future<bool> verificarConexao() async {

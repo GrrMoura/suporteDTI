@@ -74,4 +74,8 @@ class Validador {
     // Retorna true se o e-mail corresponder à expressão regular
     return regex.hasMatch(email);
   }
+
+  static bool listNotNullAndNotEmpty<T>(List<T>? list) {
+    return list != null && list.isNotEmpty;
+  }
 }

@@ -13,6 +13,7 @@ import 'package:suporte_dti/data/equipamentos_data.dart';
 import 'package:suporte_dti/model/delegacia_model.dart';
 import 'package:suporte_dti/model/equipamentos_historico_model.dart';
 import 'package:suporte_dti/model/equipamento_model.dart';
+import 'package:suporte_dti/model/itens_equipamento_model.dart';
 import 'package:suporte_dti/navegacao/app_screens_path.dart';
 import 'package:suporte_dti/screens/widgets/loading_default.dart';
 import 'package:suporte_dti/services/sqlite_service.dart';
@@ -36,7 +37,8 @@ class _SearchScreenState extends State<SearchScreen> {
   late List<EquipamentoModel> equipamentoList;
   final ConsultaController consultaController = ConsultaController();
   EquipamentosHistoricoModel historicoModel = EquipamentosHistoricoModel();
-  EquipamentoViewModel? model = EquipamentoViewModel();
+  EquipamentoViewModel? model = EquipamentoViewModel(
+      itensEquipamentoModels: ItensEquipamentoModels(equipamentos: []));
 
   late String name, cpf;
 

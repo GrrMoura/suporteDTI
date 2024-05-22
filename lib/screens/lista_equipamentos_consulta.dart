@@ -40,7 +40,10 @@ class _EquipamentoConsultaScreenState extends State<EquipamentoConsultaScreen> {
         _scrollController?.position.maxScrollExtent) {
       if (widget.model?.paginacao == null ||
           !widget.model!.paginacao!.seChegouAoFinalDaPagina()) {
-        setState(() {});
+        setState(() {
+          widget.model?.itensEquipamentoModels?.equipamentos = [];
+        });
+
         consultaController
             .buscarEquipamentos(context, widget.model!)
             .then((value) {
@@ -101,10 +104,10 @@ class _EquipamentoConsultaScreenState extends State<EquipamentoConsultaScreen> {
           physics: const BouncingScrollPhysics(
               parent: AlwaysScrollableScrollPhysics()),
           controller: _scrollController,
-          itemCount: widget.model?.itensEquipamentoModels?.equipamentos?.length,
+          itemCount: widget.model?.itensEquipamentoModels?.equipamentos.length,
           itemBuilder: (BuildContext ctxt, int index) {
             return _buildRow(
-                widget.model!.itensEquipamentoModels!.equipamentos![index]);
+                widget.model!.itensEquipamentoModels!.equipamentos[index]);
           },
         ),
       ),
@@ -120,7 +123,7 @@ class _EquipamentoConsultaScreenState extends State<EquipamentoConsultaScreen> {
             switch (snapshot.connectionState) {
               case ConnectionState.done:
                 return Validador.listNotNullAndNotEmpty(
-                        widget.model?.itensEquipamentoModels?.equipamentos)
+                        widget.model?.itensEquipamentoModels.equipamentos)
                     ? _listViewScreen()
                     : const LoadingDefault(); // TALVEZ DE ERRO.
 

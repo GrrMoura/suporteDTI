@@ -2,7 +2,7 @@ import 'package:suporte_dti/model/itens_equipamento_model.dart';
 import 'package:suporte_dti/model/paginacao_model.dart';
 
 class EquipamentoViewModel {
-  ItensEquipamentoModels? itensEquipamentoModels;
+  ItensEquipamentoModels itensEquipamentoModels;
   PaginacaoModels? paginacao;
 
   int? idTipoEquipamento;
@@ -26,7 +26,8 @@ class EquipamentoViewModel {
       this.paginacao,
       this.descricao,
       this.patrimonioSSP,
-      this.ocupado});
+      this.ocupado,
+      required this.itensEquipamentoModels});
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};

@@ -64,11 +64,9 @@ class ConsultaController {
       EquipamentoViewModel model, Response response) {
     var itensEquipamentoModel = ItensEquipamentoModels.fromJson(response.data);
     // ignore: prefer_conditional_assignment
-    if (model.itensEquipamentoModels?.equipamentos == null)
-      model.itensEquipamentoModels?.equipamentos = List.empty();
 
-    model.itensEquipamentoModels?.equipamentos!
-        .addAll(itensEquipamentoModel.equipamentos!);
+    model.itensEquipamentoModels.equipamentos
+        .addAll(itensEquipamentoModel.equipamentos);
     model.paginacao = itensEquipamentoModel.paginacao;
   }
 

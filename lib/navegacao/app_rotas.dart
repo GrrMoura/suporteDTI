@@ -42,7 +42,7 @@ class Rotas {
       GoRoute(
         path: AppRouterName.resultado,
         builder: (context, state) {
-          return ResultadoScreen();
+          return EquipamentoConsultaScreen();
         },
       ),
       GoRoute(

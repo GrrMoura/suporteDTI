@@ -17,6 +17,7 @@ class ConsultaService {
 
     return responseConsulta;
   }
+  //TODO: ERRO ao clicar na foto e não selecionar nenhuma opcao.
 
   static Future<Response> consultaEquipamentoPorId(
       ItemEquipamento model) async {

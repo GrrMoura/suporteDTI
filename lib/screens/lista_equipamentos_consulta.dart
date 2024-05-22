@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:suporte_dti/controller/consulta_controller.dart';
 import 'package:suporte_dti/model/itens_equipamento_model.dart';
+import 'package:suporte_dti/screens/widgets/card_item.dart';
 
 import 'package:suporte_dti/screens/widgets/loading_default.dart';
 import 'package:suporte_dti/utils/app_colors.dart';
@@ -41,7 +44,7 @@ class _EquipamentoConsultaScreenState extends State<EquipamentoConsultaScreen> {
       if (widget.model?.paginacao == null ||
           !widget.model!.paginacao!.seChegouAoFinalDaPagina()) {
         setState(() {
-          widget.model?.itensEquipamentoModels?.equipamentos = [];
+          widget.model?.itensEquipamentoModels.equipamentos = [];
         });
 
         consultaController
@@ -53,63 +56,90 @@ class _EquipamentoConsultaScreenState extends State<EquipamentoConsultaScreen> {
     }
   }
 
-  Widget _buildRow(ItemEquipamento item) {
+  Widget _buildCard(ItemEquipamento item) {
     return InkWell(
-      onTap: () {
-        setState(() {});
-        consultaController.buscarEquipamentoPorId(context, item).then((value) {
+        onTap: () {
           setState(() {});
-        });
-      },
-      child: Column(children: <Widget>[
-        Container(
-          padding: const EdgeInsets.all(10.0),
-          child: Row(children: <Widget>[
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Text(
-                    item.descricao!,
-                    style: Styles().descriptionDetail(),
-                  ),
-                  Text(item.patrimonioSead ?? "")
-                ],
-              ),
-            ),
-            const SizedBox(
-              height: 28,
-              child: Icon(
-                Icons.arrow_forward_ios,
-                size: 16,
-              ),
-            ),
-          ]),
-        ),
-        const Divider(
-          color: Colors.amber,
-        )
-      ]),
-    );
+          consultaController
+              .buscarEquipamentoPorId(context, item)
+              .then((value) {
+            setState(() {});
+          });
+        },
+        child: CardEquipamentosResultado(
+          tipoEquipamento: item.tipoEquipamento,
+          lotacao: item.descricao,
+          marca: item.fabricante,
+          patrimonio: item.patrimonioSsp,
+          tag: item.numeroSerie,
+        ));
+
+    //    Column(children: <Widget>[
+    //     Container(
+    //       padding: const EdgeInsets.all(10.0),
+    //       child: Row(children: <Widget>[
+    //         Expanded(
+    //           child: Column(
+    //             crossAxisAlignment: CrossAxisAlignment.start,
+    //             children: <Widget>[
+    //               Text(
+    //                 item.descricao!,
+    //                 style: Styles().descriptionDetail(),
+    //               ),
+    //               Text(item.patrimonioSead ?? "")
+    //             ],
+    //           ),
+    //         ),
+    //         const SizedBox(
+    //           height: 28,
+    //           child: Icon(
+    //             Icons.arrow_forward_ios,
+    //             size: 16,
+    //           ),
+    //         ),
+    //       ]),
+    //     ),
+    //     const Divider(
+    //       color: Colors.amber,
+    //     )
+    //   ]),
+    // );
   }
 
   Widget _listViewScreen() {
+    double screenWidth = MediaQuery.of(context).size.height;
     return Scaffold(
       backgroundColor: AppColors.cWhiteColor,
       appBar: AppBar(
-        title: const Text("ola"),
+        backgroundColor: AppColors.cSecondaryColor,
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
-      body: Center(
-        child: ListView.builder(
-          physics: const BouncingScrollPhysics(
-              parent: AlwaysScrollableScrollPhysics()),
-          controller: _scrollController,
-          itemCount: widget.model?.itensEquipamentoModels?.equipamentos.length,
-          itemBuilder: (BuildContext ctxt, int index) {
-            return _buildRow(
-                widget.model!.itensEquipamentoModels!.equipamentos[index]);
-          },
-        ),
+      body: ListView(
+        children: [
+          BoxSearchBar(),
+          SizedBox(
+            height: screenWidth,
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 10.w),
+              child: GridView.builder(
+                physics: const BouncingScrollPhysics(
+                    parent: AlwaysScrollableScrollPhysics()),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    mainAxisExtent: 220,
+                    mainAxisSpacing: 15,
+                    crossAxisSpacing: 15),
+                controller: _scrollController,
+                itemCount:
+                    widget.model?.itensEquipamentoModels.equipamentos.length,
+                itemBuilder: (BuildContext ctxt, int index) {
+                  return _buildCard(
+                      widget.model!.itensEquipamentoModels.equipamentos[index]);
+                },
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -137,5 +167,58 @@ class _EquipamentoConsultaScreenState extends State<EquipamentoConsultaScreen> {
             widget.model?.itensEquipamentoModels?.equipamentos)
         ? _listViewScreen()
         : _futureScreen();
+  }
+}
+
+class BoxSearchBar extends StatelessWidget {
+  const BoxSearchBar({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 130.h,
+      child: Stack(
+        children: [
+          Container(
+            height: 115.h,
+            width: double.infinity,
+            color: AppColors.cSecondaryColor,
+          ),
+          Positioned(
+              left: 140.w,
+              top: 70.h,
+              child: Text(
+                "Resultado",
+                style: TextStyle(color: Colors.white, fontSize: 20.sp),
+              )),
+          Positioned(
+            left: 30.w,
+            right: 30.w,
+            bottom: 80.h,
+            child: SearchBar(
+              textStyle: MaterialStateProperty.all(
+                Styles().mediumTextStyle(),
+              ),
+              side: MaterialStateProperty.all(
+                const BorderSide(color: Colors.grey),
+              ),
+              elevation: MaterialStateProperty.all(10),
+              trailing: [
+                IconButton(
+                    icon: Icon(Icons.close, size: 22.sp), onPressed: () {}),
+                IconButton(
+                    icon: Icon(Icons.tune, size: 22.sp), onPressed: () {}),
+              ],
+              leading: Icon(Icons.search, size: 22.sp),
+              backgroundColor: MaterialStateProperty.all(AppColors.cWhiteColor),
+              constraints: BoxConstraints(maxWidth: 300.w),
+              shape: MaterialStateProperty.all(const ContinuousRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(30)),
+              )),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

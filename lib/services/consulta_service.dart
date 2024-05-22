@@ -3,7 +3,7 @@ import 'package:suporte_dti/model/itens_equipamento_model.dart';
 import 'package:suporte_dti/services/api_services.dart';
 import 'package:suporte_dti/services/autenticacao_service.dart';
 import 'package:suporte_dti/services/requests_services.dart';
-import 'package:suporte_dti/viewModel/consulta_view_model.dart';
+import 'package:suporte_dti/viewModel/equipamento_view_model.dart';
 
 class ConsultaService {
   static Future<Response> buscarEquipamentos(EquipamentoViewModel model) async {

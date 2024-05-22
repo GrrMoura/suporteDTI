@@ -10,7 +10,7 @@ import 'package:suporte_dti/services/consulta_service.dart';
 import 'package:suporte_dti/services/dispositivo_service.dart';
 import 'package:suporte_dti/utils/app_name.dart';
 import 'package:suporte_dti/utils/snack_bar_generic.dart';
-import 'package:suporte_dti/viewModel/consulta_view_model.dart';
+import 'package:suporte_dti/viewModel/equipamento_view_model.dart';
 
 class ConsultaController {
   Future<void> buscarEquipamentos(
@@ -63,7 +63,10 @@ class ConsultaController {
   void pepararModelEquipamentoParaAView(
       EquipamentoViewModel model, Response response) {
     var itensEquipamentoModel = ItensEquipamentoModels.fromJson(response.data);
-    model.itensEquipamentoModels?.equipamentos ??= [];
+    // ignore: prefer_conditional_assignment
+    if (model.itensEquipamentoModels?.equipamentos == null)
+      model.itensEquipamentoModels?.equipamentos = List.empty();
+
     model.itensEquipamentoModels?.equipamentos!
         .addAll(itensEquipamentoModel.equipamentos!);
     model.paginacao = itensEquipamentoModel.paginacao;
@@ -93,7 +96,7 @@ class ConsultaController {
         if (response.statusCode == 401) {
           Generic.snackBar(
             context: context,
-            mensagem: "Erro - ${response.statusMessage}",
+            mensagem: "Usuário não autenticado ou token encerrado",
           );
           await Future.delayed(const Duration(
                   seconds:
@@ -102,7 +105,7 @@ class ConsultaController {
         }
         Generic.snackBar(
           context: context,
-          mensagem: "Erro - ${response.statusMessage}",
+          mensagem: "${response.statusMessage}",
         );
 
         return null;

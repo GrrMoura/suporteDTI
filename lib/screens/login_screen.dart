@@ -78,6 +78,9 @@ class _LoginScreenState extends State<LoginScreen> {
     double height = MediaQuery.of(context).size.height;
     return loginViewModel.ocupado == false
         ? Scaffold(
+            floatingActionButton: FloatingActionButton(onPressed: () {
+              //  UsuarioController.resetarSenha(context, model)
+            }),
             backgroundColor: AppColors.cPrimaryColor,
             body: SizedBox(
               height: height,

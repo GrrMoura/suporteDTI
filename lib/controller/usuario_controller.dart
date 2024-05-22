@@ -34,7 +34,7 @@ class UsuarioController {
         if (response.statusCode == 401) {
           Generic.snackBar(
             context: context,
-            mensagem: "Erro - ${response.statusMessage}",
+            mensagem: "Usuário não autenticado ou token encerrado",
           );
 
           return context.go(AppRouterName.login);

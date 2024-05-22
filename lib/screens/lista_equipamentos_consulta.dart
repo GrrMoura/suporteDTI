@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:suporte_dti/controller/consulta_controller.dart';
 import 'package:suporte_dti/model/itens_equipamento_model.dart';
+
 import 'package:suporte_dti/screens/widgets/loading_default.dart';
 import 'package:suporte_dti/utils/app_colors.dart';
 import 'package:suporte_dti/utils/app_styles.dart';
 import 'package:suporte_dti/utils/app_validator.dart';
-import 'package:suporte_dti/viewModel/consulta_view_model.dart';
+import 'package:suporte_dti/viewModel/equipamento_view_model.dart';
 
 class EquipamentoConsultaScreen extends StatefulWidget {
   final EquipamentoViewModel? model;
@@ -69,7 +70,7 @@ class _EquipamentoConsultaScreenState extends State<EquipamentoConsultaScreen> {
                     item.descricao!,
                     style: Styles().descriptionDetail(),
                   ),
-                  Text(item.patrimonioSSP ?? "")
+                  Text(item.patrimonioSead ?? "")
                 ],
               ),
             ),
@@ -118,8 +119,8 @@ class _EquipamentoConsultaScreenState extends State<EquipamentoConsultaScreen> {
           builder: (context, snapshot) {
             switch (snapshot.connectionState) {
               case ConnectionState.done:
-                return Validador.listNotNullAndNotEmpty(widget
-                        .model?.itensEquipamentoModels?.equipamentos ??= [])
+                return Validador.listNotNullAndNotEmpty(
+                        widget.model?.itensEquipamentoModels?.equipamentos)
                     ? _listViewScreen()
                     : const LoadingDefault(); // TALVEZ DE ERRO.
 

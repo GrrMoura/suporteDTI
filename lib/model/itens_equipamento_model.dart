@@ -1,16 +1,16 @@
 import 'package:suporte_dti/model/paginacao_model.dart';
 
 class ItensEquipamentoModels {
-  List<ItemEquipamento>? equipamentos;
+  List<ItemEquipamento> equipamentos = [];
   PaginacaoModels? paginacao;
 
-  ItensEquipamentoModels({this.equipamentos, this.paginacao});
+  ItensEquipamentoModels({required this.equipamentos, this.paginacao});
 
   ItensEquipamentoModels.fromJson(Map<String, dynamic> json) {
-    if (json['identificacoesCriminais'] != null) {
+    if (json['cadastrados'] != null) {
       equipamentos = [];
-      json['identificacoesCriminais'].forEach((v) {
-        equipamentos?.add(ItemEquipamento.fromJson(v));
+      json['cadastrados'].forEach((v) {
+        equipamentos.add(ItemEquipamento.fromJson(v));
       });
     }
     paginacao = json['paginacao'] != null
@@ -20,9 +20,8 @@ class ItensEquipamentoModels {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
-    if (equipamentos != null) {
-      data['identificacoesCriminais'] =
-          equipamentos?.map((v) => v.toJson()).toList();
+    if (equipamentos != []) {
+      data['cadastrados'] = equipamentos.map((v) => v.toJson()).toList();
     }
     if (paginacao != null) {
       data['paginacao'] = paginacao?.toJson();
@@ -32,53 +31,55 @@ class ItensEquipamentoModels {
 }
 
 class ItemEquipamento {
-  int? idTipoEquipamento;
+  int? idEquipamento;
   String? numeroSerie;
   String? patrimonioSead;
-  String? patrimonioSSP;
+  String? patrimonioSsp;
   String? descricao;
+  String? fabricante;
+  String? modelo;
+  String? tipoEquipamento;
   int? idFabricante;
   int? idModelo;
-  PaginacaoModels? paginacaoModel;
-  bool? ocupado = false;
 
-  ItemEquipamento(
-      {this.idTipoEquipamento,
-      this.numeroSerie,
-      this.patrimonioSead,
-      this.idFabricante,
-      this.idModelo,
-      this.paginacaoModel,
-      this.descricao,
-      this.patrimonioSSP,
-      this.ocupado});
+  ItemEquipamento({
+    this.idEquipamento,
+    this.numeroSerie,
+    this.patrimonioSead,
+    this.idFabricante,
+    this.idModelo,
+    this.modelo,
+    this.descricao,
+    this.fabricante,
+    this.patrimonioSsp,
+  });
 
   ItemEquipamento.fromJson(Map<String, dynamic> json) {
-    idTipoEquipamento = json['idTipoEquipamento'];
+    patrimonioSsp = json['patrimonioSsp'];
+    idEquipamento = json['idEquipamento'];
+    descricao = json['descricao'];
+    fabricante = json['fabricante'];
+    modelo = json['modelo'];
+    tipoEquipamento = json['tipoEquipamento'];
     numeroSerie = json['numeroSerie'];
-    patrimonioSead = json['patrimonioSead'];
-    patrimonioSSP = json['patrimonioSsp'];
-    idFabricante = json['idFabricante'];
-    idModelo = json['idModelo'];
+    patrimonioSead = json['patrimonioSead'] ?? "";
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
-    data['idTipoEquipamento'] = idTipoEquipamento;
+    data['idEquipamento'] = idEquipamento;
     data['numeroSerie'] = numeroSerie;
     data['patrimonioSead'] = patrimonioSead;
-    data['patrimonioSsp'] = patrimonioSSP;
+    data['patrimonioSsp'] = patrimonioSsp;
     data['idFabricante'] = idFabricante;
     data['idModelo'] = idModelo;
-    if (paginacaoModel != null) {
-      data['paginacao'] = paginacaoModel!.toJson();
-    }
+
     return data;
   }
 
   Map<String, dynamic> toJsonOnlyId() {
     final Map<String, dynamic> data = <String, dynamic>{};
-    data['id'] = idTipoEquipamento;
+    data['id'] = idEquipamento;
     return data;
   }
 }

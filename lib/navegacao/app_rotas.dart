@@ -14,7 +14,7 @@ import 'package:suporte_dti/screens/resultado_screen.dart';
 import 'package:suporte_dti/screens/resumo_levantamento.dart';
 import 'package:suporte_dti/screens/search_screen.dart';
 import 'package:suporte_dti/screens/delegacia_resultado_screen.dart';
-import 'package:suporte_dti/viewModel/consulta_view_model.dart';
+import 'package:suporte_dti/viewModel/equipamento_view_model.dart';
 
 class Rotas {
   Rotas();

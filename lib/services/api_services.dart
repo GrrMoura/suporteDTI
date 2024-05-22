@@ -7,6 +7,9 @@ class ApiServices {
   // static const String suporteDti =
   //     "https://intranet.ssp.se.gov.br/API/sgi/dti/v3";
 
+  // static const String suporteDti =
+  //     "https://intranet.ssp.se.gov.br/API/sgi/dti/v3/sGIDTI/";
+
   static const String suporteDti =
       "https://intranet.ssp.se.gov.br/api/SgiDtiv3/";
 

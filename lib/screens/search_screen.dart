@@ -1,7 +1,6 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first, no_leading_underscores_for_local_identifiers, avoid_print
 import 'dart:convert';
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -21,7 +20,7 @@ import 'package:suporte_dti/utils/app_colors.dart';
 import 'package:suporte_dti/utils/app_name.dart';
 import 'package:suporte_dti/utils/app_styles.dart';
 import 'package:suporte_dti/utils/snack_bar_generic.dart';
-import 'package:suporte_dti/viewModel/consulta_view_model.dart';
+import 'package:suporte_dti/viewModel/equipamento_view_model.dart';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key, required this.nome});
@@ -148,12 +147,10 @@ class _SearchScreenState extends State<SearchScreen> {
             if (value.isNotEmpty) {
               bool teveConflito = await checkConflict(context, value);
               setState(() {
-                print(teveConflito);
-
                 if (!teveConflito) {
                   validateInput(value);
                 }
-                model?.ocupado = true;
+                //   model?.ocupado = true;
               });
 
               print("patrimonio ssp: ${model!.patrimonioSSP}");
@@ -331,20 +328,22 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   void validateInput(value) {
+    value = value.toUpperCase().replaceAll(' ', '');
     if (RegExp(r'^[a-zA-Z]+$').hasMatch(value)) {
       model!.idTipoEquipamento = value; // euqipamento
     } else if (RegExp(r'^\d{1,7}$').hasMatch(value)) {
       model!.patrimonioSSP = value;
-    } else if (RegExp(r'^(SEAD|\d+)(\s+)/$').hasMatch(value)) {
-      model!.patrimonioSead = value.replaceAll(RegExp(r'^SEAD\s+'), '');
+    } else if (RegExp(r'^SEAD\d+$').hasMatch(value)) {
+      model!.patrimonioSead = value.replaceAll(RegExp(r'^SEAD'), '');
     } else if (RegExp(r'^[a-zA-Z0-9]+$').hasMatch(value)) {
       model!.numeroSerie = value;
     } else {
-      // inválido
+      Generic.snackBar(context: context, mensagem: 'Padrão inválido');
     }
   }
 
   Future<bool> checkConflict(BuildContext context, String input) async {
+    input = input.replaceAll(' ', '');
     if (RegExp(r'^\d{1,7}$').hasMatch(input) &&
         RegExp(r'^[a-zA-Z0-9]+$').hasMatch(input)) {
       await showDialog(

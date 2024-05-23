@@ -44,7 +44,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Future<void> login() async {
     try {
       SharedPreferences prefes = await SharedPreferences.getInstance();
-
+      //  prefes.clear();
       bool isEntrarComBiometria = prefes.getBool("leitorBiometrico") ?? false;
       loginViewModel.leitorBiometrico = isEntrarComBiometria;
       bool lembrarMe = prefes.getBool("lembrar_me") ?? false;

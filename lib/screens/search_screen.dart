@@ -24,9 +24,7 @@ import 'package:suporte_dti/utils/snack_bar_generic.dart';
 import 'package:suporte_dti/viewModel/equipamento_view_model.dart';
 
 class SearchScreen extends StatefulWidget {
-  const SearchScreen({super.key, required this.nome});
-
-  final String nome;
+  const SearchScreen({super.key});
 
   @override
   State<SearchScreen> createState() => _SearchScreenState();
@@ -40,7 +38,7 @@ class _SearchScreenState extends State<SearchScreen> {
   EquipamentoViewModel? model = EquipamentoViewModel(
       itensEquipamentoModels: ItensEquipamentoModels(equipamentos: []));
 
-  late String name, cpf;
+  String name = "oi", cpf = "";
 
   SqliteService db = SqliteService();
   // ignore: prefer_typing_uninitialized_variables
@@ -68,12 +66,17 @@ class _SearchScreenState extends State<SearchScreen> {
         lotacao: "ARACAJU");
   }
 
-  void pegarIdentificacao() {
-    String informacoes = widget.nome;
+  void pegarIdentificacao() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
 
-    List names = informacoes.split(' ');
-    String _nome = "${names[0]} ${names[1]}";
-    String _cpf = "${names[2]}";
+    String? nome1 = prefs.getString("nome");
+    String? nome2 = prefs.getString("segundoNome");
+    String? cpfs = prefs.getString("cpf");
+    //String informacoes = widget.nome;
+
+    // List names = informacoes.split(' ');
+    String _nome = "$nome1 $nome2";
+    String _cpf = cpfs!;
     name = _nome;
     cpf = _cpf;
   }
@@ -308,13 +311,11 @@ class _SearchScreenState extends State<SearchScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     FittedBox(
-                      fit: BoxFit.scaleDown,
-                      child: Text(
-                        name,
-                        style: Styles().titleStyle().copyWith(
-                            fontSize: name.length >= 17 ? 16.sp : 22.sp),
-                      ),
-                    ),
+                        fit: BoxFit.scaleDown,
+                        child: Text(name,
+                            style: Styles().titleStyle().copyWith(
+                                  fontSize: name.length >= 17 ? 16.sp : 22.sp,
+                                ))),
                     Row(
                       children: [Text(cpf, style: Styles().subTitleStyle())],
                     )

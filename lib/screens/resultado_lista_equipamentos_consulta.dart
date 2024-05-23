@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 import 'package:suporte_dti/controller/consulta_controller.dart';
 import 'package:suporte_dti/model/itens_equipamento_model.dart';
+import 'package:suporte_dti/navegacao/app_screens_path.dart';
 import 'package:suporte_dti/screens/widgets/card_item.dart';
 
 import 'package:suporte_dti/screens/widgets/loading_default.dart';
@@ -26,6 +27,7 @@ class _EquipamentoConsultaScreenState extends State<EquipamentoConsultaScreen> {
 
   @override
   void initState() {
+    setState(() {});
     super.initState();
     _scrollController = ScrollController()..addListener(_scrollListener);
   }
@@ -67,11 +69,7 @@ class _EquipamentoConsultaScreenState extends State<EquipamentoConsultaScreen> {
           });
         },
         child: CardEquipamentosResultado(
-          tipoEquipamento: item.tipoEquipamento,
-          lotacao: item.descricao,
-          marca: item.fabricante,
-          patrimonio: item.patrimonioSsp,
-          tag: item.numeroSerie,
+          item: item,
         ));
 
     //    Column(children: <Widget>[
@@ -112,13 +110,21 @@ class _EquipamentoConsultaScreenState extends State<EquipamentoConsultaScreen> {
       backgroundColor: AppColors.cWhiteColor,
       appBar: AppBar(
         backgroundColor: AppColors.cSecondaryColor,
+        leading: IconButton(
+            onPressed: () {
+              context.push(AppRouterName.homeController);
+            },
+            icon: const Icon(Icons.arrow_back_ios)),
         iconTheme: const IconThemeData(color: Colors.white),
       ),
+      floatingActionButton: FloatingActionButton(onPressed: () {
+        setState(() {});
+      }),
       body: ListView(
         children: [
-          BoxSearchBar(),
+          const BoxSearchBar(),
           SizedBox(
-            height: screenWidth,
+            height: screenWidth - kToolbarHeight - 160.h,
             child: Padding(
               padding: EdgeInsets.symmetric(horizontal: 10.w),
               child: GridView.builder(

@@ -5,12 +5,11 @@ import 'package:suporte_dti/navegacao/app_screens_path.dart';
 import 'package:suporte_dti/screens/edite_screen.dart';
 import 'package:suporte_dti/screens/equipamento_detalhe_screen.dart';
 import 'package:suporte_dti/screens/levantamento_escrito_screen.dart';
-import 'package:suporte_dti/screens/lista_equipamentos_consulta.dart';
+import 'package:suporte_dti/screens/resultado_lista_equipamentos_consulta.dart';
 import 'package:suporte_dti/screens/login_screen.dart';
 import 'package:suporte_dti/screens/qr_code_resultado_screen.dart';
 import 'package:suporte_dti/screens/qr_code_scanner_screen.dart';
 import 'package:suporte_dti/screens/recuperar_senha.dart';
-import 'package:suporte_dti/screens/resultado_screen.dart';
 import 'package:suporte_dti/screens/resumo_levantamento.dart';
 import 'package:suporte_dti/screens/search_screen.dart';
 import 'package:suporte_dti/screens/delegacia_resultado_screen.dart';
@@ -27,16 +26,14 @@ class Rotas {
       ),
       GoRoute(
         path: AppRouterName.searchScreen,
-        builder: (context, state) => (const SearchScreen(
-          nome: "aaaa",
-        )),
+        builder: (context, state) => (const SearchScreen()),
       ),
       GoRoute(
         path: AppRouterName.homeController,
         builder: (context, state) {
           //LoginViewModel? loginViewModel = state.extra as LoginViewModel;
-          String? nome = state.extra as String;
-          return (HomeControler(nome: nome));
+          //   String? nome = state.extra as String;
+          return (HomeControler());
         },
       ),
       GoRoute(
@@ -57,10 +54,8 @@ class Rotas {
         path: AppRouterName.search,
         builder: (context, state) {
           // LoginViewModel? loginViewModel = state.extra as LoginViewModel;
-          String? nome = state.extra as String;
-          return (SearchScreen(
-            nome: nome,
-          ));
+          // String? nome = state.extra as String;
+          return (SearchScreen());
         },
       ),
       // GoRoute(

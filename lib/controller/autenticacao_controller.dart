@@ -62,6 +62,8 @@ class AutenticacaoController {
       String segundoNome = names[names.length - 1];
       String cpf = model.login!;
       String dados = "$primeiroNome $segundoNome $cpf";
+      prefs.setString("nome", primeiroNome);
+      prefs.setString("segundoNome", segundoNome);
 
       context.go(AppRouterName.homeController, extra: dados);
     });

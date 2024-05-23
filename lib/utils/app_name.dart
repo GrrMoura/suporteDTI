@@ -19,4 +19,18 @@ class AppName {
   static String? logoDti = 'assets/images/logo_azul.png';
   static String? add = 'assets/images/add.png';
   static String? semFoto = "assets/images/semfotos.png";
+
+  static String? cpu = "assets/images/cpu.png";
+  static String? impressora = "assets/images/impressora.png";
+  static String? nobreak = "assets/images/nobreak.jpg";
+  static String? estabilizador = "assets/images/estabilizador.png";
+  static String? notebook = "assets/images/notebook.png";
+  static String? scanner = "assets/images/scanner.png";
+  static String? roteador = "assets/images/roteador.png";
+  static String? switche = "assets/images/switch.png";
+  static String? webcam = "assets/images/webcam.png";
+  static String? projetor = "assets/images/projetor.png";
+  static String? semImagem = "assets/images/semimagem.png";
+  static String? monitor = "assets/images/monitor.png";
+  static String? hd = "assets/images/hds.png";
 }

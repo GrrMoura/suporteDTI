@@ -1,18 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:suporte_dti/model/itens_equipamento_model.dart';
 import 'package:suporte_dti/utils/app_colors.dart';
+import 'package:suporte_dti/utils/app_name.dart';
 import 'package:suporte_dti/utils/app_styles.dart';
 
 class CardEquipamentosResultado extends StatelessWidget {
-  const CardEquipamentosResultado(
-      {required this.lotacao,
-      required this.patrimonio,
-      required this.marca,
-      required this.tag,
-      required this.tipoEquipamento,
-      super.key});
+  const CardEquipamentosResultado({required this.item, super.key});
 
-  final String? patrimonio, lotacao, marca, tipoEquipamento, tag;
+  final ItemEquipamento item;
+  // final String? patrimonio, lotacao, marca, tipoEquipamento, tag;
 
   @override
   Widget build(BuildContext context) {
@@ -29,11 +26,11 @@ class CardEquipamentosResultado extends StatelessWidget {
             SizedBox(height: 3.h),
             Row(
               children: [
-                Text("Patri: ", style: Styles().hintTextStyle()),
+                Text("Patr. ", style: Styles().hintTextStyle()),
                 Flexible(
                   child: SizedBox(
                     child: Text(
-                      patrimonio ?? "",
+                      item.patrimonioSsp ?? "",
                       style: Styles().smallTextStyle(),
                     ),
                   ),
@@ -43,16 +40,88 @@ class CardEquipamentosResultado extends StatelessWidget {
             // Text(marca ?? "Sem marca", style: Styles().smallTextStyle()),
             Padding(
               padding: EdgeInsets.symmetric(vertical: 2.h),
-              child: Image.asset("assets/images/nobreak.jpg", height: 70.h),
+              child: Image.asset(
+                fotoEquipamento,
+                height: 70.h,
+              ),
             ),
-            LinhaDescricao(informacao: patrimonio, nome: "Patri"),
-            LinhaDescricao(informacao: lotacao, nome: "Lotação"),
-            LinhaDescricao(informacao: tag, nome: "TAG"),
+            LinhaDescricao(informacao: item.fabricante, nome: "Fabricante"),
+            LinhaDescricao(informacao: item.modelo, nome: "Modelo"),
+            item.patrimonioSead!.length <= 1 || item.patrimonioSead == ""
+                ? Container()
+                : LinhaDescricao(informacao: item.patrimonioSead, nome: "SEAD"),
+            item.numeroSerie != null
+                ? Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 5.w),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text("TAG: ", style: Styles().hintTextStyle()),
+                        Flexible(
+                          child: SizedBox(
+                            child: Text(
+                              item.numeroSerie!,
+                              style: Styles()
+                                  .smallTextStyle()
+                                  .copyWith(fontSize: 10.sp),
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
+                  )
+                : Container(),
             SizedBox(height: 3.h),
           ],
         ),
       ),
     );
+  }
+
+  String get fotoEquipamento {
+    switch (item.tipoEquipamento) {
+      case "MONITOR":
+        return AppName.monitor!;
+
+      case "CPU":
+        return AppName.cpu!;
+
+      case "NOTEBOOK":
+        return AppName.notebook!;
+
+      case "NETBOOK":
+        return AppName.notebook!;
+
+      case "ESTABILIZADOR":
+        return AppName.estabilizador!;
+
+      case "NOBREAK":
+        return AppName.nobreak!;
+
+      case "IMPRESSORA":
+        return AppName.impressora!;
+
+      case "SCANNER":
+        return AppName.scanner!;
+
+      case "ROTEADOR 3G":
+        return AppName.roteador!;
+
+      case "SWITCH":
+        return AppName.switche!;
+
+      case "WEBCAM":
+        return AppName.webcam!;
+
+      case "PROJETOR":
+        return AppName.projetor!;
+
+      case "TECLADO":
+        return AppName.teclado!;
+
+      default:
+        return AppName.semImagem!;
+    }
   }
 }
 
@@ -74,7 +143,9 @@ class LinhaDescricao extends StatelessWidget {
             child: SizedBox(
               child: Text(
                 informacao ?? "Sem número",
-                style: Styles().smallTextStyle(),
+                style: Styles()
+                    .smallTextStyle()
+                    .copyWith(fontSize: 10.sp, overflow: TextOverflow.ellipsis),
               ),
             ),
           ),

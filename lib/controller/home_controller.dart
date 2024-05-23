@@ -8,9 +8,8 @@ import 'package:suporte_dti/screens/search_screen.dart';
 import 'package:suporte_dti/utils/app_colors.dart';
 
 class HomeControler extends StatefulWidget {
-  HomeControler({super.key, required this.nome});
+  const HomeControler({super.key});
   // final LoginViewModel loginViewModel;
-  late String? nome;
 
   @override
   State<HomeControler> createState() => _HomePageState();
@@ -20,7 +19,7 @@ class _HomePageState extends State<HomeControler> {
   int selectedPage = 0;
 
   late List<StatefulWidget> pageList = [
-    SearchScreen(nome: widget.nome!),
+    SearchScreen(),
     const QrCodeScanner(),
     //const LoginScreen(),
 

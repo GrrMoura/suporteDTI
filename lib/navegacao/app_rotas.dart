@@ -33,15 +33,10 @@ class Rotas {
         builder: (context, state) {
           //LoginViewModel? loginViewModel = state.extra as LoginViewModel;
           //   String? nome = state.extra as String;
-          return (HomeControler());
+          return (const HomeControler());
         },
       ),
-      GoRoute(
-        path: AppRouterName.resultado,
-        builder: (context, state) {
-          return EquipamentoConsultaScreen();
-        },
-      ),
+
       GoRoute(
         path: AppRouterName.detalhesEquipamento,
         builder: (context, state) {
@@ -55,7 +50,7 @@ class Rotas {
         builder: (context, state) {
           // LoginViewModel? loginViewModel = state.extra as LoginViewModel;
           // String? nome = state.extra as String;
-          return (SearchScreen());
+          return (const SearchScreen());
         },
       ),
       // GoRoute(
@@ -96,11 +91,11 @@ class Rotas {
         builder: (context, state) => (const RecuperarSenha()),
       ),
       GoRoute(
-        path: AppRouterName.listaEquipamentos,
+        path: AppRouterName.resultadoEquipamentoConsulta,
         builder: (context, state) {
           //LoginViewModel? loginViewModel = state.extra as LoginViewModel;
           EquipamentoViewModel? model = state.extra as EquipamentoViewModel;
-          return (EquipamentoConsultaScreen(model: model));
+          return (ResultadoEquipamentoConsultaScreen(model: model));
         },
       ),
     ],

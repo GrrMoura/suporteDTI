@@ -56,7 +56,7 @@ class _SearchScreenState extends State<SearchScreen> {
     pegarIdentificacao();
 
     delegaciaList = delegaciaData;
-    todosOsEquipamentos = equipamentosData;
+    // todosOsEquipamentos = equipamentosData;
     teste = EquipamentosHistoricoModel(
         id: 7,
         marca: "DELL",
@@ -165,7 +165,8 @@ class _SearchScreenState extends State<SearchScreen> {
               model?.idModelo = 0;
               model?.idTipoEquipamento = 0;
               if (context.mounted) {
-                context.push(AppRouterName.listaEquipamentos, extra: model);
+                context.push(AppRouterName.resultadoEquipamentoConsulta,
+                    extra: model);
               } else {
                 Generic.snackBar(
                   context: context,

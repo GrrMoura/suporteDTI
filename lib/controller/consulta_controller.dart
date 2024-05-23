@@ -110,7 +110,7 @@ class ConsultaController {
       }
 
       EquipamentoModel equipamentoModel =
-          EquipamentoModel.fromJson(response.data);
+          EquipamentoModel.fromJson(response.data["detalhes"]);
 
       context.push(AppRouterName.detalhesEquipamento, extra: equipamentoModel);
     });

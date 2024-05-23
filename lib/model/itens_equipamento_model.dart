@@ -79,7 +79,7 @@ class ItemEquipamento {
 
   Map<String, dynamic> toJsonOnlyId() {
     final Map<String, dynamic> data = <String, dynamic>{};
-    data['id'] = idEquipamento;
+    data['idEquipamento'] = idEquipamento;
     return data;
   }
 }

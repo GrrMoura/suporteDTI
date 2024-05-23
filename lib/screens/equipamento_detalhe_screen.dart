@@ -2,7 +2,6 @@
 
 import 'dart:io';
 import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
@@ -30,15 +29,22 @@ class EquipamentoDetalhe extends StatelessWidget {
       width: width,
       child: Scaffold(
         appBar: AppBar(
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.white),
-            onPressed: () => context.pop(),
+          toolbarHeight: 80.h,
+          leading: Padding(
+            padding: EdgeInsets.only(bottom: 30.h),
+            child: IconButton(
+              icon: const Icon(Icons.arrow_back, color: Colors.white),
+              onPressed: () => context.pop(),
+            ),
           ),
           backgroundColor: AppColors.cSecondaryColor,
-          title: Text("Detalhes do equipamento",
-              style: Styles()
-                  .mediumTextStyle()
-                  .copyWith(color: AppColors.cWhiteColor)),
+          title: Padding(
+            padding: EdgeInsets.only(top: 30.h),
+            child: Text("Detalhes do equipamento",
+                style: Styles()
+                    .mediumTextStyle()
+                    .copyWith(color: AppColors.cWhiteColor, fontSize: 20.sp)),
+          ),
           centerTitle: true,
         ),
         body: Screenshot(
@@ -46,7 +52,7 @@ class EquipamentoDetalhe extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              const ScreenShoti(),
+              ScreenShoti(model: equipamentoModel),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -60,20 +66,15 @@ class EquipamentoDetalhe extends StatelessWidget {
             ],
           ),
         ),
-        bottomNavigationBar: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text("Data da Alocação: 16/10/2023",
-                style: Styles().subTitleDetail()),
-          ],
-        ),
       ),
     );
   }
 
   void screenShotShare(ScreenshotController screenshotController) async {
     await screenshotController
-        .captureFromWidget(const ScreenShoti())
+        .captureFromWidget(ScreenShoti(
+      model: equipamentoModel,
+    ))
         .then((value) async {
       Uint8List image = value;
       print("passou aqui");
@@ -89,10 +90,8 @@ class EquipamentoDetalhe extends StatelessWidget {
 
 class ScreenShoti extends StatelessWidget {
   //nome errado pq existe método igual
-  const ScreenShoti({
-    super.key,
-  });
-
+  const ScreenShoti({required this.model, super.key});
+  final EquipamentoModel model;
   @override
   Widget build(BuildContext context) {
     return Material(
@@ -101,11 +100,11 @@ class ScreenShoti extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           SizedBox(height: 10.h),
-          const MarcaModelo(),
+          MarcaModelo(model: model),
           SizedBox(height: 10.h),
-          const DetalhesDetalhes(),
+          DetalhesDetalhes(model: model),
           SizedBox(height: 10.h),
-          const ObservacoesDetalhe(),
+          ObservacoesDetalhe(model: model),
         ],
       ),
     );
@@ -113,9 +112,8 @@ class ScreenShoti extends StatelessWidget {
 }
 
 class ObservacoesDetalhe extends StatelessWidget {
-  const ObservacoesDetalhe({
-    super.key,
-  });
+  const ObservacoesDetalhe({required this.model, super.key});
+  final EquipamentoModel model;
 
   @override
   Widget build(BuildContext context) {
@@ -129,12 +127,40 @@ class ObservacoesDetalhe extends StatelessWidget {
         ),
         Padding(
             padding: EdgeInsets.only(left: 20.w, right: 20.w, bottom: 10.h),
-            child: const Row(
+            child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                InformacaoDetalhes(informacao: "288/13", titulo: "Convênio"),
-                InformacaoDetalhes(informacao: "1212", titulo: "Lacre"),
-                InformacaoDetalhes(informacao: "xxxx", titulo: "Outro"),
+                model.numeroLacre == null || model.numeroLacre == ""
+                    ? Container()
+                    : InformacaoDetalhes(
+                        informacao: model.numeroLacre!, titulo: "Lacre"),
+                model.patrimonioSead == null || model.patrimonioSead == ""
+                    ? Container()
+                    : InformacaoDetalhes(
+                        informacao: model.patrimonioSead!, titulo: "SEAD"),
+                model.numeroLacre == null || model.numeroLacre == ""
+                    ? Container()
+                    : InformacaoDetalhes(
+                        informacao: model.patrimonioSead!, titulo: "SEAD"),
+              ],
+            )),
+        Padding(
+            padding: EdgeInsets.only(left: 20.w, right: 20.w, bottom: 10.h),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                model.numeroLacre == null || model.numeroLacre == ""
+                    ? Container()
+                    : InformacaoDetalhes(
+                        informacao: model.numeroLacre!, titulo: "Lacre"),
+                model.patrimonioSead == null || model.patrimonioSead == ""
+                    ? Container()
+                    : InformacaoDetalhes(
+                        informacao: model.patrimonioSead!, titulo: "SEAD"),
+                model.numeroLacre == null || model.numeroLacre == ""
+                    ? Container()
+                    : InformacaoDetalhes(
+                        informacao: model.patrimonioSead!, titulo: "SEAD"),
               ],
             )),
       ],
@@ -144,9 +170,10 @@ class ObservacoesDetalhe extends StatelessWidget {
 
 class DetalhesDetalhes extends StatelessWidget {
   const DetalhesDetalhes({
+    required this.model,
     super.key,
   });
-
+  final EquipamentoModel model;
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -155,8 +182,8 @@ class DetalhesDetalhes extends StatelessWidget {
         const TituloDetalhe(titulo: "Detalhes"),
         Padding(
             padding: EdgeInsets.fromLTRB(20.w, 5.h, 20.w, 0),
-            child: const InformacaoDetalhes(
-                informacao: "CN0N2D7T74444545TAABS", titulo: "TAG")),
+            child: InformacaoDetalhes(
+                informacao: model.numeroSerie!, titulo: "TAG")),
         Padding(
           padding: EdgeInsets.fromLTRB(20.w, 5.h, 20.w, 0),
           child: const Row(
@@ -167,10 +194,18 @@ class DetalhesDetalhes extends StatelessWidget {
             ],
           ),
         ),
-        Padding(
-            padding: EdgeInsets.fromLTRB(20.w, 5.h, 20.w, 0),
-            child: const InformacaoDetalhes(
-                informacao: "149892", titulo: "Patrimônio")),
+        model.numeroLacre != null
+            ? Padding(
+                padding: EdgeInsets.fromLTRB(20.w, 5.h, 20.w, 0),
+                child: InformacaoDetalhes(
+                    informacao: model.patrimonioSsp!, titulo: "Patrimônio"))
+            : Container(),
+        model.patrimonioSsp == null || model.patrimonioSsp == ""
+            ? Container()
+            : Padding(
+                padding: EdgeInsets.fromLTRB(20.w, 5.h, 20.w, 0),
+                child: InformacaoDetalhes(
+                    informacao: model.patrimonioSsp!, titulo: "Patrimônio")),
       ],
     );
   }
@@ -196,15 +231,16 @@ class TituloDetalhe extends StatelessWidget {
 
 class MarcaModelo extends StatelessWidget {
   const MarcaModelo({
+    required this.model,
     super.key,
   });
-
+  final EquipamentoModel model;
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const TituloDetalhe(titulo: "Equipamentos"),
+        const TituloDetalhe(titulo: "Equipamento"),
         Padding(
           padding: EdgeInsets.only(top: 5.h, left: 20.w, right: 20.w),
           child: Row(
@@ -234,15 +270,23 @@ class MarcaModelo extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text("Estabilizador", style: Styles().titleDetail()),
+                  Text(model.tipoEquipamento!, style: Styles().titleDetail()),
                   SizedBox(height: 20.h),
-                  Text("Marca", style: Styles().subTitleDetail()),
-                  Text("DELL",
+                  Text("Fabricante", style: Styles().subTitleDetail()),
+                  Text(model.fabricante!,
                       style: Styles().descriptionDetail().copyWith(
                           letterSpacing: AppDimens.espacamentoPequeno)),
                   SizedBox(height: 10.h),
                   Text("Modelo", style: Styles().subTitleDetail()),
-                  Text("P2422HB", style: Styles().descriptionDetail()),
+                  FittedBox(
+                      fit: BoxFit.contain,
+                      child: SizedBox(
+                        width: 120.w,
+                        child: Text(model.modelo!,
+                            style: Styles().descriptionDetail().copyWith(
+                                fontSize:
+                                    model.modelo!.length >= 15 ? 12.sp : 16)),
+                      )),
                 ],
               ),
             ],

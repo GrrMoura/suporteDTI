@@ -19,7 +19,7 @@ class _HomePageState extends State<HomeControler> {
   int selectedPage = 0;
 
   late List<StatefulWidget> pageList = [
-    SearchScreen(),
+    const SearchScreen(),
     const QrCodeScanner(),
     //const LoginScreen(),
 

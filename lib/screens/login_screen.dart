@@ -78,9 +78,6 @@ class _LoginScreenState extends State<LoginScreen> {
     double height = MediaQuery.of(context).size.height;
     return loginViewModel.ocupado == false
         ? Scaffold(
-            floatingActionButton: FloatingActionButton(onPressed: () {
-              //  UsuarioController.resetarSenha(context, model)
-            }),
             backgroundColor: AppColors.cPrimaryColor,
             body: SizedBox(
               height: height,
@@ -90,7 +87,6 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: Stack(
                     children: [
                       Positioned(
-                          key: const Key("telaAzul"),
                           top: 0,
                           bottom: 370.h,
                           left: 0,
@@ -108,7 +104,6 @@ class _LoginScreenState extends State<LoginScreen> {
                           bottom: 380.h,
                           left: 0,
                           right: 0,
-                          key: const Key("logo"),
                           child: CircleAvatar(
                             backgroundColor: Colors.transparent,
                             child: Image.asset(
@@ -117,7 +112,6 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                           )),
                       Positioned(
-                          key: const Key("credenciais"),
                           top: 270.h,
                           bottom: 10.h,
                           left: 30.w,
@@ -141,7 +135,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             ],
                           )),
                       Positioned(
-                          top: 450.h,
+                          top: 460.h,
                           bottom: 60.h,
                           left: 30.w,
                           right: 40.w,

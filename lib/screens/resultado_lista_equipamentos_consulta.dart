@@ -8,22 +8,27 @@ import 'package:suporte_dti/screens/widgets/card_item.dart';
 
 import 'package:suporte_dti/screens/widgets/loading_default.dart';
 import 'package:suporte_dti/utils/app_colors.dart';
+import 'package:suporte_dti/utils/app_name.dart';
 import 'package:suporte_dti/utils/app_styles.dart';
 import 'package:suporte_dti/utils/app_validator.dart';
+import 'package:suporte_dti/utils/snack_bar_generic.dart';
 import 'package:suporte_dti/viewModel/equipamento_view_model.dart';
 
-class EquipamentoConsultaScreen extends StatefulWidget {
+class ResultadoEquipamentoConsultaScreen extends StatefulWidget {
   final EquipamentoViewModel? model;
-  const EquipamentoConsultaScreen({super.key, this.model});
+  const ResultadoEquipamentoConsultaScreen({super.key, this.model});
 
   @override
-  State<EquipamentoConsultaScreen> createState() =>
-      _EquipamentoConsultaScreenState();
+  State<ResultadoEquipamentoConsultaScreen> createState() =>
+      _ResultadoEquipamentoConsultaScreenState();
 }
 
-class _EquipamentoConsultaScreenState extends State<EquipamentoConsultaScreen> {
+class _ResultadoEquipamentoConsultaScreenState
+    extends State<ResultadoEquipamentoConsultaScreen> {
   ScrollController? _scrollController;
   var consultaController = ConsultaController();
+  EquipamentoViewModel? model = EquipamentoViewModel(
+      itensEquipamentoModels: ItensEquipamentoModels(equipamentos: []));
 
   @override
   void initState() {
@@ -68,40 +73,7 @@ class _EquipamentoConsultaScreenState extends State<EquipamentoConsultaScreen> {
             setState(() {});
           });
         },
-        child: CardEquipamentosResultado(
-          item: item,
-        ));
-
-    //    Column(children: <Widget>[
-    //     Container(
-    //       padding: const EdgeInsets.all(10.0),
-    //       child: Row(children: <Widget>[
-    //         Expanded(
-    //           child: Column(
-    //             crossAxisAlignment: CrossAxisAlignment.start,
-    //             children: <Widget>[
-    //               Text(
-    //                 item.descricao!,
-    //                 style: Styles().descriptionDetail(),
-    //               ),
-    //               Text(item.patrimonioSead ?? "")
-    //             ],
-    //           ),
-    //         ),
-    //         const SizedBox(
-    //           height: 28,
-    //           child: Icon(
-    //             Icons.arrow_forward_ios,
-    //             size: 16,
-    //           ),
-    //         ),
-    //       ]),
-    //     ),
-    //     const Divider(
-    //       color: Colors.amber,
-    //     )
-    //   ]),
-    // );
+        child: CardEquipamentosResultado(item: item));
   }
 
   Widget _listViewScreen() {
@@ -117,16 +89,32 @@ class _EquipamentoConsultaScreenState extends State<EquipamentoConsultaScreen> {
             icon: const Icon(Icons.arrow_back_ios)),
         iconTheme: const IconThemeData(color: Colors.white),
       ),
-      floatingActionButton: FloatingActionButton(onPressed: () {
-        setState(() {});
-      }),
       body: ListView(
         children: [
-          const BoxSearchBar(),
           SizedBox(
-            height: screenWidth - kToolbarHeight - 160.h,
+            height: 60.h,
+            child: Stack(
+              children: [
+                Container(
+                  height: 115.h,
+                  width: double.infinity,
+                  color: AppColors.cSecondaryColor,
+                ),
+                Positioned(
+                    left: 125.w,
+                    right: 125.w,
+                    top: 0.h,
+                    child: Text(
+                      "Resultado",
+                      style: TextStyle(color: Colors.white, fontSize: 22.sp),
+                    )),
+              ],
+            ),
+          ),
+          SizedBox(
+            height: screenWidth - kToolbarHeight - 115.h,
             child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 10.w),
+              padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.h),
               child: GridView.builder(
                 physics: const BouncingScrollPhysics(
                     parent: AlwaysScrollableScrollPhysics()),
@@ -152,6 +140,7 @@ class _EquipamentoConsultaScreenState extends State<EquipamentoConsultaScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // ignore: no_leading_underscores_for_local_identifiers
     FutureBuilder _futureScreen() {
       return FutureBuilder(
           future: consultaController.buscarEquipamentos(context, widget.model!),
@@ -170,61 +159,75 @@ class _EquipamentoConsultaScreenState extends State<EquipamentoConsultaScreen> {
     }
 
     return Validador.listNotNullAndNotEmpty(
-            widget.model?.itensEquipamentoModels?.equipamentos)
+            widget.model?.itensEquipamentoModels.equipamentos)
         ? _listViewScreen()
         : _futureScreen();
   }
-}
 
-class BoxSearchBar extends StatelessWidget {
-  const BoxSearchBar({super.key});
+  void validateInput(value) {
+    value = value.toUpperCase().replaceAll(' ', '');
+    if (RegExp(r'^[a-zA-Z]+$').hasMatch(value)) {
+      model!.idTipoEquipamento = value; // euqipamento
+    } else if (RegExp(r'^\d{1,7}$').hasMatch(value)) {
+      model!.patrimonioSSP = value;
+    } else if (RegExp(r'^SEAD\d+$').hasMatch(value)) {
+      model!.patrimonioSead = value.replaceAll(RegExp(r'^SEAD'), '');
+    } else if (RegExp(r'^[a-zA-Z0-9]+$').hasMatch(value)) {
+      model!.numeroSerie = value;
+    } else {
+      Generic.snackBar(context: context, mensagem: 'Padrão inválido');
+    }
+  }
 
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: 130.h,
-      child: Stack(
-        children: [
-          Container(
-            height: 115.h,
-            width: double.infinity,
-            color: AppColors.cSecondaryColor,
-          ),
-          Positioned(
-              left: 140.w,
-              top: 70.h,
-              child: Text(
-                "Resultado",
-                style: TextStyle(color: Colors.white, fontSize: 20.sp),
-              )),
-          Positioned(
-            left: 30.w,
-            right: 30.w,
-            bottom: 80.h,
-            child: SearchBar(
-              textStyle: MaterialStateProperty.all(
-                Styles().mediumTextStyle(),
-              ),
-              side: MaterialStateProperty.all(
-                const BorderSide(color: Colors.grey),
-              ),
-              elevation: MaterialStateProperty.all(10),
-              trailing: [
-                IconButton(
-                    icon: Icon(Icons.close, size: 22.sp), onPressed: () {}),
-                IconButton(
-                    icon: Icon(Icons.tune, size: 22.sp), onPressed: () {}),
-              ],
-              leading: Icon(Icons.search, size: 22.sp),
-              backgroundColor: MaterialStateProperty.all(AppColors.cWhiteColor),
-              constraints: BoxConstraints(maxWidth: 300.w),
-              shape: MaterialStateProperty.all(const ContinuousRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(30)),
-              )),
+  Future<bool> checkConflict(BuildContext context, String input) async {
+    input = input.replaceAll(' ', '');
+    if (RegExp(r'^\d{1,7}$').hasMatch(input) &&
+        RegExp(r'^[a-zA-Z0-9]+$').hasMatch(input)) {
+      await showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            backgroundColor: AppColors.cWhiteColor,
+            title: const Text(
+              'Está entrada é ?',
+              textAlign: TextAlign.center,
             ),
-          ),
-        ],
-      ),
-    );
+            actions: <Widget>[
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
+                onPressed: () {
+                  Navigator.of(context).pop(AppName.patri);
+                },
+                child: Text(AppName.patri!,
+                    style: const TextStyle(color: AppColors.contentColorBlack)),
+              ),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
+                onPressed: () {
+                  Navigator.of(context).pop(AppName.nSerie);
+                },
+                child: Text(AppName.nSerie!,
+                    style: const TextStyle(color: AppColors.contentColorBlack)),
+              ),
+            ],
+          );
+        },
+      ).then((value) {
+        if (value != null) {
+          if (value == AppName.nSerie) {
+            model!.patrimonioSSP = "";
+            model!.numeroSerie = input;
+            model!.patrimonioSead = "";
+          } else {
+            model!.patrimonioSSP = input;
+            model!.numeroSerie = "";
+            model!.patrimonioSead = "";
+          }
+        } else {}
+      });
+      return true;
+    } else {
+      return false;
+    }
   }
 }

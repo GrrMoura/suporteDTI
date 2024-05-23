@@ -21,8 +21,7 @@ class ConsultaService {
 
   static Future<Response> consultaEquipamentoPorId(
       ItemEquipamento model) async {
-    var url = ApiServices.concatConsultaIntegradaUrl(
-        "IdentificacoesCriminais/Detalhes");
+    var url = ApiServices.concatConsultaIntegradaUrl("Equipamentos/Detalhes");
 
     var options = await AutenticacaoService.getCabecalhoRequisicao();
 

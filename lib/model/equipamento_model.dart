@@ -1,54 +1,95 @@
 class EquipamentoModel {
-  final int idEquipamento;
-  final int idFabricante;
-  final int idTipoEquipamento;
-  final int idModelo;
-  final int idUnidade;
-  final String numeroSerie;
-  final String patrimonioSsp;
-  final String patrimonioSead;
-  final String lotacao;
-  final String setor;
-  final String descricao;
+  int? idEquipamento;
+  int? idFabricante;
+  int? idModelo;
+  int? idTipoEquipamento;
+  String? modelo;
+  String? tipoEquipamento;
+  String? dataCompra;
+
+  String? numeroNotafiscal;
+  String? numeroSerie;
+  String? numeroSerieSo;
+  String? enderecoIp;
+  String? patrimonioSead;
+  String? patrimonioSsp;
+  String? descricaoSo;
+  String? fabricante;
+  List? alocacoes;
+  String? notaFiscal; //TODO: VER O TIPO NO BANCO
+  String? idTipoAquisicao; //AQUI TMB
+  String? tipoAquisicao;
+  String? idUnidadedeAdministrativaDestino; //auqi tmb
+  String? unidadeAtual;
+  String? descricaoUnidadeDestino;
+  String? descricao;
+  String? numeroRegistro;
+  String? numeroLacre;
 
   EquipamentoModel(
-      {required this.descricao,
-      required this.idUnidade,
-      required this.idEquipamento,
-      required this.idFabricante,
-      required this.idModelo,
-      required this.patrimonioSsp,
-      required this.patrimonioSead,
-      required this.idTipoEquipamento,
-      required this.numeroSerie,
-      required this.lotacao,
-      required this.setor});
+      {this.descricao,
+      this.numeroRegistro,
+      this.numeroLacre,
+      this.descricaoUnidadeDestino,
+      this.idUnidadedeAdministrativaDestino,
+      this.idEquipamento,
+      this.idFabricante,
+      this.idModelo,
+      this.idTipoAquisicao,
+      this.tipoAquisicao,
+      this.fabricante,
+      this.modelo,
+      this.enderecoIp,
+      this.tipoEquipamento,
+      this.dataCompra,
+      this.numeroNotafiscal,
+      this.numeroSerie,
+      this.numeroSerieSo,
+      this.patrimonioSsp,
+      this.patrimonioSead,
+      this.descricaoSo,
+      this.idTipoEquipamento,
+      this.alocacoes,
+      this.unidadeAtual});
 
-  factory EquipamentoModel.fromJson(Map<String, dynamic> json) =>
-      EquipamentoModel(
-          patrimonioSsp: json['patrimonioSsp'],
-          idModelo: json['idModelo'],
-          idTipoEquipamento: json['idTipoEquipamento'],
-          numeroSerie: json['numeroSerie'],
-          lotacao: json['lotacao'],
-          setor: json['setor'],
-          descricao: json['descricao'],
-          idUnidade: json['IdUnidade'],
-          idEquipamento: json['idEquipamento'],
-          idFabricante: json['idFabricante'],
-          patrimonioSead: json['patrimonioSead']);
-
-  Map<String, dynamic> toJson() => {
-        'patrimonioSsp': patrimonioSsp,
-        'idModelo': idModelo,
-        'idTipoEquipamento': idTipoEquipamento,
-        'numeroSerie': numeroSerie,
-        "lotacao": lotacao,
-        "setor": setor,
-        "descricao": descricao,
-        "idUnidade": idUnidade,
-        "idEquipamento": idEquipamento,
-        "idFabricante": idFabricante,
-        "patrimonioSead": patrimonioSead,
-      };
+  EquipamentoModel.fromJson(Map<String, dynamic> json) {
+    idEquipamento = json['idEquipamento'];
+    descricao = json['descricao'];
+    idFabricante = json['idFabricante'];
+    idModelo = json['idModelo'];
+    idTipoEquipamento = json['idTipoEquipamento'];
+    modelo = json['modelo'];
+    tipoEquipamento = json['tipoEquipamento'];
+    dataCompra = json['dataCompra'];
+    numeroNotafiscal = json['numeroNotaFiscal'];
+    numeroSerie = json['numeroSerie'];
+    numeroSerieSo = json['numeroSerieSo'];
+    enderecoIp = json['enderecoIp'];
+    patrimonioSead = json['patrimonioSead'];
+    patrimonioSsp = json['patrimonioSsp'];
+    descricaoSo = json['descricaoSo'];
+    fabricante = json['fabricante'];
+    alocacoes = json['alocacoes'];
+    notaFiscal = json['notaFiscal'];
+    idTipoAquisicao = json['idTipoAquisicao'];
+    tipoAquisicao = json['tipoAquisicao'];
+    unidadeAtual = json['unidadeAtual'];
+    idUnidadedeAdministrativaDestino = json['idUnidadeAdministrativaDestino'];
+    descricaoUnidadeDestino = json['DescricaoUnidadeDestino'];
+    numeroRegistro = json['numeroRegistro'];
+    numeroLacre = json['numeroLacre'];
+  }
+  // Map<String, dynamic> toJson() => {
+  //       'patrimonioSsp': patrimonioSsp,
+  //       'idModelo': idModelo,
+  //       'idTipoEquipamento': idTipoEquipamento,
+  //       'numeroSerie': numeroSerie,
+  //       "alocacoes": alocacoes,
+  //       "unidadeAtual": unidadeAtual,
+  //       "descricao": descricao,
+  //       "idUnidadedeAdministrativaDestino": idUnidadedeAdministrativaDestino,
+  //       "idEquipamento": idEquipamento,
+  //       "idFabricante": idFabricante,
+  //       "patrimonioSead": patrimonioSead,
+  //     };
 }

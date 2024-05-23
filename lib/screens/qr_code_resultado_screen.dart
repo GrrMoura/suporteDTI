@@ -8,6 +8,7 @@ import 'package:go_router/go_router.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:screenshot/screenshot.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:suporte_dti/model/equipamento_model.dart';
 import 'package:suporte_dti/navegacao/app_screens_path.dart';
 import 'package:suporte_dti/screens/equipamento_detalhe_screen.dart';
 import 'package:suporte_dti/utils/app_colors.dart';
@@ -119,9 +120,9 @@ class CardEbotoes extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              ButtonScanResult(icone: Icons.search, type: "Consultar"),
-              ButtonScanResult(icone: Icons.share, type: "Partilhar"),
-              ButtonScanResult(icone: Icons.upload, type: "Atualizar"),
+              // ButtonScanResult(icone: Icons.search, type: "Consultar"),
+              // ButtonScanResult(icone: Icons.share, type: "Partilhar"),
+              // ButtonScanResult(icone: Icons.upload, type: "Atualizar"),
             ],
           ),
         ),
@@ -235,9 +236,11 @@ class ButtonScanResult extends StatelessWidget {
     super.key,
     required this.type,
     required this.icone,
+    required this.model,
   });
 
   final String type;
+  final EquipamentoModel model;
   final IconData icone;
   ScreenshotController screenshotController1 = ScreenshotController();
 
@@ -260,7 +263,7 @@ class ButtonScanResult extends StatelessWidget {
                 break;
 
               case "Partilhar":
-                screenShotShare(screenshotController1);
+                screenShotShare(screenshotController1, model);
                 break;
 
               case "Atualizar":
@@ -281,9 +284,12 @@ class ButtonScanResult extends StatelessWidget {
     );
   }
 
-  void screenShotShare(ScreenshotController screenshotController) async {
+  void screenShotShare(
+      ScreenshotController screenshotController, EquipamentoModel model) async {
     await screenshotController
-        .captureFromWidget(const ScreenShoti())
+        .captureFromWidget(ScreenShoti(
+      model: model,
+    ))
         .then((value) async {
       Uint8List image = value;
 

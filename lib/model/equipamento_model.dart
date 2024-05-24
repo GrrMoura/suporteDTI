@@ -15,11 +15,11 @@ class EquipamentoModel {
   String? patrimonioSsp;
   String? descricaoSo;
   String? fabricante;
-  List? alocacoes;
+  List<Alocacoes>? alocacoes;
   String? notaFiscal; //TODO: VER O TIPO NO BANCO
-  String? idTipoAquisicao; //AQUI TMB
+  int? idTipoAquisicao; //AQUI TMB
   String? tipoAquisicao;
-  String? idUnidadedeAdministrativaDestino; //auqi tmb
+  int? idUnidadedeAdministrativaDestino; //auqi tmb
   String? unidadeAtual;
   String? descricaoUnidadeDestino;
   String? descricao;
@@ -50,7 +50,8 @@ class EquipamentoModel {
       this.descricaoSo,
       this.idTipoEquipamento,
       this.alocacoes,
-      this.unidadeAtual});
+      this.unidadeAtual,
+      this.notaFiscal});
 
   EquipamentoModel.fromJson(Map<String, dynamic> json) {
     idEquipamento = json['idEquipamento'];
@@ -69,10 +70,15 @@ class EquipamentoModel {
     patrimonioSsp = json['patrimonioSsp'];
     descricaoSo = json['descricaoSo'];
     fabricante = json['fabricante'];
-    alocacoes = json['alocacoes'];
+    if (json['alocacoes'] != null || json['alocacoes'] == []) {
+      alocacoes = [];
+      json['alocacoes'].forEach((v) {
+        alocacoes!.add(Alocacoes.fromJson(v));
+      });
+    }
     notaFiscal = json['notaFiscal'];
     idTipoAquisicao = json['idTipoAquisicao'];
-    tipoAquisicao = json['tipoAquisicao'];
+
     unidadeAtual = json['unidadeAtual'];
     idUnidadedeAdministrativaDestino = json['idUnidadeAdministrativaDestino'];
     descricaoUnidadeDestino = json['DescricaoUnidadeDestino'];
@@ -92,4 +98,37 @@ class EquipamentoModel {
   //       "idFabricante": idFabricante,
   //       "patrimonioSead": patrimonioSead,
   //     };
+}
+
+class Alocacoes {
+  String? unidadeAdministrativa;
+  String? dataAlocacao;
+  String? usuarioAlocacao;
+  String? dataDesalocacao;
+  String? usuarioDesalocacao;
+
+  Alocacoes(
+      {this.unidadeAdministrativa,
+      this.dataAlocacao,
+      this.usuarioAlocacao,
+      this.dataDesalocacao,
+      this.usuarioDesalocacao});
+
+  Alocacoes.fromJson(Map<String, dynamic> json) {
+    unidadeAdministrativa = json['unidadeAdministrativa'];
+    dataAlocacao = json['dataAlocacao'];
+    usuarioAlocacao = json['usuarioAlocacao'];
+    dataDesalocacao = json['dataDesalocacao'];
+    usuarioDesalocacao = json['usuarioDesalocacao'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['unidadeAdministrativa'] = unidadeAdministrativa;
+    data['dataAlocacao'] = dataAlocacao;
+    data['usuarioAlocacao'] = usuarioAlocacao;
+    data['dataDesalocacao'] = dataDesalocacao;
+    data['usuarioDesalocacao'] = usuarioDesalocacao;
+    return data;
+  }
 }

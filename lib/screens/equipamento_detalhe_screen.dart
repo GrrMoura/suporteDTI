@@ -3,6 +3,7 @@
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:path_provider/path_provider.dart';
@@ -12,6 +13,7 @@ import 'package:suporte_dti/model/equipamento_model.dart';
 import 'package:suporte_dti/screens/widgets/widget_informacao.dart';
 import 'package:suporte_dti/utils/app_colors.dart';
 import 'package:suporte_dti/utils/app_dimens.dart';
+import 'package:suporte_dti/utils/app_name.dart';
 import 'package:suporte_dti/utils/app_styles.dart';
 
 class EquipamentoDetalhe extends StatelessWidget {
@@ -25,49 +27,57 @@ class EquipamentoDetalhe extends StatelessWidget {
     ScreenshotController screenshotController = ScreenshotController();
 
     return SizedBox(
-      height: height,
-      width: width,
-      child: Scaffold(
-        appBar: AppBar(
-          toolbarHeight: 80.h,
-          leading: Padding(
-            padding: EdgeInsets.only(bottom: 30.h),
-            child: IconButton(
-              icon: const Icon(Icons.arrow_back, color: Colors.white),
-              onPressed: () => context.pop(),
-            ),
-          ),
-          backgroundColor: AppColors.cSecondaryColor,
-          title: Padding(
-            padding: EdgeInsets.only(top: 30.h),
-            child: Text("Detalhes do equipamento",
-                style: Styles()
-                    .mediumTextStyle()
-                    .copyWith(color: AppColors.cWhiteColor, fontSize: 20.sp)),
-          ),
-          centerTitle: true,
-        ),
-        body: Screenshot(
-          controller: screenshotController,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              ScreenShoti(model: equipamentoModel),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  IconButton(
+        height: height,
+        width: width,
+        child: Scaffold(
+            appBar: AppBar(
+              toolbarHeight: 80.h,
+              actions: [
+                Padding(
+                  padding: EdgeInsets.only(bottom: 30.h),
+                  child: IconButton(
                       onPressed: () async {
                         screenShotShare(screenshotController);
                       },
-                      icon: Icon(Icons.share, size: 30.sp))
-                ],
-              )
-            ],
-          ),
-        ),
-      ),
-    );
+                      icon:
+                          Icon(Icons.share, size: 20.sp, color: Colors.white)),
+                )
+              ],
+              leading: Padding(
+                padding: EdgeInsets.only(bottom: 30.h),
+                child: IconButton(
+                  icon: const Icon(Icons.arrow_back, color: Colors.white),
+                  onPressed: () => context.pop(),
+                ),
+              ),
+              backgroundColor: AppColors.cSecondaryColor,
+              title: Padding(
+                padding: EdgeInsets.only(top: 30.h),
+                child: Text("Detalhes do equipamento",
+                    style: Styles().mediumTextStyle().copyWith(
+                        color: AppColors.cWhiteColor, fontSize: 18.sp)),
+              ),
+              centerTitle: true,
+            ),
+            body: Screenshot(
+              controller: screenshotController,
+              child: ScreenShoti(model: equipamentoModel),
+            ),
+            bottomNavigationBar: equipamentoModel.alocacoes!.isEmpty
+                ? const Text("")
+                : Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                          "Última alocação: ${equipamentoModel.alocacoes![0].dataAlocacao.toString()}",
+                          style: Styles().subTitleDetail()),
+                      Text(
+                          " por ${equipamentoModel.alocacoes![0].usuarioAlocacao}",
+                          style: Styles()
+                              .subTitleDetail()
+                              .copyWith(overflow: TextOverflow.ellipsis)),
+                    ],
+                  )));
   }
 
   void screenShotShare(ScreenshotController screenshotController) async {
@@ -97,9 +107,8 @@ class ScreenShoti extends StatelessWidget {
     return Material(
       color: Colors.white,
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          SizedBox(height: 10.h),
+          SizedBox(height: 30.h),
           MarcaModelo(model: model),
           SizedBox(height: 10.h),
           DetalhesDetalhes(model: model),
@@ -123,27 +132,8 @@ class ObservacoesDetalhe extends StatelessWidget {
         Padding(
           padding: EdgeInsets.only(left: 20.w),
           child: Text("Observações",
-              style: Styles().titleDetail().copyWith(fontSize: 22.sp)),
+              style: Styles().titleDetail().copyWith(fontSize: 20.sp)),
         ),
-        Padding(
-            padding: EdgeInsets.only(left: 20.w, right: 20.w, bottom: 10.h),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                model.numeroLacre == null || model.numeroLacre == ""
-                    ? Container()
-                    : InformacaoDetalhes(
-                        informacao: model.numeroLacre!, titulo: "Lacre"),
-                model.patrimonioSead == null || model.patrimonioSead == ""
-                    ? Container()
-                    : InformacaoDetalhes(
-                        informacao: model.patrimonioSead!, titulo: "SEAD"),
-                model.numeroLacre == null || model.numeroLacre == ""
-                    ? Container()
-                    : InformacaoDetalhes(
-                        informacao: model.patrimonioSead!, titulo: "SEAD"),
-              ],
-            )),
         Padding(
             padding: EdgeInsets.only(left: 20.w, right: 20.w, bottom: 10.h),
             child: Row(
@@ -157,7 +147,7 @@ class ObservacoesDetalhe extends StatelessWidget {
                     ? Container()
                     : InformacaoDetalhes(
                         informacao: model.patrimonioSead!, titulo: "SEAD"),
-                model.numeroLacre == null || model.numeroLacre == ""
+                model.patrimonioSead == null || model.patrimonioSead == ""
                     ? Container()
                     : InformacaoDetalhes(
                         informacao: model.patrimonioSead!, titulo: "SEAD"),
@@ -169,10 +159,7 @@ class ObservacoesDetalhe extends StatelessWidget {
 }
 
 class DetalhesDetalhes extends StatelessWidget {
-  const DetalhesDetalhes({
-    required this.model,
-    super.key,
-  });
+  const DetalhesDetalhes({required this.model, super.key});
   final EquipamentoModel model;
   @override
   Widget build(BuildContext context) {
@@ -180,42 +167,73 @@ class DetalhesDetalhes extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const TituloDetalhe(titulo: "Detalhes"),
-        Padding(
-            padding: EdgeInsets.fromLTRB(20.w, 5.h, 20.w, 0),
-            child: InformacaoDetalhes(
-                informacao: model.numeroSerie!, titulo: "TAG")),
-        Padding(
-          padding: EdgeInsets.fromLTRB(20.w, 5.h, 20.w, 0),
-          child: const Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              InformacaoDetalhes(titulo: "Lotaçao", informacao: "Capela"),
-              InformacaoDetalhes(titulo: "Setor", informacao: "Cartório")
-            ],
-          ),
-        ),
-        model.numeroLacre != null
-            ? Padding(
+        model.numeroSerie == null || model.numeroSerie == ""
+            ? Container()
+            : Padding(
                 padding: EdgeInsets.fromLTRB(20.w, 5.h, 20.w, 0),
                 child: InformacaoDetalhes(
-                    informacao: model.patrimonioSsp!, titulo: "Patrimônio"))
-            : Container(),
+                    informacao: model.numeroSerie!, titulo: "TAG")),
+        model.patrimonioSead == null || model.patrimonioSead == ""
+            ? Container()
+            : Padding(
+                padding: EdgeInsets.fromLTRB(20.w, 5.h, 20.w, 0),
+                child: InformacaoDetalhes(
+                    informacao: model.patrimonioSead!, titulo: "SEAD")),
         model.patrimonioSsp == null || model.patrimonioSsp == ""
             ? Container()
             : Padding(
                 padding: EdgeInsets.fromLTRB(20.w, 5.h, 20.w, 0),
                 child: InformacaoDetalhes(
                     informacao: model.patrimonioSsp!, titulo: "Patrimônio")),
+        model.dataCompra == null || model.dataCompra == ""
+            ? Container()
+            : Padding(
+                padding: EdgeInsets.fromLTRB(20.w, 5.h, 20.w, 0),
+                child: InformacaoDetalhes(
+                    informacao: model.patrimonioSsp!,
+                    titulo: "Data da compra")),
+        unidadeAtual(),
       ],
+    );
+  }
+
+  Padding unidadeAtual() {
+    return Padding(
+      padding: EdgeInsets.fromLTRB(20.w, 5.h, 20.w, 0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          model.unidadeAtual == null || model.unidadeAtual == ""
+              ? Container()
+              : Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 10.w),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text("Lotação", style: Styles().subTitleDetail()),
+                      FittedBox(
+                        fit: BoxFit.contain,
+                        child: SizedBox(
+                          width: 250.w,
+                          child: Text(model.unidadeAtual!,
+                              style: Styles().descriptionDetail().copyWith(
+                                  letterSpacing: AppDimens.espacamentoPequeno,
+                                  fontSize: model.unidadeAtual!.length > 16
+                                      ? 15
+                                      : 20)),
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+        ],
+      ),
     );
   }
 }
 
 class TituloDetalhe extends StatelessWidget {
-  const TituloDetalhe({
-    required this.titulo,
-    super.key,
-  });
+  const TituloDetalhe({required this.titulo, super.key});
 
   final String titulo;
 
@@ -224,7 +242,7 @@ class TituloDetalhe extends StatelessWidget {
     return Padding(
       padding: EdgeInsets.only(left: 20.w, top: 5.h),
       child:
-          Text(titulo, style: Styles().titleDetail().copyWith(fontSize: 22.sp)),
+          Text(titulo, style: Styles().titleDetail().copyWith(fontSize: 20.sp)),
     );
   }
 }
@@ -240,43 +258,40 @@ class MarcaModelo extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const TituloDetalhe(titulo: "Equipamento"),
         Padding(
-          padding: EdgeInsets.only(top: 5.h, left: 20.w, right: 20.w),
+          padding: EdgeInsets.only(left: 20.w, right: 20.w),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Padding(
-                padding: EdgeInsets.only(top: 10.h),
-                child: Material(
-                  color: AppColors.cWhiteColor,
-                  elevation: 4,
-                  borderRadius: BorderRadius.circular(10),
-                  shadowColor: Colors.grey,
-                  child: Column(
-                    children: [
-                      SizedBox(height: 3.h),
-                      Padding(
-                        padding: EdgeInsets.symmetric(
-                            vertical: 5.h, horizontal: 5.w),
-                        child: Image.asset("assets/images/impressora.png",
-                            height: 150.h),
-                      ),
-                    ],
-                  ),
+              Material(
+                color: AppColors.cWhiteColor,
+                elevation: 4,
+                borderRadius: BorderRadius.circular(10),
+                shadowColor: Colors.grey,
+                child: Column(
+                  children: [
+                    SizedBox(height: 3.h),
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 5.w),
+                      child: Image.asset(
+                          AppName.fotoEquipamento(model.tipoEquipamento!),
+                          height: 140.h),
+                    ),
+                  ],
                 ),
               ),
-              SizedBox(width: 5.w),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(model.tipoEquipamento!, style: Styles().titleDetail()),
-                  SizedBox(height: 20.h),
+                  Text("Tipo", style: Styles().subTitleDetail()),
+                  Text(model.tipoEquipamento!,
+                      style: Styles().descriptionDetail()),
+                  SizedBox(height: 15.h),
                   Text("Fabricante", style: Styles().subTitleDetail()),
                   Text(model.fabricante!,
                       style: Styles().descriptionDetail().copyWith(
                           letterSpacing: AppDimens.espacamentoPequeno)),
-                  SizedBox(height: 10.h),
+                  SizedBox(height: 15.h),
                   Text("Modelo", style: Styles().subTitleDetail()),
                   FittedBox(
                       fit: BoxFit.contain,

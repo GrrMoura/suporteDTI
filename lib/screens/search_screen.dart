@@ -9,7 +9,6 @@ import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:suporte_dti/controller/consulta_controller.dart';
 import 'package:suporte_dti/data/delegacia_data.dart';
-import 'package:suporte_dti/data/equipamentos_data.dart';
 import 'package:suporte_dti/model/delegacia_model.dart';
 import 'package:suporte_dti/model/equipamentos_historico_model.dart';
 import 'package:suporte_dti/model/equipamento_model.dart';

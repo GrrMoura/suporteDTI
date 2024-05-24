@@ -41,7 +41,7 @@ class CardEquipamentosResultado extends StatelessWidget {
             Padding(
               padding: EdgeInsets.symmetric(vertical: 2.h),
               child: Image.asset(
-                fotoEquipamento,
+                AppName.fotoEquipamento(item.tipoEquipamento!),
                 height: 70.h,
               ),
             ),
@@ -76,52 +76,6 @@ class CardEquipamentosResultado extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  String get fotoEquipamento {
-    switch (item.tipoEquipamento) {
-      case "MONITOR":
-        return AppName.monitor!;
-
-      case "CPU":
-        return AppName.cpu!;
-
-      case "NOTEBOOK":
-        return AppName.notebook!;
-
-      case "NETBOOK":
-        return AppName.notebook!;
-
-      case "ESTABILIZADOR":
-        return AppName.estabilizador!;
-
-      case "NOBREAK":
-        return AppName.nobreak!;
-
-      case "IMPRESSORA":
-        return AppName.impressora!;
-
-      case "SCANNER":
-        return AppName.scanner!;
-
-      case "ROTEADOR 3G":
-        return AppName.roteador!;
-
-      case "SWITCH":
-        return AppName.switche!;
-
-      case "WEBCAM":
-        return AppName.webcam!;
-
-      case "PROJETOR":
-        return AppName.projetor!;
-
-      case "TECLADO":
-        return AppName.teclado!;
-
-      default:
-        return AppName.semImagem!;
-    }
   }
 }
 

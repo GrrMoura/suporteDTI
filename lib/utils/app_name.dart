@@ -1,3 +1,5 @@
+import 'package:suporte_dti/model/itens_equipamento_model.dart';
+
 class AppName {
   static String? erro = "erro";
   static String? sucesso = "sucesso";
@@ -22,8 +24,8 @@ class AppName {
 
   static String? cpu = "assets/images/cpu.png";
   static String? impressora = "assets/images/impressora.png";
-  static String? nobreak = "assets/images/nobreak.jpg";
-  static String? estabilizador = "assets/images/estabilizador.png";
+  static String? nobreak = "assets/images/nobreak.png";
+  static String? estabilizador = "assets/images/nobreak.png";
   static String? notebook = "assets/images/notebook.png";
   static String? scanner = "assets/images/scanner.png";
   static String? roteador = "assets/images/roteador.png";
@@ -33,4 +35,50 @@ class AppName {
   static String? semImagem = "assets/images/semimagem.png";
   static String? monitor = "assets/images/monitor.png";
   static String? hd = "assets/images/hds.png";
+
+  static String fotoEquipamento(String tipoEquipamento) {
+    switch (tipoEquipamento) {
+      case "MONITOR":
+        return AppName.monitor!;
+
+      case "CPU":
+        return AppName.cpu!;
+
+      case "NOTEBOOK":
+        return AppName.notebook!;
+
+      case "NETBOOK":
+        return AppName.notebook!;
+
+      case "ESTABILIZADOR":
+        return AppName.estabilizador!;
+
+      case "NOBREAK":
+        return AppName.nobreak!;
+
+      case "IMPRESSORA":
+        return AppName.impressora!;
+
+      case "SCANNER":
+        return AppName.scanner!;
+
+      case "ROTEADOR 3G":
+        return AppName.roteador!;
+
+      case "SWITCH":
+        return AppName.switche!;
+
+      case "WEBCAM":
+        return AppName.webcam!;
+
+      case "PROJETOR":
+        return AppName.projetor!;
+
+      case "TECLADO":
+        return AppName.teclado!;
+
+      default:
+        return AppName.semImagem!;
+    }
+  }
 }

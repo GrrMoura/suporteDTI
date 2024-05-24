@@ -85,8 +85,9 @@ class Styles {
 
   TextStyle descriptionDetail() {
     return TextStyle(
+        color: AppColors.cDescriptionIconColor,
         fontStyle: FontStyle.normal,
-        fontSize: AppDimens.largeTextSize,
+        fontSize: AppDimens.mediumSize,
         fontWeight: FontWeight.w500,
         letterSpacing: AppDimens.espacamentoMedio);
   }

@@ -2,6 +2,7 @@
 
 import 'dart:io';
 import 'dart:typed_data';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -62,22 +63,7 @@ class EquipamentoDetalhe extends StatelessWidget {
             body: Screenshot(
               controller: screenshotController,
               child: ScreenShoti(model: equipamentoModel),
-            ),
-            bottomNavigationBar: equipamentoModel.alocacoes!.isEmpty
-                ? const Text("")
-                : Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                          "Última alocação: ${equipamentoModel.alocacoes![0].dataAlocacao.toString()}",
-                          style: Styles().subTitleDetail()),
-                      Text(
-                          " por ${equipamentoModel.alocacoes![0].usuarioAlocacao}",
-                          style: Styles()
-                              .subTitleDetail()
-                              .copyWith(overflow: TextOverflow.ellipsis)),
-                    ],
-                  )));
+            )));
   }
 
   void screenShotShare(ScreenshotController screenshotController) async {
@@ -114,6 +100,26 @@ class ScreenShoti extends StatelessWidget {
           DetalhesDetalhes(model: model),
           SizedBox(height: 10.h),
           ObservacoesDetalhe(model: model),
+          const Expanded(child: SizedBox(height: 10)),
+          model.alocacoes!.isEmpty ? const Text("") : ultimaAlocacao()
+        ],
+      ),
+    );
+  }
+
+  Padding ultimaAlocacao() {
+    return Padding(
+      padding: const EdgeInsets.all(10),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+              "Última alocação: ${model.alocacoes![0].dataAlocacao.toString()}",
+              style: Styles().subTitleDetail()),
+          Text(" por ${model.alocacoes![0].usuarioAlocacao}",
+              style: Styles().subTitleDetail().copyWith(
+                    overflow: TextOverflow.ellipsis,
+                  )),
         ],
       ),
     );
@@ -139,18 +145,18 @@ class ObservacoesDetalhe extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
+                //lacre
                 model.numeroLacre == null || model.numeroLacre == ""
                     ? Container()
                     : InformacaoDetalhes(
                         informacao: model.numeroLacre!, titulo: "Lacre"),
+                //sead
                 model.patrimonioSead == null || model.patrimonioSead == ""
                     ? Container()
-                    : InformacaoDetalhes(
-                        informacao: model.patrimonioSead!, titulo: "SEAD"),
-                model.patrimonioSead == null || model.patrimonioSead == ""
-                    ? Container()
-                    : InformacaoDetalhes(
-                        informacao: model.patrimonioSead!, titulo: "SEAD"),
+                    : Padding(
+                        padding: EdgeInsets.fromLTRB(20.w, 5.h, 20.w, 0),
+                        child: InformacaoDetalhes(
+                            informacao: model.patrimonioSead!, titulo: "SEAD")),
               ],
             )),
       ],
@@ -167,24 +173,23 @@ class DetalhesDetalhes extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const TituloDetalhe(titulo: "Detalhes"),
+        //serie
         model.numeroSerie == null || model.numeroSerie == ""
             ? Container()
             : Padding(
                 padding: EdgeInsets.fromLTRB(20.w, 5.h, 20.w, 0),
                 child: InformacaoDetalhes(
                     informacao: model.numeroSerie!, titulo: "TAG")),
-        model.patrimonioSead == null || model.patrimonioSead == ""
-            ? Container()
-            : Padding(
-                padding: EdgeInsets.fromLTRB(20.w, 5.h, 20.w, 0),
-                child: InformacaoDetalhes(
-                    informacao: model.patrimonioSead!, titulo: "SEAD")),
+
+        //patrimonio
         model.patrimonioSsp == null || model.patrimonioSsp == ""
             ? Container()
             : Padding(
                 padding: EdgeInsets.fromLTRB(20.w, 5.h, 20.w, 0),
                 child: InformacaoDetalhes(
                     informacao: model.patrimonioSsp!, titulo: "Patrimônio")),
+
+        //data compra
         model.dataCompra == null || model.dataCompra == ""
             ? Container()
             : Padding(

@@ -65,7 +65,7 @@ class _ResultadoEquipamentoConsultaScreenState
   Widget _buildCard(ItemEquipamento item) {
     return InkWell(
         onTap: () {
-          setState(() {});
+          // setState(() {});
           consultaController
               .buscarEquipamentoPorId(context, item)
               .then((value) {
@@ -104,7 +104,7 @@ class _ResultadoEquipamentoConsultaScreenState
                     right: 125.w,
                     top: 0.h,
                     child: Text(
-                      "Resultado",
+                      "Resultadoo",
                       style: TextStyle(color: Colors.white, fontSize: 22.sp),
                     )),
               ],

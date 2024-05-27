@@ -12,7 +12,7 @@ import 'package:suporte_dti/screens/qr_code_scanner_screen.dart';
 import 'package:suporte_dti/screens/recuperar_senha.dart';
 import 'package:suporte_dti/screens/resumo_levantamento.dart';
 import 'package:suporte_dti/screens/search_screen.dart';
-import 'package:suporte_dti/screens/delegacia_resultado_screen.dart';
+import 'package:suporte_dti/screens/delegacia_detalhe.dart';
 import 'package:suporte_dti/viewModel/equipamento_view_model.dart';
 
 class Rotas {
@@ -60,8 +60,11 @@ class Rotas {
       // ),
       GoRoute(
         name: 'resultDelegacia',
-        path: AppRouterName.resultDelegacias,
-        builder: (context, state) => (const ResultDelegacia()),
+        path: AppRouterName.delegaciaDetalhe,
+        builder: (context, state) {
+          EquipamentoViewModel? model = state.extra as EquipamentoViewModel;
+          return (DelegaciaDetalhe(model: model));
+        },
       ),
       GoRoute(
         name: 'resumoLevantamento',

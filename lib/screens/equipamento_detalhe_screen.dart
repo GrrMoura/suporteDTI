@@ -104,7 +104,7 @@ class ScreenShoti extends StatelessWidget {
           model.alocacoes!.isEmpty ? const Text("") : ultimaAlocacao()
         ],
       ),
-    );
+    ); //TODO: FAZER UMA TELA MAIS  BONITINHA PARA COMPARTILHAR
   }
 
   Padding ultimaAlocacao() {

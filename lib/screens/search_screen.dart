@@ -122,7 +122,7 @@ class _SearchScreenState extends State<SearchScreen> {
                 child: Column(
                   children: [
                     heading(),
-                    FastSearch(delegaciaList: delegaciaList),
+                    FastSearch(delegaciaList: delegaciaList, model: model!),
                     searchBar(context, model?.ocupado ?? false),
                     SizedBox(height: 25.h),
                     builderHistorico(),
@@ -154,16 +154,10 @@ class _SearchScreenState extends State<SearchScreen> {
                 if (!teveConflito) {
                   validateInput(value);
                 }
-                //   model?.ocupado = true;
               });
 
-              print("patrimonio ssp: ${model!.patrimonioSSP}");
-              print("numero de serie:  ${model!.numeroSerie}");
-              print("Sead: ${model!.patrimonioSead}");
-              model?.idFabricante = 0;
-              model?.idModelo = 0;
-              model?.idTipoEquipamento = 0;
               if (context.mounted) {
+                model!.idUnidade = null;
                 context.push(AppRouterName.resultadoEquipamentoConsulta,
                     extra: model);
               } else {
@@ -399,13 +393,11 @@ class _SearchScreenState extends State<SearchScreen> {
 }
 
 class FastSearch extends StatelessWidget {
-  const FastSearch({
-    super.key,
-    required this.delegaciaList,
-  });
+  const FastSearch(
+      {super.key, required this.delegaciaList, required this.model});
 
   final List<DelegaciaModel> delegaciaList;
-
+  final EquipamentoViewModel model;
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -419,6 +411,7 @@ class FastSearch extends StatelessWidget {
             if (index < delegaciaList.length) {
               final delegacia = delegaciaList[index];
               return DelegaciasIcones(
+                  model: model,
                   path: delegacia.path,
                   id: delegacia.id,
                   name: delegacia.name,
@@ -449,7 +442,8 @@ class PesquisarDelegacias extends StatelessWidget {
             highlightColor: Colors.transparent,
             splashFactory: NoSplash.splashFactory,
             onTap: () {
-              context.push(AppRouterName.resultDelegacias);
+              Generic.snackBar(
+                  context: context, mensagem: "pesquisar todas as delegacias");
             },
             child: Container(
               height: 80.h,
@@ -478,71 +472,73 @@ class PesquisarDelegacias extends StatelessWidget {
   }
 }
 
-class CardUltimasConsultas extends StatefulWidget {
-  const CardUltimasConsultas(
-      {this.lotacao, this.patrimonio, this.db, super.key});
+// class CardUltimasConsultas extends StatefulWidget {
+//   const CardUltimasConsultas(
+//       {this.lotacao, this.patrimonio, this.db, super.key});
 
-  final String? patrimonio, lotacao;
-  final SqliteService? db;
+//   final String? patrimonio, lotacao;
+//   final SqliteService? db;
 
-  @override
-  State<CardUltimasConsultas> createState() => _CardUltimasConsultasState();
-}
+//   @override
+//   State<CardUltimasConsultas> createState() => _CardUltimasConsultasState();
+// }
 
-class _CardUltimasConsultasState extends State<CardUltimasConsultas> {
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onLongPress: () {
-        Clipboard.setData(ClipboardData(text: widget.patrimonio!));
-        Generic.snackBar(
-            context: context,
-            mensagem: "Copiado para área de transferência",
-            tipo: AppName.sucesso);
-      },
-      child: Padding(
-        padding: EdgeInsets.fromLTRB(8.w, 10.h, 8.w, 0),
-        child: SizedBox(
-          width: 100.w,
-          child: Material(
-            color: AppColors.cWhiteColor,
-            elevation: 10,
-            borderRadius: BorderRadius.circular(10),
-            shadowColor: Colors.grey,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    InkWell(
-                        onTap: () {
-                          widget.db!.deletarEquipamento(widget.patrimonio!);
-                          setState(() {});
-                        },
-                        child: const Icon(Icons.remove_circle_outline,
-                            color: Colors.red))
-                  ],
-                ),
-                Image.asset("assets/images/impressora.png", height: 70.h),
-                Text(widget.patrimonio!, style: Styles().smallTextStyle()),
-                Text(widget.lotacao!, style: Styles().hintTextStyle()),
-                SizedBox(height: 3.h),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
+// class _CardUltimasConsultasState extends State<CardUltimasConsultas> {
+//   @override
+//   Widget build(BuildContext context) {
+//     return GestureDetector(
+//       onLongPress: () {
+//         Clipboard.setData(ClipboardData(text: widget.patrimonio!));
+//         Generic.snackBar(
+//             context: context,
+//             mensagem: "Copiado para área de transferência",
+//             tipo: AppName.sucesso);
+//       },
+//       child: Padding(
+//         padding: EdgeInsets.fromLTRB(8.w, 10.h, 8.w, 0),
+//         child: SizedBox(
+//           width: 100.w,
+//           child: Material(
+//             color: AppColors.cWhiteColor,
+//             elevation: 10,
+//             borderRadius: BorderRadius.circular(10),
+//             shadowColor: Colors.grey,
+//             child: Column(
+//               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//               children: [
+//                 Row(
+//                   mainAxisAlignment: MainAxisAlignment.end,
+//                   children: [
+//                     InkWell(
+//                         onTap: () {
+//                           widget.db!.deletarEquipamento(widget.patrimonio!);
+//                           setState(() {});
+//                         },
+//                         child: const Icon(Icons.remove_circle_outline,
+//                             color: Colors.red))
+//                   ],
+//                 ),
+//                 Image.asset("assets/images/impressora.png", height: 70.h),
+//                 Text(widget.patrimonio!, style: Styles().smallTextStyle()),
+//                 Text(widget.lotacao!, style: Styles().hintTextStyle()),
+//                 SizedBox(height: 3.h),
+//               ],
+//             ),
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+// }
 
 class DelegaciasIcones extends StatelessWidget {
   final String? path;
   final int? id;
   final String? name;
   final String? region;
+  final EquipamentoViewModel model;
   const DelegaciasIcones({
+    required this.model,
     required this.id,
     required this.path,
     required this.name,
@@ -558,7 +554,18 @@ class DelegaciasIcones extends StatelessWidget {
         highlightColor: Colors.transparent,
         splashFactory: NoSplash.splashFactory,
         onTap: () {
-          context.push(AppRouterName.resultDelegacias);
+          if (context.mounted) {
+            model.idUnidade = 30;
+            model.numeroSerie = "";
+            model.patrimonioSSP = "";
+            model.patrimonioSead = "";
+            context.push(AppRouterName.delegaciaDetalhe, extra: model);
+          } else {
+            Generic.snackBar(
+              context: context,
+              mensagem: "Tente novamente",
+            );
+          }
         },
         child: Column(
           children: [

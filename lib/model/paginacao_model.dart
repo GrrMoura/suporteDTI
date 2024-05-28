@@ -8,7 +8,7 @@ class PaginacaoModels {
       {this.limite, this.pagina, this.totalPaginas, this.registros});
 
   PaginacaoModels.fromJson(Map<String, dynamic> json) {
-    limite = json['limite'];
+    limite = 10;
     pagina = json['pagina'];
     totalPaginas = json['totalPaginas'];
     registros = json['registros'];
@@ -28,6 +28,7 @@ class PaginacaoModels {
   }
 
   bool seChegouAoFinalDaPagina() {
+    print(pagina);
     return pagina! == totalPaginas!;
   }
 

@@ -42,7 +42,7 @@ class CardEquipamentosResultado extends StatelessWidget {
               padding: EdgeInsets.symmetric(vertical: 2.h),
               child: Image.asset(
                 AppName.fotoEquipamento(item.tipoEquipamento!),
-                height: 70.h,
+                height: 60.h,
               ),
             ),
             LinhaDescricao(informacao: item.fabricante, nome: "Fabricante"),

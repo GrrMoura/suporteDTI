@@ -3,7 +3,7 @@ import 'package:suporte_dti/model/delegacia_model.dart';
 final delegaciaData = <DelegaciaModel>[
   DelegaciaModel(
       id: 1,
-      name: 'LAGARTO',
+      name: 'DP Lagarto',
       path: "assets/images/lagarto.jpg",
       region: "nordeste",
       address: "Rua cabaceira",
@@ -17,7 +17,7 @@ final delegaciaData = <DelegaciaModel>[
       contact: "79 3322-4477"),
   DelegaciaModel(
       id: 3,
-      name: 'ITABAIANA',
+      name: "DP Itabaiana",
       path: "assets/images/itabaiana.jpg",
       region: "nordeste",
       address: "Rua cabaceira",

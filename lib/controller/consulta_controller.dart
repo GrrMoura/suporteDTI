@@ -27,6 +27,7 @@ class ConsultaController {
           !model.paginacao!.seChegouAoFinalDaPagina()) {
         model.paginacao!.setProximaPagina();
       }
+
       Response responseConsulta =
           await ConsultaService.buscarEquipamentos(model);
 

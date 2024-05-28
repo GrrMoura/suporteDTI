@@ -8,6 +8,7 @@ import 'package:suporte_dti/navegacao/app_screens_path.dart';
 import 'package:suporte_dti/screens/widgets/card_item.dart';
 import 'package:suporte_dti/screens/widgets/loading_default.dart';
 import 'package:suporte_dti/utils/app_colors.dart';
+import 'package:suporte_dti/utils/app_dimens.dart';
 import 'package:suporte_dti/utils/app_name.dart';
 import 'package:suporte_dti/utils/app_styles.dart';
 import 'package:suporte_dti/utils/app_validator.dart';
@@ -16,7 +17,8 @@ import 'package:suporte_dti/viewModel/equipamento_view_model.dart';
 
 //
 class DelegaciaDetalhe extends StatefulWidget {
-  final EquipamentoViewModel? model;
+  final EquipamentoViewModel?
+      model; //TODO: FAZER PARA TRAZER O NOME DA DELGACIA JUNTO COM A MODEL
   const DelegaciaDetalhe({this.model, super.key});
 
   @override
@@ -40,6 +42,9 @@ class _DelegaciaDetalheState extends State<DelegaciaDetalhe> {
   void dispose() {
     scrollController?.removeListener(_scrollListener);
     scrollController?.dispose();
+    widget.model?.paginacao?.pagina = 0;
+    widget.model?.itensEquipamentoModels.equipamentos = [];
+
     super.dispose();
   }
 
@@ -49,9 +54,7 @@ class _DelegaciaDetalheState extends State<DelegaciaDetalhe> {
         scrollController?.position.maxScrollExtent) {
       if (widget.model?.paginacao == null ||
           !widget.model!.paginacao!.seChegouAoFinalDaPagina()) {
-        setState(() {
-          widget.model?.itensEquipamentoModels.equipamentos = [];
-        });
+        setState(() {});
 
         consultaController
             .buscarEquipamentos(context, widget.model!)
@@ -75,17 +78,11 @@ class _DelegaciaDetalheState extends State<DelegaciaDetalhe> {
         child: CardEquipamentosResultado(item: item));
   }
 
-  // final List<Map> myProducts2 = List.generate(
-  //     10,
-  //     (index) => {
-  //           "id": index,
-  //           "name": "Produto $index",
-  //         }).toList();
-
   int touchedIndex = -1;
 
   @override
   Widget build(BuildContext context) {
+    setState(() {});
     FutureBuilder _futureScreen() {
       return FutureBuilder(
           future: consultaController.buscarEquipamentos(context, widget.model!),
@@ -116,7 +113,12 @@ class _DelegaciaDetalheState extends State<DelegaciaDetalhe> {
           iconTheme: const IconThemeData(
             color: Colors.white, //change your color here
           ),
-          automaticallyImplyLeading: true,
+          leading: IconButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                //    context.go(AppRouterName.homeController);
+              },
+              icon: const Icon(Icons.arrow_back_ios_new)),
           title: Text("CAPELA",
               style: Styles().titleStyle().copyWith(
                   color: AppColors.cWhiteColor,
@@ -169,11 +171,11 @@ class _DelegaciaDetalheState extends State<DelegaciaDetalhe> {
                   ],
                 ),
               ),
-
-              Titulos(
-                  //TODO: COLOCAR PAGINAÇÃO AQUI PARA VOLTAR
-                  nome:
-                      " ${widget.model?.itensEquipamentoModels.equipamentos.length ?? ""} Equipamentos  "),
+              widget.model?.itensEquipamentoModels.equipamentos.length != null
+                  ? Titulos(
+                      nome:
+                          " ${widget.model?.itensEquipamentoModels.equipamentos.length} de ${widget.model?.paginacao!.registros} equipamentos  ")
+                  : const Titulos(nome: "  Equipamentos "),
 
               // GridviewEquipamentos(
               //   myProducts: myProducts2,
@@ -213,32 +215,6 @@ class _DelegaciaDetalheState extends State<DelegaciaDetalhe> {
     );
   }
 }
-
-// @override
-//   Widget build(BuildContext context) {
-//     // ignore: no_leading_underscores_for_local_identifiers
-//     FutureBuilder _futureScreen() {
-//       return FutureBuilder(
-//           future: consultaController.buscarEquipamentos(context, widget.model!),
-//           builder: (context, snapshot) {
-//             switch (snapshot.connectionState) {
-//               case ConnectionState.done:
-//                 return Validador.listNotNullAndNotEmpty(
-//                         widget.model?.itensEquipamentoModels.equipamentos)
-//                     ? _listViewScreen()
-//                     : const LoadingDefault(); // TALVEZ DE ERRO.
-
-//               default:
-//                 return const LoadingDefault();
-//             }
-//           });
-//     }
-
-//     return Validador.listNotNullAndNotEmpty(
-//             widget.model?.itensEquipamentoModels.equipamentos)
-//         ? _listViewScreen()
-//         : _futureScreen();
-//   }
 
 class AddBotao extends StatelessWidget {
   const AddBotao({super.key});
@@ -288,7 +264,6 @@ class AddBotao extends StatelessWidget {
                 ),
               ],
             ),
-            // Botão com imagem 2
           ],
         );
       },
@@ -425,7 +400,8 @@ class Titulos extends StatelessWidget {
               Icon(Icons.fiber_manual_record, size: 12.sp),
               Text(
                 nome,
-                style: Styles().mediumTextStyle().copyWith(color: Colors.black),
+                style: Styles().mediumTextStyle().copyWith(
+                    color: Colors.black, fontSize: AppDimens.smallTextSize),
               ),
             ],
           ),

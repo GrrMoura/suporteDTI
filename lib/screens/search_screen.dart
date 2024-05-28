@@ -157,7 +157,7 @@ class _SearchScreenState extends State<SearchScreen> {
               });
 
               if (context.mounted) {
-                model!.idUnidade = null;
+                //   model!.idUnidade = null;
                 context.push(AppRouterName.resultadoEquipamentoConsulta,
                     extra: model);
               } else {
@@ -537,6 +537,7 @@ class DelegaciasIcones extends StatelessWidget {
   final String? name;
   final String? region;
   final EquipamentoViewModel model;
+
   const DelegaciasIcones({
     required this.model,
     required this.id,
@@ -555,10 +556,19 @@ class DelegaciasIcones extends StatelessWidget {
         splashFactory: NoSplash.splashFactory,
         onTap: () {
           if (context.mounted) {
-            model.idUnidade = 30;
-            model.numeroSerie = "";
-            model.patrimonioSSP = "";
-            model.patrimonioSead = "";
+            switch (name) {
+              case "DP Lagarto":
+                model.idUnidade = 468;
+                break;
+              case "DEOTAP":
+                model.idUnidade = 63;
+                break;
+              case "DP Itabaiana":
+                model.idUnidade = 467;
+                break;
+              default:
+            }
+
             context.push(AppRouterName.delegaciaDetalhe, extra: model);
           } else {
             Generic.snackBar(

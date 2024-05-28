@@ -1,5 +1,3 @@
-import 'package:suporte_dti/model/itens_equipamento_model.dart';
-
 class AppName {
   static String? erro = "erro";
   static String? sucesso = "sucesso";
@@ -13,6 +11,12 @@ class AppName {
 // alertDialogs
   static String? nSerie = 'N° de Série';
   static String? patri = 'Patrimônio';
+
+  //DELEGACIAS
+  static String? lagarto = "DP Lagarto";
+  static String? itabaiana = "DP Itabaiana";
+  static String? estancia = "DP Estância";
+  static String? deotap = "DEOTAP";
 
 // imagens
   static String? teclado = 'assets/images/qwerty.png';

@@ -17,9 +17,14 @@ import 'package:suporte_dti/viewModel/equipamento_view_model.dart';
 
 //
 class DelegaciaDetalhe extends StatefulWidget {
+  final String? sigla;
   final EquipamentoViewModel?
       model; //TODO: FAZER PARA TRAZER O NOME DA DELGACIA JUNTO COM A MODEL
-  const DelegaciaDetalhe({this.model, super.key});
+  const DelegaciaDetalhe({
+    this.sigla,
+    this.model,
+    super.key,
+  });
 
   @override
   State<DelegaciaDetalhe> createState() => _DelegaciaDetalheState();
@@ -42,7 +47,7 @@ class _DelegaciaDetalheState extends State<DelegaciaDetalhe> {
   void dispose() {
     scrollController?.removeListener(_scrollListener);
     scrollController?.dispose();
-    widget.model?.paginacao?.pagina = 0;
+    model?.paginacao?.pagina = 0;
     widget.model?.itensEquipamentoModels.equipamentos = [];
 
     super.dispose();
@@ -119,7 +124,7 @@ class _DelegaciaDetalheState extends State<DelegaciaDetalhe> {
                 //    context.go(AppRouterName.homeController);
               },
               icon: const Icon(Icons.arrow_back_ios_new)),
-          title: Text("CAPELA",
+          title: Text(widget.sigla ?? "",
               style: Styles().titleStyle().copyWith(
                   color: AppColors.cWhiteColor,
                   fontSize: 22.sp,

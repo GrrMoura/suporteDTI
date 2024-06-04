@@ -1,33 +1,83 @@
 class DelegaciaModel {
-  final int id;
-  final String name;
-  final String path;
-  final String region;
-  String? contact;
-  String? address;
+  List<Ativas>? ativas;
+  Paginacao? paginacao;
 
-  DelegaciaModel(
-      {required this.id,
-      required this.name,
-      required this.path,
-      required this.region,
-      this.address,
-      this.contact});
+  DelegaciaModel({this.ativas, this.paginacao});
 
-  factory DelegaciaModel.fromJson(Map<String, dynamic> json) => DelegaciaModel(
-      id: json['id'],
-      name: json['name'],
-      path: json['path'],
-      region: json['region'],
-      address: json['address'],
-      contact: json['contact']);
+  DelegaciaModel.fromJson(Map<String, dynamic> json) {
+    if (json['ativas'] != null) {
+      ativas = <Ativas>[];
+      json['ativas'].forEach((v) {
+        ativas!.add(Ativas.fromJson(v));
+      });
+    }
+    paginacao = json['paginacao'] != null
+        ? Paginacao.fromJson(json['paginacao'])
+        : null;
+  }
 
-  Map<String, dynamic> toJson() => {
-        'id': id,
-        'path': path,
-        'name': name,
-        'region': region,
-        'address': address,
-        'contact': contact
-      };
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    if (ativas != null) {
+      data['ativas'] = ativas!.map((v) => v.toJson()).toList();
+    }
+    if (paginacao != null) {
+      data['paginacao'] = paginacao!.toJson();
+    }
+    return data;
+  }
+}
+
+class Ativas {
+  int? id;
+  int? idIntranetAntiga;
+  String? nome;
+  String? sigla;
+  String? descricao;
+
+  Ativas(
+      {this.id, this.idIntranetAntiga, this.nome, this.sigla, this.descricao});
+
+  Ativas.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    idIntranetAntiga = json['idIntranetAntiga'];
+    nome = json['nome'];
+    sigla = json['sigla'];
+    descricao = json['descricao'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['id'] = id;
+    data['idIntranetAntiga'] = idIntranetAntiga;
+    data['nome'] = nome;
+    data['sigla'] = sigla;
+    data['descricao'] = descricao;
+    return data;
+  }
+}
+
+class Paginacao {
+  int? limite;
+  int? pagina;
+  int? totalPaginas;
+  int? registros;
+
+  Paginacao({this.limite, this.pagina, this.totalPaginas, this.registros});
+
+  Paginacao.fromJson(Map<String, dynamic> json) {
+    limite = json['limite'];
+    pagina = json['pagina'];
+    totalPaginas = json['totalPaginas'];
+    registros = json['registros'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['limite'] = limite;
+    data['pagina'] = pagina;
+    data['totalPaginas'] = totalPaginas;
+    data['registros'] = registros;
+    return data;
+  }
 }

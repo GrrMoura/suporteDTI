@@ -1,4 +1,4 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first, no_leading_underscores_for_local_identifiers, avoid_print
+// ignore_for_file: public_member_api_docs, sort_constructors_first, no_leading_underscores_for_local_identifiers, avoid_print, must_be_immutable
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
@@ -8,8 +8,7 @@ import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:suporte_dti/controller/consulta_controller.dart';
-import 'package:suporte_dti/data/delegacia_data.dart';
-import 'package:suporte_dti/model/delegacia_model.dart';
+import 'package:suporte_dti/model/itens_delegacia_model.dart';
 import 'package:suporte_dti/model/equipamentos_historico_model.dart';
 import 'package:suporte_dti/model/equipamento_model.dart';
 import 'package:suporte_dti/model/itens_equipamento_model.dart';
@@ -20,6 +19,7 @@ import 'package:suporte_dti/utils/app_colors.dart';
 import 'package:suporte_dti/utils/app_name.dart';
 import 'package:suporte_dti/utils/app_styles.dart';
 import 'package:suporte_dti/utils/snack_bar_generic.dart';
+import 'package:suporte_dti/viewModel/delegacias_view_model.dart';
 import 'package:suporte_dti/viewModel/equipamento_view_model.dart';
 
 class SearchScreen extends StatefulWidget {
@@ -30,7 +30,6 @@ class SearchScreen extends StatefulWidget {
 }
 
 class _SearchScreenState extends State<SearchScreen> {
-  late List<DelegaciaModel> delegaciaList;
   late List<EquipamentoModel> equipamentoList;
   final ConsultaController consultaController = ConsultaController();
   EquipamentosHistoricoModel historicoModel = EquipamentosHistoricoModel();
@@ -41,7 +40,6 @@ class _SearchScreenState extends State<SearchScreen> {
 
   SqliteService db = SqliteService();
   // ignore: prefer_typing_uninitialized_variables
-  EquipamentosHistoricoModel? teste;
 
   String? semFoto = AppName.semFoto;
   Uint8List? bytes;
@@ -53,16 +51,6 @@ class _SearchScreenState extends State<SearchScreen> {
 
     pegarFoto();
     pegarIdentificacao();
-
-    delegaciaList = delegaciaData;
-    // todosOsEquipamentos = equipamentosData;
-    teste = EquipamentosHistoricoModel(
-        id: 7,
-        marca: "DELL",
-        patrimonio: "777777",
-        tag: "BH2239",
-        tipo: "monitor",
-        lotacao: "ARACAJU");
   }
 
   void pegarIdentificacao() async {
@@ -122,7 +110,7 @@ class _SearchScreenState extends State<SearchScreen> {
                 child: Column(
                   children: [
                     heading(),
-                    FastSearch(delegaciaList: delegaciaList, model: model!),
+                    const FastSearch(),
                     searchBar(context, model?.ocupado ?? false),
                     SizedBox(height: 25.h),
                     builderHistorico(),
@@ -393,44 +381,41 @@ class _SearchScreenState extends State<SearchScreen> {
 }
 
 class FastSearch extends StatelessWidget {
-  const FastSearch(
-      {super.key, required this.delegaciaList, required this.model});
+  const FastSearch({super.key});
 
-  final List<DelegaciaModel> delegaciaList;
-  final EquipamentoViewModel model;
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: EdgeInsets.only(top: 20.h),
       child: SizedBox(
-        height: 107.h,
-        width: double.infinity,
-        child: ListView.builder(
-          itemCount: delegaciaList.length + 1,
-          itemBuilder: (context, index) {
-            if (index < delegaciaList.length) {
-              final delegacia = delegaciaList[index];
-              return DelegaciasIcones(
-                  model: model,
-                  path: delegacia.path,
-                  id: delegacia.id,
-                  name: delegacia.name,
-                  region: delegacia.region);
-            } else {
-              return const PesquisarDelegacias();
-            }
-          },
-          scrollDirection: Axis.horizontal,
-        ),
-      ),
+          height: 107.h,
+          width: double.infinity,
+          child: Row(
+            children: [
+              DelegaciasIcones(
+                path: AppName.dpLagarto,
+                name: "DP Lagarto",
+              ),
+              DelegaciasIcones(
+                path: AppName.dpItabaiana,
+                name: "DP Itabaiana",
+              ),
+              DelegaciasIcones(
+                path: AppName.dpDeotap,
+                name: "DEOTAP",
+              ),
+              PesquisarDelegacias()
+            ],
+          )),
     );
   }
 }
 
 class PesquisarDelegacias extends StatelessWidget {
-  const PesquisarDelegacias({
-    super.key,
-  });
+  PesquisarDelegacias({super.key});
+
+  DelegaciasViewModel delegaciasViewModel = DelegaciasViewModel(
+      itensDelegaciaModel: ItensDelegaciaModel(delegacias: []));
 
   @override
   Widget build(BuildContext context) {
@@ -442,8 +427,8 @@ class PesquisarDelegacias extends StatelessWidget {
             highlightColor: Colors.transparent,
             splashFactory: NoSplash.splashFactory,
             onTap: () {
-              Generic.snackBar(
-                  context: context, mensagem: "pesquisar todas as delegacias");
+              context.push(AppRouterName.delegaciaLista,
+                  extra: delegaciasViewModel);
             },
             child: Container(
               height: 80.h,
@@ -533,17 +518,14 @@ class PesquisarDelegacias extends StatelessWidget {
 
 class DelegaciasIcones extends StatelessWidget {
   final String? path;
-  final int? id;
   final String? name;
-  final String? region;
-  final EquipamentoViewModel model;
 
-  const DelegaciasIcones({
-    required this.model,
-    required this.id,
+  EquipamentoViewModel? model = EquipamentoViewModel(
+      itensEquipamentoModels: ItensEquipamentoModels(equipamentos: []));
+
+  DelegaciasIcones({
     required this.path,
     required this.name,
-    required this.region,
     super.key,
   });
 
@@ -558,18 +540,19 @@ class DelegaciasIcones extends StatelessWidget {
           if (context.mounted) {
             switch (name) {
               case "DP Lagarto":
-                model.idUnidade = 468;
+                model!.idUnidade = 468;
                 break;
               case "DEOTAP":
-                model.idUnidade = 63;
+                model!.idUnidade = 63;
                 break;
               case "DP Itabaiana":
-                model.idUnidade = 467;
+                model!.idUnidade = 102;
                 break;
+
               default:
             }
-
-            context.push(AppRouterName.delegaciaDetalhe, extra: model);
+            context.push(AppRouterName.delegaciaDetalhe,
+                extra: {"model": model, "sigla": name});
           } else {
             Generic.snackBar(
               context: context,

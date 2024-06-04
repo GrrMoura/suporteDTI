@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:suporte_dti/data/delegacia_data.dart';
-import 'package:suporte_dti/model/delegacia_model.dart';
+import 'package:suporte_dti/model/itens_delegacia_model.dart';
 import 'package:suporte_dti/utils/app_colors.dart';
 
 import 'package:suporte_dti/utils/app_styles.dart';
@@ -15,13 +15,11 @@ class LevantamentoScreen extends StatefulWidget {
 }
 
 class _LevantamentoScreenState extends State<LevantamentoScreen> {
-  late List<DelegaciaModel> delegaciaList;
+  late List<ItensDelegaciaModel> delegaciaList;
 
   @override
   initState() {
     super.initState();
-
-    delegaciaList = delegaciaData;
   }
 
   @override
@@ -51,11 +49,6 @@ class _LevantamentoScreenState extends State<LevantamentoScreen> {
 
                   return Column(
                     children: [
-                      CardDelegaciasLevantamento(
-                        image: delegacia.path,
-                        contato: delegacia.contact!,
-                        delegacia: delegacia.name,
-                      ),
                       SizedBox(
                           height: 40.h,
                           child: Divider(indent: 55.w, endIndent: 55.w))

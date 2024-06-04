@@ -2,6 +2,7 @@ import 'package:go_router/go_router.dart';
 import 'package:suporte_dti/controller/home_controller.dart';
 import 'package:suporte_dti/model/equipamento_model.dart';
 import 'package:suporte_dti/navegacao/app_screens_path.dart';
+import 'package:suporte_dti/screens/delegacia_list.dart';
 import 'package:suporte_dti/screens/edite_screen.dart';
 import 'package:suporte_dti/screens/equipamento_detalhe_screen.dart';
 import 'package:suporte_dti/screens/levantamento_escrito_screen.dart';
@@ -13,6 +14,7 @@ import 'package:suporte_dti/screens/recuperar_senha.dart';
 import 'package:suporte_dti/screens/resumo_levantamento.dart';
 import 'package:suporte_dti/screens/search_screen.dart';
 import 'package:suporte_dti/screens/delegacia_detalhe.dart';
+import 'package:suporte_dti/viewModel/delegacias_view_model.dart';
 import 'package:suporte_dti/viewModel/equipamento_view_model.dart';
 
 class Rotas {
@@ -58,14 +60,29 @@ class Rotas {
       //   path: AppRouterName.qrCodeResult,
       //   builder: (context, state) => (QrCodeResult()),
       // ),
+
       GoRoute(
         name: 'resultDelegacia',
         path: AppRouterName.delegaciaDetalhe,
         builder: (context, state) {
-          EquipamentoViewModel? model = state.extra as EquipamentoViewModel;
-          return (DelegaciaDetalhe(model: model));
+          final data = state.extra! as Map<String, dynamic>;
+          return (DelegaciaDetalhe(
+            model: data["model"],
+            sigla: data["sigla"],
+          ));
         },
       ),
+      GoRoute(
+        name: 'delegaciaLista',
+        path: AppRouterName.delegaciaLista,
+        builder: (context, state) {
+          DelegaciasViewModel? model = state.extra as DelegaciasViewModel;
+          return (DelegaciaListScreen(
+            model: model,
+          ));
+        },
+      ),
+
       GoRoute(
         name: 'resumoLevantamento',
         path: AppRouterName.resumoLevantamento,

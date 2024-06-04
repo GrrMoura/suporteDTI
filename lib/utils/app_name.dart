@@ -12,12 +12,6 @@ class AppName {
   static String? nSerie = 'N° de Série';
   static String? patri = 'Patrimônio';
 
-  //DELEGACIAS
-  static String? lagarto = "DP Lagarto";
-  static String? itabaiana = "DP Itabaiana";
-  static String? estancia = "DP Estância";
-  static String? deotap = "DEOTAP";
-
 // imagens
   static String? teclado = 'assets/images/qwerty.png';
   static String? sspLogo = 'assets/images/ssp_logo.png';
@@ -39,6 +33,9 @@ class AppName {
   static String? semImagem = "assets/images/semimagem.png";
   static String? monitor = "assets/images/monitor.png";
   static String? hd = "assets/images/hds.png";
+  static String? dpLagarto = "assets/images/lagarto.jpg";
+  static String? dpItabaiana = "assets/images/itabaiana.jpg";
+  static String? dpDeotap = "assets/images/deotap.jpeg";
 
   static String fotoEquipamento(String tipoEquipamento) {
     switch (tipoEquipamento) {

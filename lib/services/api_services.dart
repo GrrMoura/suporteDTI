@@ -13,20 +13,15 @@ class ApiServices {
   static const String suporteDti =
       "https://intranet.ssp.se.gov.br/api/SgiDtiv3/";
 
-  //maquina local
-  // static final String intranetUrl = "http://10.10.1.71:3071/";
-  // static final String suporteDti = "http://10.10.1.71:58477/";
-
-  // intranet
-  // static final String intranetUrl = "http://intradev.ssp.gov-se/Api/intranet/";
-  // static final String suporteDti = "http://10.10.2.10/API/intranet/";
-  // static final String suporteDti =
-  //     "http://intradev.ssp.gov-se/Api/ConsultaIntegrada/";
+  static const String intranet = "https://intranet.ssp.se.gov.br/api/intranet/";
 
   static String concatIntranetUrl(String url) {
     developer.log("", name: "Serviço de API");
+
     return intranetUrl + url;
   }
+
+  static String concatDelegaciasUrl(String url) => intranet + url;
 
   static String concatConsultaIntegradaUrl(String url) => suporteDti + url;
 }

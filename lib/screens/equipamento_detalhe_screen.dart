@@ -137,11 +137,13 @@ class ObservacoesDetalhe extends StatelessWidget {
       children: [
         Padding(
           padding: EdgeInsets.only(left: 20.w),
-          child: Text("Observações",
-              style: Styles().titleDetail().copyWith(fontSize: 20.sp)),
+          child: model.numeroLacre == null && model.patrimonioSead == null
+              ? Container()
+              : Text("Observações",
+                  style: Styles().titleDetail().copyWith(fontSize: 20.sp)),
         ),
         Padding(
-            padding: EdgeInsets.only(left: 20.w, right: 20.w, bottom: 10.h),
+            padding: EdgeInsets.only(left: 5.w, right: 20.w, bottom: 10.h),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [

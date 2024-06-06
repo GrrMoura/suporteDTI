@@ -48,7 +48,8 @@ class _ResultadoEquipamentoConsultaScreenState
     if (_scrollController?.position.pixels ==
         _scrollController?.position.maxScrollExtent) {
       if (widget.model?.paginacao == null ||
-          !widget.model!.paginacao!.seChegouAoFinalDaPagina()) {
+          !widget.model!.paginacao!
+              .seChegouAoFinalDaPagina(widget.model!.paginacao!.pagina!)) {
         setState(() {
           widget.model?.itensEquipamentoModels.equipamentos = [];
         });
@@ -100,11 +101,11 @@ class _ResultadoEquipamentoConsultaScreenState
                   color: AppColors.cSecondaryColor,
                 ),
                 Positioned(
-                    left: 125.w,
-                    right: 125.w,
+                    left: 120.w,
+                    right: 120.w,
                     top: 0.h,
                     child: Text(
-                      "Resultadoo",
+                      "Resultado",
                       style: TextStyle(color: Colors.white, fontSize: 22.sp),
                     )),
               ],

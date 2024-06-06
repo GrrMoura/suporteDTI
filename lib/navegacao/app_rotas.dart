@@ -6,7 +6,7 @@ import 'package:suporte_dti/screens/delegacia_list.dart';
 import 'package:suporte_dti/screens/edite_screen.dart';
 import 'package:suporte_dti/screens/equipamento_detalhe_screen.dart';
 import 'package:suporte_dti/screens/levantamento_escrito_screen.dart';
-import 'package:suporte_dti/screens/resultado_lista_equipamentos_consulta.dart';
+import 'package:suporte_dti/screens/resultado_esquipamento_consulta.dart';
 import 'package:suporte_dti/screens/login_screen.dart';
 import 'package:suporte_dti/screens/qr_code_resultado_screen.dart';
 import 'package:suporte_dti/screens/qr_code_scanner_screen.dart';
@@ -67,9 +67,7 @@ class Rotas {
         builder: (context, state) {
           final data = state.extra! as Map<String, dynamic>;
           return (DelegaciaDetalhe(
-            model: data["model"],
-            sigla: data["sigla"],
-          ));
+              model: data["model"], sigla: data["sigla"], nome: data["nome"]));
         },
       ),
       GoRoute(

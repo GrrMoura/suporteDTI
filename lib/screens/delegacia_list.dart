@@ -107,7 +107,8 @@ class _DelegaciaListScreenState extends State<DelegaciaListScreen> {
                         return cardDelegacia(
                             context,
                             widget
-                                .model!.itensDelegaciaModel!.delegacias[index]);
+                                .model!.itensDelegaciaModel!.delegacias[index],
+                            index);
                       },
                     ),
                   ),
@@ -123,7 +124,7 @@ class _DelegaciaListScreenState extends State<DelegaciaListScreen> {
                       controller: _scrollController,
                       itemCount: delegacias.length,
                       itemBuilder: (BuildContext ctxt, int index) {
-                        return cardDelegacia(context, delegacias[index]);
+                        return cardDelegacia(context, delegacias[index], index);
                       },
                     ),
                   ),
@@ -158,13 +159,15 @@ class _DelegaciaListScreenState extends State<DelegaciaListScreen> {
         : _futureScreen();
   }
 
-  Padding cardDelegacia(BuildContext context, ItemDelegacia item) {
+  Padding cardDelegacia(BuildContext context, ItemDelegacia item, int index) {
     return Padding(
       padding: EdgeInsets.only(bottom: 5.0, right: 5.w, left: 5.w),
       child: SizedBox(
-        height: 90.h,
+        height: 100.h,
         child: Card(
-            color: Colors.white,
+            color: index.isEven
+                ? AppColors.cSecondaryColor
+                : AppColors.cSecondaryColor.withOpacity(0.85),
             elevation: 3,
             shape:
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -172,35 +175,50 @@ class _DelegaciaListScreenState extends State<DelegaciaListScreen> {
               onTap: () async {
                 modelEquipamento!.idUnidade = item.id;
 
-                context.push(AppRouterName.delegaciaDetalhe,
-                    extra: {"model": modelEquipamento, "sigla": item.sigla});
+                context.push(AppRouterName.delegaciaDetalhe, extra: {
+                  "model": modelEquipamento,
+                  "sigla": item.sigla,
+                  "nome": item.nome
+                });
               },
               child: Padding(
                 padding: EdgeInsets.symmetric(vertical: 5.h, horizontal: 5.w),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      item.sigla == null ? "Não informado" : item.sigla!,
-                      style: Styles()
-                          .descriptionDetail()
-                          .copyWith(fontSize: 12.sp),
-                    ),
-                    Text(
-                      item.nome!,
-                      style: Styles()
-                          .smallTextStyle()
-                          .copyWith(fontSize: item.nome!.length > 60 ? 11 : 13),
-                      overflow: TextOverflow.clip,
-                    ),
-                  ],
+                child: Padding(
+                  padding: const EdgeInsets.all(5),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        item.sigla == null ? "Não informado" : item.sigla!,
+                        style: Styles()
+                            .descriptionDetail()
+                            .copyWith(fontSize: 12.sp, color: Colors.white),
+                      ),
+                      const Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Text(""),
+                          Icon(
+                            Icons.arrow_outward_sharp,
+                            color: AppColors.cWhiteColor,
+                          )
+                        ],
+                      ),
+                      Text(
+                        item.nome!,
+                        style: Styles().smallTextStyle().copyWith(
+                            color: Colors.white,
+                            fontSize: item.nome!.length > 50 ? 10 : 13),
+                        overflow: TextOverflow.clip,
+                      ),
+                    ],
+                  ),
                 ),
               ),
             )),
       ),
     );
   }
-  //widget                            .model!.itensDelegaciaModel!.delegacias
 
   filterSearchResults({required String query}) {
     inicio = false;

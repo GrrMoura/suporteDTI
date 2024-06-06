@@ -28,11 +28,17 @@ class _LevantamentoScreenState extends State<LevantamentoScreen> {
     return Scaffold(
       backgroundColor: AppColors.cWhiteColor,
       appBar: AppBar(
-        title: Text(
-          "Levantamentos",
-          style:
-              Styles().mediumTextStyle().copyWith(color: AppColors.cWhiteColor),
-        ),
+        iconTheme: const IconThemeData(color: Colors.white),
+        leading: IconButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            icon: const Icon(Icons.arrow_back_ios_new)),
+        title: Text("Levantamento",
+            style: Styles().titleStyle().copyWith(
+                color: AppColors.cWhiteColor,
+                fontSize: 22.sp,
+                fontWeight: FontWeight.normal)),
         centerTitle: true,
         backgroundColor: AppColors.cSecondaryColor,
       ),

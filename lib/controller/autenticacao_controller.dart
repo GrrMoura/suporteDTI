@@ -5,7 +5,6 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:suporte_dti/controller/consulta_controller.dart';
 import 'package:suporte_dti/controller/login_controller.dart';
 import 'package:suporte_dti/model/sessao_model.dart';
 import 'package:suporte_dti/navegacao/app_screens_path.dart';

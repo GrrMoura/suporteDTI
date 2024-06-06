@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:suporte_dti/navegacao/app_screens_path.dart';
 import 'package:suporte_dti/utils/app_colors.dart';
+import 'package:suporte_dti/utils/app_styles.dart';
 
 class QrCodeScanner extends StatefulWidget {
   const QrCodeScanner({super.key});
@@ -37,8 +38,6 @@ class _QrCodeScannerState extends State<QrCodeScanner> {
       codigo = barcode.rawValue;
 
       if (codigo!.isNotEmpty) {
-        // context.push(AppRouterName.resultado);
-
         context.push(AppRouterName.qrCodeResult);
 
         return;
@@ -59,7 +58,21 @@ class _QrCodeScannerState extends State<QrCodeScanner> {
     );
 
     return Scaffold(
-      appBar: AppBar(backgroundColor: AppColors.cSecondaryColor),
+      appBar: AppBar(
+        iconTheme: const IconThemeData(color: Colors.white),
+        leading: IconButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            icon: const Icon(Icons.arrow_back_ios_new)),
+        title: Text("Scanner",
+            style: Styles().titleStyle().copyWith(
+                color: AppColors.cWhiteColor,
+                fontSize: 22.sp,
+                fontWeight: FontWeight.normal)),
+        centerTitle: true,
+        backgroundColor: AppColors.cSecondaryColor,
+      ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

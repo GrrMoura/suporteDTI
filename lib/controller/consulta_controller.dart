@@ -4,7 +4,6 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:suporte_dti/model/itens_delegacia_model.dart';
-import 'package:suporte_dti/model/delegacia_model.dart';
 import 'package:suporte_dti/model/equipamento_model.dart';
 import 'package:suporte_dti/model/itens_equipamento_model.dart';
 import 'package:suporte_dti/navegacao/app_screens_path.dart';
@@ -27,10 +26,13 @@ class ConsultaController {
         return null;
       }
       if (model.paginacao != null &&
-          !model.paginacao!.seChegouAoFinalDaPagina()) {
-        model.paginacao!.setProximaPagina();
+          !model.paginacao!.seChegouAoFinalDaPagina(model.paginacao!.pagina!)) {
+        model.paginacao!.pagina = model.paginacao!.setProximaPagina(
+            model.paginacao!.pagina!, model.paginacao!.totalPaginas!);
       }
 
+//TODO:  ver regra para que consultas com apenas
+// uma página passe no metodo chegou ao final sem acrescentar + 1 a páginas
       Response responseConsulta =
           await ConsultaService.buscarEquipamentos(model);
 
@@ -146,15 +148,12 @@ class ConsultaController {
             context: context,
             mensagem: "Usuário não autenticado ou token encerrado",
           );
-          await Future.delayed(const Duration(
-                  seconds:
-                      3)) //TODO: testar se limpa a stack de paginas e colocar na pagina router pra elmbar
+          await Future.delayed(const Duration(seconds: 3))
+              //TODO: testar se limpa a stack de paginas e colocar na pagina router pra elmbar
               .then((_) => {context.goNamed(AppRouterName.login)});
         }
         Generic.snackBar(
-          context: context,
-          mensagem: "${response.statusMessage}",
-        );
+            context: context, mensagem: "${response.statusMessage}");
 
         return null;
       }

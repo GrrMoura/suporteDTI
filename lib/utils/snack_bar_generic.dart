@@ -9,6 +9,7 @@ class Generic {
       String? tipo = "erro",
       int duracaoFixa = 3,
       int? duracao}) {
+    //tipo == sucesso, info ou erro
     switch (tipo) {
       case "erro":
         showTopSnackBar(
@@ -31,6 +32,5 @@ class Generic {
         break;
       default:
     }
-    //tipo == sucesso, info ou erro
   }
 }

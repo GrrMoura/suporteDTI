@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 class PaginacaoModels {
   int? limite;
   int? pagina;
@@ -27,12 +29,15 @@ class PaginacaoModels {
     return (pagina! * limite!) - limite!;
   }
 
-  bool seChegouAoFinalDaPagina() {
-    print(pagina);
-    return pagina! == totalPaginas!;
+  bool seChegouAoFinalDaPagina(int paginas) {
+    return paginas == totalPaginas!;
   }
 
-  void setProximaPagina() {
-    pagina = pagina! + 1;
+  int setProximaPagina(int paginas, int totalPaginas) {
+    if (totalPaginas == 1) {
+      return 1;
+    } else {
+      return paginas = paginas + 1;
+    }
   }
 }

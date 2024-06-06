@@ -552,7 +552,7 @@ class DelegaciasIcones extends StatelessWidget {
               default:
             }
             context.push(AppRouterName.delegaciaDetalhe,
-                extra: {"model": model, "sigla": name});
+                extra: {"model": model, "sigla": name, "nome": ""});
           } else {
             Generic.snackBar(
               context: context,

@@ -18,13 +18,10 @@ import 'package:suporte_dti/viewModel/equipamento_view_model.dart';
 //
 class DelegaciaDetalhe extends StatefulWidget {
   final String? sigla;
-  final EquipamentoViewModel?
-      model; //TODO: FAZER PARA TRAZER O NOME DA DELGACIA JUNTO COM A MODEL
-  const DelegaciaDetalhe({
-    this.sigla,
-    this.model,
-    super.key,
-  });
+  final String? nome;
+  final EquipamentoViewModel? model;
+  const DelegaciaDetalhe(
+      {this.sigla, this.model, super.key, required this.nome});
 
   @override
   State<DelegaciaDetalhe> createState() => _DelegaciaDetalheState();
@@ -47,9 +44,9 @@ class _DelegaciaDetalheState extends State<DelegaciaDetalhe> {
   void dispose() {
     scrollController?.removeListener(_scrollListener);
     scrollController?.dispose();
-    model?.paginacao?.pagina = 0;
     widget.model?.itensEquipamentoModels.equipamentos = [];
-
+    widget.model?.paginacao?.pagina = 1;
+    widget.model?.paginacao?.totalPaginas = 1;
     super.dispose();
   }
 
@@ -58,7 +55,8 @@ class _DelegaciaDetalheState extends State<DelegaciaDetalhe> {
     if (scrollController?.position.pixels ==
         scrollController?.position.maxScrollExtent) {
       if (widget.model?.paginacao == null ||
-          !widget.model!.paginacao!.seChegouAoFinalDaPagina()) {
+          !widget.model!.paginacao!
+              .seChegouAoFinalDaPagina(widget.model!.paginacao!.pagina!)) {
         setState(() {});
 
         consultaController
@@ -66,21 +64,26 @@ class _DelegaciaDetalheState extends State<DelegaciaDetalhe> {
             .then((value) {
           setState(() {});
         });
+      } else {
+        Generic.snackBar(
+            context: context,
+            mensagem: "A lista chegou ao fim.",
+            tipo: AppName.info);
       }
     }
   }
 
-  Widget _buildCard(ItemEquipamento item) {
+  Widget _buildCard(ItemEquipamento itens) {
     return InkWell(
         onTap: () {
           setState(() {});
           consultaController
-              .buscarEquipamentoPorId(context, item)
+              .buscarEquipamentoPorId(context, itens)
               .then((value) {
             setState(() {});
           });
         },
-        child: CardEquipamentosResultado(item: item));
+        child: CardEquipamentosResultado(item: itens));
   }
 
   int touchedIndex = -1;
@@ -94,10 +97,7 @@ class _DelegaciaDetalheState extends State<DelegaciaDetalhe> {
           builder: (context, snapshot) {
             switch (snapshot.connectionState) {
               case ConnectionState.done:
-                return Validador.listNotNullAndNotEmpty(
-                        widget.model?.itensEquipamentoModels.equipamentos)
-                    ? _listViewScreen()
-                    : const LoadingDefault(); // TALVEZ DE ERRO.
+                return _listViewScreen();
 
               default:
                 return const LoadingDefault();
@@ -115,13 +115,12 @@ class _DelegaciaDetalheState extends State<DelegaciaDetalhe> {
     double screenWidth = MediaQuery.of(context).size.height;
     return Scaffold(
         appBar: AppBar(
-          iconTheme: const IconThemeData(
-            color: Colors.white, //change your color here
-          ),
+          iconTheme: const IconThemeData(color: Colors.white),
           leading: IconButton(
               onPressed: () {
+                widget.model?.paginacao?.pagina = 1;
+                widget.model?.paginacao?.totalPaginas = 1;
                 Navigator.of(context).pop();
-                //    context.go(AppRouterName.homeController);
               },
               icon: const Icon(Icons.arrow_back_ios_new)),
           title: Text(widget.sigla ?? "",
@@ -137,6 +136,21 @@ class _DelegaciaDetalheState extends State<DelegaciaDetalhe> {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      width: 250.w,
+                      child: Text(
+                        widget.nome!,
+                        style: Styles().smallTextStyle(),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
               const Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [

@@ -76,7 +76,6 @@ class _DelegaciaDetalheState extends State<DelegaciaDetalhe> {
   Widget _buildCard(ItemEquipamento itens) {
     return InkWell(
         onTap: () {
-          setState(() {});
           consultaController
               .buscarEquipamentoPorId(context, itens)
               .then((value) {

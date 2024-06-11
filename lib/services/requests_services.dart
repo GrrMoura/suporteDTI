@@ -30,7 +30,7 @@ class RequestsServices {
               statusCode: 403,
               requestOptions: RequestOptions(path: ''),
               statusMessage:
-                  "Não foi possível estabelecer conexão com o servidor. Por favor verifique se a internet está nula ou limitada e tente novamente.");
+                  "Não foi possível estabelecer conexão com o servidor. Tente novamente.");
 
           return response;
         }
@@ -67,7 +67,7 @@ class RequestsServices {
               statusCode: 403,
               requestOptions: RequestOptions(path: ''),
               statusMessage:
-                  "Não foi possível estabelecer conexão com o servidor. Por favor verifique se a internet está nula ou limitada e tente novamente.");
+                  "Não foi possível estabelecer conexão com o servidor.");
 
           return response;
         }

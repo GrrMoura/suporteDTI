@@ -28,20 +28,33 @@ class _RecuperarSenhaState extends State<RecuperarSenha> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        toolbarHeight: 100.h,
+        title: Column(
+          children: [
+            Text(
+              "Recuperar senha",
+              style: Styles()
+                  .titleStyle()
+                  .copyWith(fontSize: AppDimens.subHeadingSize),
+            ),
+            Text(
+              "É necessário confirmar algumas informações",
+              style: TextStyle(color: Colors.white, fontSize: 12.sp),
+            )
+          ],
+        ),
+        backgroundColor: AppColors.cSecondaryColor,
+        leading: IconButton(
+            onPressed: () {
+              context.pop("value");
+            },
+            icon: const Icon(Icons.arrow_back_ios)),
+        iconTheme: const IconThemeData(color: Colors.white),
+      ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          Column(
-            children: [
-              Text(
-                "Recuperar senha",
-                style: Styles().titleStyle().copyWith(
-                    color: AppColors.contentColorBlack,
-                    fontSize: AppDimens.subHeadingSize),
-              ),
-              const Text("É necessário confirmar algumas informações")
-            ],
-          ),
           Column(
             children: [
               GenericFormFieldRecuperarSenha(

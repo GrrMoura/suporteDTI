@@ -9,6 +9,7 @@ import 'package:suporte_dti/screens/widgets/card_item.dart';
 import 'package:suporte_dti/screens/widgets/loading_default.dart';
 import 'package:suporte_dti/utils/app_colors.dart';
 import 'package:suporte_dti/utils/app_name.dart';
+import 'package:suporte_dti/utils/app_styles.dart';
 import 'package:suporte_dti/utils/app_validator.dart';
 import 'package:suporte_dti/utils/snack_bar_generic.dart';
 import 'package:suporte_dti/viewModel/equipamento_view_model.dart';
@@ -50,15 +51,18 @@ class _ResultadoEquipamentoConsultaScreenState
       if (widget.model?.paginacao == null ||
           !widget.model!.paginacao!
               .seChegouAoFinalDaPagina(widget.model!.paginacao!.pagina!)) {
-        setState(() {
-          widget.model?.itensEquipamentoModels.equipamentos = [];
-        });
+        setState(() {});
 
         consultaController
             .buscarEquipamentos(context, widget.model!)
             .then((value) {
           setState(() {});
         });
+      } else {
+        Generic.snackBar(
+            context: context,
+            mensagem: "Não há mais itens.",
+            tipo: AppName.info);
       }
     }
   }
@@ -133,6 +137,22 @@ class _ResultadoEquipamentoConsultaScreenState
               ),
             ),
           ),
+          SizedBox(height: 5.h),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                widget.model!.paginacao!.registros! <= 10
+                    ? "${widget.model!.paginacao!.registros!} "
+                    : "${widget.model!.paginacao!.pagina! * 10}  ",
+                style: Styles().smallTextStyle(),
+              ),
+              Text(
+                "de ${widget.model!.paginacao!.registros} equipamentos",
+                style: Styles().smallTextStyle(),
+              )
+            ],
+          )
         ],
       ),
     );
@@ -147,10 +167,7 @@ class _ResultadoEquipamentoConsultaScreenState
           builder: (context, snapshot) {
             switch (snapshot.connectionState) {
               case ConnectionState.done:
-                return Validador.listNotNullAndNotEmpty(
-                        widget.model?.itensEquipamentoModels.equipamentos)
-                    ? _listViewScreen()
-                    : const LoadingDefault(); // TALVEZ DE ERRO.
+                return _listViewScreen();
 
               default:
                 return const LoadingDefault();

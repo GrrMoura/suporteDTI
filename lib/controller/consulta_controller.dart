@@ -43,8 +43,7 @@ class ConsultaController {
             mensagem: "Erro - ${responseConsulta.statusMessage}",
           );
 
-          return await Future.delayed(const Duration(seconds: 3))
-              .then((_) => context.push(AppRouterName.login));
+          return context.push(AppRouterName.login);
         }
 
         if (responseConsulta.statusCode == 422) {
@@ -148,14 +147,12 @@ class ConsultaController {
             context: context,
             mensagem: "Usuário não autenticado ou token encerrado",
           );
-          await Future.delayed(const Duration(seconds: 3))
-              //TODO: testar se limpa a stack de paginas e colocar na pagina router pra elmbar
-              .then((_) => {context.goNamed(AppRouterName.login)});
+          return context.goNamed(AppRouterName.login);
         }
         Generic.snackBar(
             context: context, mensagem: "${response.statusMessage}");
 
-        return null;
+        return;
       }
       pepararModelDelegaciaParaAView(model, response);
     });

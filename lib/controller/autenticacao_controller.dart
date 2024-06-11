@@ -33,14 +33,13 @@ class AutenticacaoController {
       if (response.statusCode != 200) {
         model.ocupado = false;
         if (response.statusCode == 422) {
-          Generic.snackBar(
-              context: context, mensagem: ' Erro - ${response.data[0]}');
+          Generic.snackBar(context: context, mensagem: '${response.data[0]}');
 
           return null;
         }
 
         Generic.snackBar(
-            context: context, mensagem: ' Erro - ${response.statusMessage}');
+            context: context, mensagem: '${response.statusMessage}');
 
         return null;
       }

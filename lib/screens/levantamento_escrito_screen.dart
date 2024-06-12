@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:suporte_dti/controller/consulta_controller.dart';
 import 'package:suporte_dti/model/itens_equipamento_model.dart';
-import 'package:suporte_dti/navegacao/app_screens_path.dart';
-import 'package:suporte_dti/screens/widgets/loading_default.dart';
+
 import 'package:suporte_dti/utils/app_colors.dart';
 import 'package:suporte_dti/utils/app_name.dart';
 import 'package:suporte_dti/utils/app_styles.dart';
@@ -22,66 +20,14 @@ class LevantamentoDigitado extends StatefulWidget {
 
 class _LevantamentoDigitadoState extends State<LevantamentoDigitado> {
   ScrollController? _scrollController;
-  Future<void>? _future;
+  Future<List<dynamic>>? _future;
   var consultaController = ConsultaController();
   EquipamentoViewModel? model = EquipamentoViewModel(
       itensEquipamentoModels: ItensEquipamentoModels(equipamentos: []));
 
   @override
-  void initState() {
-    setState(() {});
-    super.initState();
-    //  _scrollController = ScrollController()..addListener(_scrollListener);
-  }
-
-  @override
-  void dispose() {
-    _scrollController?.removeListener(_scrollListener);
-    _scrollController?.dispose();
-    super.dispose();
-  }
-
-  void _scrollListener() {
-    if (_scrollController?.position.pixels ==
-        _scrollController?.position.maxScrollExtent) {
-      if (model?.paginacao == null ||
-          model!.paginacao!
-              .seChegouAoFinalDaPagina(model!.paginacao!.pagina!)) {
-        setState(() {});
-
-        consultaController.buscarEquipamentos(context, model!).then((value) {
-          setState(() {}); //testar
-        });
-      } else {
-        Generic.snackBar(
-            context: context,
-            mensagem: "Não há mais itens.",
-            tipo: AppName.info);
-      }
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
-    return _listViewScreen(height: height);
-  }
-
-  Widget _buildCard(ItemEquipamento item) {
-    return InkWell(
-        onTap: () {
-          // setState(() {});
-          consultaController
-              .buscarEquipamentoPorId(context, item)
-              .then((value) {
-            setState(() {});
-          });
-        },
-        child: CardEquipamentosResultadoLevantamento(item: item));
-  }
-
-  Widget _listViewScreen({required double height}) {
-    double screenWidth = MediaQuery.of(context).size.height;
     return Scaffold(
       backgroundColor: AppColors.cWhiteColor,
       appBar: AppBar(
@@ -127,7 +73,6 @@ class _LevantamentoDigitadoState extends State<LevantamentoDigitado> {
             ),
           ),
           SizedBox(
-            height: height,
             child: SingleChildScrollView(
               child: Column(
                 children: [
@@ -136,54 +81,27 @@ class _LevantamentoDigitadoState extends State<LevantamentoDigitado> {
               ),
             ),
           ),
-          FutureBuilder(
-              future: _future,
-              builder: (context, snapshot) {
-                switch (snapshot.connectionState) {
-                  case ConnectionState.none:
-                  case ConnectionState.waiting:
-                    return Center(child: CircularProgressIndicator());
-                  case ConnectionState.active:
-                  case ConnectionState.done:
-                    if (snapshot.hasError) {
-                      return Center(child: Text('Erro ao buscar equipamentos'));
-                    } else {
-                      WidgetsBinding.instance.addPostFrameCallback((_) {
-                        setState(() {});
-                      });
-                      return Container(
-                        color: Colors.amber,
-                        height: height - kToolbarHeight - 115.h,
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: 10.w, vertical: 5.h),
-                          child: GridView.builder(
-                            physics: const BouncingScrollPhysics(
-                                parent: AlwaysScrollableScrollPhysics()),
-                            gridDelegate:
-                                const SliverGridDelegateWithFixedCrossAxisCount(
-                                    crossAxisCount: 2,
-                                    mainAxisExtent: 220,
-                                    mainAxisSpacing: 15,
-                                    crossAxisSpacing: 15),
-                            controller: _scrollController,
-                            itemCount: model
-                                ?.itensEquipamentoModels.equipamentos.length,
-                            itemBuilder: (BuildContext ctxt, int index) {
-                              return Container(
-                                height: 300,
-                                width: 100,
-                                color: Colors.black,
-                              );
-                              // _buildCard(
-                              //     model!.itensEquipamentoModels.equipamentos[index]);
-                            },
-                          ),
-                        ),
-                      );
-                    }
-                }
-              }),
+          SizedBox(
+            height: height - kToolbarHeight - 115.h,
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.h),
+              child: GridView.builder(
+                physics: const BouncingScrollPhysics(
+                    parent: AlwaysScrollableScrollPhysics()),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    mainAxisExtent: 220,
+                    mainAxisSpacing: 15,
+                    crossAxisSpacing: 15),
+                controller: _scrollController,
+                itemCount: model?.itensEquipamentoModels.equipamentos.length,
+                itemBuilder: (BuildContext ctxt, int index) {
+                  return CardEquipamentosResultadoLevantamento(
+                      item: model!.itensEquipamentoModels.equipamentos[index]);
+                },
+              ),
+            ),
+          )
         ],
       ),
     );
@@ -206,7 +124,10 @@ class _LevantamentoDigitadoState extends State<LevantamentoDigitado> {
             });
 
             if (context.mounted) {
-              _future = consultaController.buscarEquipamentos(context, model!);
+              consultaController
+                  .buscarEquipamentos(context, model!)
+                  .then((value) => null);
+              print(model);
             } else {
               Generic.snackBar(
                 context: context,
@@ -311,10 +232,16 @@ class CardEquipamentosResultadoLevantamento extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     debugPrint("criando o card");
-    return Container(
-      height: 300,
+    return InkWell(
+      onTap: () {
+        // setState(() {});
+        // consultaController
+        //     .buscarEquipamentoPorId(context, item)
+        //     .then((value) {
+        //   setState(() {});
+        // });
+      },
       child: Material(
-        color: AppColors.contentColorBlack,
         elevation: 7,
         borderRadius: BorderRadius.circular(10),
         shadowColor: Colors.grey,

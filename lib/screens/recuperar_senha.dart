@@ -52,8 +52,7 @@ class _RecuperarSenhaState extends State<RecuperarSenha> {
             icon: const Icon(Icons.arrow_back_ios)),
         iconTheme: const IconThemeData(color: Colors.white),
       ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      body: ListView(
         children: [
           Column(
             children: [
@@ -78,6 +77,7 @@ class _RecuperarSenhaState extends State<RecuperarSenha> {
               ),
             ],
           ),
+          SizedBox(height: 20.h),
           Padding(
             padding: EdgeInsets.only(right: 20.w, left: 20.w),
             child: Row(
@@ -116,12 +116,19 @@ class _RecuperarSenhaState extends State<RecuperarSenha> {
                             dtNascimneto: dtNascimentoCtrl.text,
                             email: emailCtrl.text);
                         if (result == "OK") {
-                          Generic.snackBar(
-                              context: context,
-                              tipo: AppName.sucesso,
-                              mensagem:
-                                  'Sua senha foi enviada para email ${emailCtrl.text}');
-                          UsuarioController.resetarSenha(context, model);
+                          model.cpf = cpfCtrl.text;
+                          model.dataNascimento = dtNascimentoCtrl.text;
+                          model.email = emailCtrl.text;
+                          model.esqueceuSenha = true;
+                          UsuarioController.resetarSenha(context, model)
+                              .then((value) => {
+                                    Generic.snackBar(
+                                        context: context,
+                                        tipo: AppName.sucesso,
+                                        mensagem:
+                                            'Sua senha foi enviada para email ${emailCtrl.text}'),
+                                    context.pop("value")
+                                  });
                         } else {
                           Generic.snackBar(context: context, mensagem: result);
                         }

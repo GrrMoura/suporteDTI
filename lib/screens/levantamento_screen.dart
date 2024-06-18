@@ -1,7 +1,6 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:suporte_dti/data/delegacia_data.dart';
 import 'package:suporte_dti/model/itens_delegacia_model.dart';
 import 'package:suporte_dti/utils/app_colors.dart';
 
@@ -51,8 +50,6 @@ class _LevantamentoScreenState extends State<LevantamentoScreen> {
               child: ListView.builder(
                 itemCount: delegaciaList.length,
                 itemBuilder: (context, index) {
-                  final delegacia = delegaciaList[index];
-
                   return Column(
                     children: [
                       SizedBox(

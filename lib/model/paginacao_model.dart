@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-
 class PaginacaoModels {
   int? limite;
   int? pagina;

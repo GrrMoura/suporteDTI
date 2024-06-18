@@ -38,7 +38,6 @@ dependencies:
   go_router: ^13.0.0
   flutter_screenutil: ^5.9.0
   convex_bottom_bar: ^3.2.0
-  sqflite: ^2.3.0
   path: ^1.8.3
   share_plus: ^7.2.1
   screenshot: ^2.1.0
@@ -57,6 +56,8 @@ dependencies:
   device_info_plus: ^9.1.1
   android_id: ^0.3.6
   top_snackbar_flutter: ^3.1.0
+  intl: ^0.19.0
+  sqflite: ^2.3.3+1
  
  
 

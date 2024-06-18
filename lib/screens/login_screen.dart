@@ -366,10 +366,10 @@ class _LoginScreenState extends State<LoginScreen> {
       return 'O campo "senha" está muito curto! Entre 8 e 20 caracteres';
     }
 
-    // loginViewModel.login = cpf;
-    // loginViewModel.senha = senha;
-    loginViewModel.login = '093.472.924-78';
-    loginViewModel.senha = "Muebom10";
+    loginViewModel.login = cpf;
+    loginViewModel.senha = senha;
+    // loginViewModel.login = '093.472.924-78';
+    // loginViewModel.senha = "Muebom10";
     loginViewModel.ocupado = true;
 
     return "OK";

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:go_router/go_router.dart';
-import 'package:suporte_dti/navegacao/app_screens_path.dart';
+import 'package:intl/intl.dart';
+import 'package:suporte_dti/data/sqflite_helper.dart';
+import 'package:suporte_dti/model/itens_equipamento_model.dart';
 import 'package:suporte_dti/utils/app_colors.dart';
 import 'package:suporte_dti/utils/app_dimens.dart';
 import 'package:suporte_dti/utils/app_name.dart';
@@ -9,29 +10,33 @@ import 'package:suporte_dti/utils/app_styles.dart';
 import 'package:suporte_dti/utils/snack_bar_generic.dart';
 
 class ResumoLevantamento extends StatelessWidget {
-  const ResumoLevantamento({super.key});
+  ResumoLevantamento({super.key});
+  final DatabaseHelper dbHelper = DatabaseHelper();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        iconTheme: const IconThemeData(color: Colors.white),
+        leading: IconButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            icon: const Icon(Icons.arrow_back_ios_new)),
+        title: Text("Resumo",
+            style: Styles().titleStyle().copyWith(
+                color: AppColors.cWhiteColor,
+                fontSize: 22.sp,
+                fontWeight: FontWeight.normal)),
+        centerTitle: true,
         backgroundColor: AppColors.cSecondaryColor,
       ),
       body: Column(
         children: [
           const Header(),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                "Resumo",
-                style: Styles().mediumTextStyle(),
-              )
-            ],
-          ),
-          const UltimoLevantamento(),
-          const LevantamentoAtual(),
-          const BoxEquipamentos()
+          //   UltimoLevantamento(),
+          LevantamentoAtual(dbHelper: dbHelper),
+          BoxEquipamentos(dbHelper: dbHelper)
         ],
       ),
     );
@@ -39,10 +44,8 @@ class ResumoLevantamento extends StatelessWidget {
 }
 
 class BoxEquipamentos extends StatelessWidget {
-  const BoxEquipamentos({
-    super.key,
-  });
-
+  const BoxEquipamentos({super.key, required this.dbHelper});
+  final DatabaseHelper dbHelper;
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -53,25 +56,36 @@ class BoxEquipamentos extends StatelessWidget {
             color: AppColors.cSecondaryColor,
             borderRadius: BorderRadius.circular(20)),
         child: ListView(
-          children: const [
-            CardEquipametos(
-                titulo: "Estabilizador",
-                id: "1",
-                setor: "Sala do diretor",
-                patrimonio: "44155",
-                lacre: "1212"),
-            CardEquipametos(
-                titulo: "Monitor",
-                id: "2",
-                setor: "Cartorio",
-                patrimonio: "122/13",
-                lacre: "1010"),
-            CardEquipametos(
-                titulo: "Monitor",
-                id: "2",
-                setor: "Cartorio",
-                patrimonio: "122/13",
-                lacre: "1010")
+          children: [
+            SizedBox(
+              height: 400,
+              child: FutureBuilder(
+                  initialData: [],
+                  future: dbHelper.equipamentos(),
+                  builder: (context, AsyncSnapshot<List> snapshot) {
+                    var data = snapshot.data;
+                    var datalength = data!.length;
+
+                    return datalength == 0
+                        ? Center(
+                            child: Text(
+                            "Sem Contatos Salvos",
+                            style: Styles().mediumTextStyle(),
+                          ))
+                        : ListView.builder(
+                            itemCount: datalength,
+                            itemBuilder: (context, index) => CardEquipametos(
+                                  index: index,
+                                  equipamento: data[index],
+                                ));
+                  }),
+            ),
+            // CardEquipametos(
+            //     titulo: "Monitor",
+            //     id: "2",
+            //     setor: "Cartorio",
+            //     patrimonio: "122/13",
+            //     lacre: "1010")
           ],
         ),
       ),
@@ -81,9 +95,10 @@ class BoxEquipamentos extends StatelessWidget {
 
 class LevantamentoAtual extends StatelessWidget {
   const LevantamentoAtual({
+    required this.dbHelper,
     super.key,
   });
-
+  final DatabaseHelper dbHelper;
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -99,53 +114,49 @@ class LevantamentoAtual extends StatelessWidget {
                 bottomLeft: Radius.circular(50),
                 topLeft: Radius.circular(5),
                 bottomRight: Radius.circular(5))),
-        child: const Column(
+        child: Column(
           children: [
-            InfoResumo(
-              titulo: "Levantamento Atual",
-              info: "25/01/2024",
+            Padding(
+              padding: EdgeInsets.only(top: 15.h),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  SizedBox(
+                    width: 180.w,
+                    child: Text(
+                      "Levantamento Atual:",
+                      style: Styles().descriptionRestulScan().copyWith(
+                          color: const Color.fromARGB(255, 195, 197, 199)),
+                    ),
+                  ),
+                  SizedBox(
+                    width: 80.w,
+                    child: Text(DateFormat('dd-MM-yyyy').format(DateTime.now()),
+                        style: Styles()
+                            .descriptionRestulScan()
+                            .copyWith(color: AppColors.cPrimaryColor)),
+                  ),
+                ],
+              ),
             ),
-            InfoResumo(
-              titulo: "Total de Equipamentos",
-              info: "25",
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class UltimoLevantamento extends StatelessWidget {
-  const UltimoLevantamento({
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 10.h),
-      child: Container(
-        width: double.maxFinite,
-        height: 80.h,
-        decoration: const BoxDecoration(
-            color: AppColors.cSecondaryColor,
-            boxShadow: [BoxShadow(color: Colors.black)],
-            borderRadius: BorderRadius.only(
-                topRight: Radius.circular(5),
-                bottomLeft: Radius.circular(5),
-                topLeft: Radius.circular(50),
-                bottomRight: Radius.circular(50))),
-        child: const Column(
-          children: [
-            InfoResumo(
-              titulo: "Último levantamento",
-              info: "20/04/2022",
-            ),
-            InfoResumo(
-              titulo: "Total de Equipamentos",
-              info: "30",
-            ),
+            FutureBuilder(
+                future: dbHelper.getEquipamentosCount(),
+                builder: ((context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Text("");
+                  } else if (snapshot.hasError) {
+                    return Center(child: Text('Erro: ${snapshot.error}'));
+                  } else {
+                    return InfoResumo(
+                      titulo: "Equipamentos Cadastrados",
+                      info: " ${snapshot.data ?? 0}",
+                    );
+                  }
+                }))
+            // const InfoResumo(
+            //   titulo: "Equipamentos Cadastrados",
+            //   info: await dbHelper.getEquipamentosCount(),
+            // ),
           ],
         ),
       ),
@@ -154,9 +165,7 @@ class UltimoLevantamento extends StatelessWidget {
 }
 
 class Header extends StatelessWidget {
-  const Header({
-    super.key,
-  });
+  const Header({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -201,19 +210,10 @@ class Header extends StatelessWidget {
 }
 
 class CardEquipametos extends StatelessWidget {
-  const CardEquipametos({
-    super.key,
-    required this.titulo,
-    required this.id,
-    required this.setor,
-    required this.patrimonio,
-    required this.lacre,
-  });
-  final String titulo;
-  final String id;
-  final String setor;
-  final String patrimonio;
-  final String lacre;
+  const CardEquipametos(
+      {required this.equipamento, required this.index, super.key});
+  final ItemEquipamento equipamento;
+  final int index;
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -223,29 +223,36 @@ class CardEquipametos extends StatelessWidget {
           padding: EdgeInsets.only(left: 10.w, right: 5.w),
           child: Column(
             children: [
+              //TODO: ADICIONAR "NÃO INFORMADO NA HORA DE ADCIONAR O ITEM AO BANCO DE DADOS";
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  SizedBox(width: 50.w, child: Text(id)),
+                  SizedBox(width: 50.w, child: Text("${index + 1}")),
                   SizedBox(
                       width: 100.w,
-                      child: Text(titulo, textAlign: TextAlign.center)),
+                      child: Text(equipamento.tipoEquipamento!,
+                          textAlign: TextAlign.center)),
                   SizedBox(
                     width: 50.w,
                     child: IconButton(
                         onPressed: () {
-                          Generic.snackBar(
-                              tipo: AppName.info,
-                              context: context,
-                              mensagem: "Vai para a tela edit");
+                          showOptions(context, 'editar');
+                          // Generic.snackBar(
+                          //     tipo: AppName.info,
+                          //     context: context,
+                          //     mensagem: "Vai para a tela edit");
                         },
-                        icon: Icon(Icons.edit, size: 15.sp)),
+                        icon: Icon(Icons.more_vert_outlined, size: 15.sp)),
                   ),
                 ],
               ),
               InkWell(
                 onTap: () {
-                  context.push(AppRouterName.detalhesEquipamento);
+                  Generic.snackBar(
+                      tipo: AppName.info,
+                      context: context,
+                      mensagem: "Vai para a tela DETALHE");
+                  //context.push(AppRouterName.detalhesEquipamento);
                 },
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -258,7 +265,8 @@ class CardEquipametos extends StatelessWidget {
                         ),
                         SizedBox(
                             width: 100.w,
-                            child: Text(setor, textAlign: TextAlign.center)),
+                            child: Text(equipamento.descricao!,
+                                textAlign: TextAlign.center)),
                       ],
                     ),
                     Column(
@@ -269,8 +277,8 @@ class CardEquipametos extends StatelessWidget {
                         ),
                         SizedBox(
                             width: 80.w,
-                            child:
-                                Text(patrimonio, textAlign: TextAlign.center)),
+                            child: Text(equipamento.patrimonioSsp!,
+                                textAlign: TextAlign.center)),
                       ],
                     ),
                     Column(
@@ -281,8 +289,8 @@ class CardEquipametos extends StatelessWidget {
                         ),
                         SizedBox(
                             width: 80.w,
-                            child:
-                                Text(patrimonio, textAlign: TextAlign.center)),
+                            child: Text(equipamento.patrimonioSead!,
+                                textAlign: TextAlign.center)),
                       ],
                     ),
                   ],
@@ -294,6 +302,28 @@ class CardEquipametos extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  void showOptions(BuildContext context, String opcao) {
+    // Mostra o menu de opções específico para cada ícone
+    showMenu(
+      context: context,
+      position: RelativeRect.fromLTRB(0, 0, 0, 0),
+      items: [
+        PopupMenuItem(child: Text('Opção 1'), value: 'opcao1'),
+        PopupMenuItem(child: Text('Opção 2'), value: 'opcao2'),
+        PopupMenuItem(child: Text('Opção 3'), value: 'opcao3'),
+      ],
+      elevation: 8.0,
+    ).then((value) {
+      if (value != null) {
+        if (opcao == 'editar') {
+          // Adicione o código para editar aqui
+        } else if (opcao == 'deletar') {
+          // Adicione o código para deletar aqui
+        }
+      }
+    });
   }
 }
 
@@ -313,7 +343,7 @@ class InfoResumo extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           SizedBox(
-            width: 160.w,
+            width: 180.w,
             child: Text(
               "$titulo:",
               style: Styles()

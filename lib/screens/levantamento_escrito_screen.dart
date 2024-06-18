@@ -2,12 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:suporte_dti/controller/consulta_controller.dart';
+import 'package:suporte_dti/data/sqflite_helper.dart';
 import 'package:suporte_dti/model/itens_equipamento_model.dart';
-
 import 'package:suporte_dti/utils/app_colors.dart';
 import 'package:suporte_dti/utils/app_name.dart';
 import 'package:suporte_dti/utils/app_styles.dart';
-import 'package:suporte_dti/utils/app_validator.dart';
 import 'package:suporte_dti/utils/snack_bar_generic.dart';
 import 'package:suporte_dti/viewModel/equipamento_view_model.dart';
 
@@ -20,7 +19,6 @@ class LevantamentoDigitado extends StatefulWidget {
 
 class _LevantamentoDigitadoState extends State<LevantamentoDigitado> {
   ScrollController? _scrollController;
-  Future<List<dynamic>>? _future;
   var consultaController = ConsultaController();
   EquipamentoViewModel? model = EquipamentoViewModel(
       itensEquipamentoModels: ItensEquipamentoModels(equipamentos: []));
@@ -89,7 +87,7 @@ class _LevantamentoDigitadoState extends State<LevantamentoDigitado> {
                 physics: const BouncingScrollPhysics(
                     parent: AlwaysScrollableScrollPhysics()),
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
+                    crossAxisCount: 1,
                     mainAxisExtent: 220,
                     mainAxisSpacing: 15,
                     crossAxisSpacing: 15),
@@ -126,8 +124,9 @@ class _LevantamentoDigitadoState extends State<LevantamentoDigitado> {
             if (context.mounted) {
               consultaController
                   .buscarEquipamentos(context, model!)
-                  .then((value) => null);
-              print(model);
+                  .then((value) {
+                setState(() {});
+              });
             } else {
               Generic.snackBar(
                 context: context,
@@ -145,9 +144,9 @@ class _LevantamentoDigitadoState extends State<LevantamentoDigitado> {
           fillColor: AppColors.cWhiteColor,
           filled: true,
           isDense: true,
-          hintText: 'Patrimônio, Marca, Tipo, Modelo, Tag...',
+          hintText: 'Patrimônio,Tag, SEAD xx',
           hintStyle: Styles().hintTextStyle(),
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(30)),
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
           prefixIcon: Icon(Icons.search,
               size: 25.sp, color: AppColors.cDescriptionIconColor),
         ),
@@ -224,85 +223,97 @@ class _LevantamentoDigitadoState extends State<LevantamentoDigitado> {
 }
 
 class CardEquipamentosResultadoLevantamento extends StatelessWidget {
-  const CardEquipamentosResultadoLevantamento({required this.item, super.key});
-
+  CardEquipamentosResultadoLevantamento({required this.item, super.key});
+  DatabaseHelper dbHelper = DatabaseHelper();
   final ItemEquipamento item;
-  // final String? patrimonio, lotacao, marca, tipoEquipamento, tag;
-
   @override
   Widget build(BuildContext context) {
-    debugPrint("criando o card");
-    return InkWell(
-      onTap: () {
-        // setState(() {});
-        // consultaController
-        //     .buscarEquipamentoPorId(context, item)
-        //     .then((value) {
-        //   setState(() {});
-        // });
-      },
-      child: Material(
-        elevation: 7,
-        borderRadius: BorderRadius.circular(10),
-        shadowColor: Colors.grey,
-        child: Padding(
-          padding: EdgeInsets.all(3.w),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              SizedBox(height: 3.h),
-              Row(
-                children: [
-                  Text("Patr. ", style: Styles().hintTextStyle()),
-                  Flexible(
-                    child: SizedBox(
-                      child: Text(
-                        item.patrimonioSsp ?? "",
-                        style: Styles().smallTextStyle(),
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 10.w),
+      child: InkWell(
+        onTap: () {
+          // setState(() {});
+          // consultaController
+          //     .buscarEquipamentoPorId(context, item)
+          //     .then((value) {
+          //   setState(() {});
+          // });
+        },
+        child: Material(
+          elevation: 7,
+          borderRadius: BorderRadius.circular(10),
+          shadowColor: Colors.grey,
+          child: Padding(
+            padding: EdgeInsets.all(3.w),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                SizedBox(height: 3.h),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 5.w),
+                  child: Row(
+                    children: [
+                      Text("Patr. ", style: Styles().hintTextStyle()),
+                      Flexible(
+                        child: SizedBox(
+                          child: Text(
+                            item.patrimonioSsp ?? "Não informado.",
+                            style: Styles().smallTextStyle(),
+                          ),
+                        ),
                       ),
-                    ),
+                    ],
                   ),
-                ],
-              ),
-              // Text(marca ?? "Sem marca", style: Styles().smallTextStyle()),
-              Padding(
-                padding: EdgeInsets.symmetric(vertical: 2.h),
-                child: Image.asset(
-                  AppName.fotoEquipamento(item.tipoEquipamento!),
-                  height: 60.h,
                 ),
-              ),
-              LinhaDescricaoLevantamento(
-                  informacao: item.fabricante, nome: "Fabricante"),
-              LinhaDescricaoLevantamento(
-                  informacao: item.modelo, nome: "Modelo"),
-              item.patrimonioSead!.length <= 1 || item.patrimonioSead == ""
-                  ? Container()
-                  : LinhaDescricaoLevantamento(
-                      informacao: item.patrimonioSead, nome: "SEAD"),
-              item.numeroSerie != null
-                  ? Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 5.w),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text("TAG: ", style: Styles().hintTextStyle()),
-                          Flexible(
-                            child: SizedBox(
-                              child: Text(
-                                item.numeroSerie!,
-                                style: Styles()
-                                    .smallTextStyle()
-                                    .copyWith(fontSize: 10.sp),
+                // Text(marca ?? "Sem marca", style: Styles().smallTextStyle()),
+
+                LinhaDescricaoLevantamento(
+                    informacao: item.fabricante, nome: "Fabricante"),
+                LinhaDescricaoLevantamento(
+                    informacao: item.modelo, nome: "Modelo"),
+                item.patrimonioSead!.length <= 1 || item.patrimonioSead == ""
+                    ? Container()
+                    : LinhaDescricaoLevantamento(
+                        informacao: item.patrimonioSead, nome: "SEAD"),
+                item.numeroSerie != null
+                    ? Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 5.w),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text("TAG: ", style: Styles().hintTextStyle()),
+                            Flexible(
+                              child: SizedBox(
+                                child: Text(
+                                  item.numeroSerie!,
+                                  style: Styles()
+                                      .smallTextStyle()
+                                      .copyWith(fontSize: 10.sp),
+                                ),
                               ),
-                            ),
-                          )
-                        ],
-                      ),
-                    )
-                  : Container(),
-              SizedBox(height: 3.h),
-            ],
+                            )
+                          ],
+                        ),
+                      )
+                    : Container(),
+                ElevatedButton(
+                    style:
+                        ElevatedButton.styleFrom(backgroundColor: Colors.green),
+                    onPressed: () async {
+                      await dbHelper.database;
+                      await dbHelper.insertEquipamento(item);
+                      //await dbHelper.deleteTable();
+                      Generic.snackBar(
+                          context: context,
+                          mensagem: "Item adicionado ao levantamento.",
+                          tipo: AppName.info);
+                      //    print(dbHelper.getEquipamento(1));
+                    },
+                    child: const Text("Adicionar",
+                        style: TextStyle(color: Colors.white))),
+                SizedBox(height: 3.h),
+              ],
+            ),
           ),
         ),
       ),

@@ -7,7 +7,7 @@ class ConfiguracoesGlobalUtils {
 
   static const String versao_header = "Version";
   //producao
-  static const String Versao_SISTEMA = "3.6.3.5";
+  static const String Versao_SISTEMA = "3.7.0.1";
 
   //desenvolvimento
   // static const String Versao_SISTEMA = "3.6.0.2";

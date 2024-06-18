@@ -52,6 +52,7 @@ class ItemEquipamento {
     this.descricao,
     this.fabricante,
     this.patrimonioSsp,
+    this.tipoEquipamento,
   });
 
   ItemEquipamento.fromJson(Map<String, dynamic> json) {
@@ -73,6 +74,21 @@ class ItemEquipamento {
     data['patrimonioSsp'] = patrimonioSsp;
     data['idFabricante'] = idFabricante;
     data['idModelo'] = idModelo;
+
+    return data;
+  }
+
+  Map<String, dynamic> toDb() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['idEquipamento'] = idEquipamento;
+    data['numeroSerie'] = numeroSerie;
+    data['patrimonioSead'] = patrimonioSead;
+    data['patrimonioSsp'] = patrimonioSsp;
+    data['idFabricante'] = idFabricante;
+    data['descricao'] = descricao;
+    data['fabricante'] = fabricante;
+    data['modelo'] = modelo;
+    data['tipoEquipamento'] = tipoEquipamento;
 
     return data;
   }

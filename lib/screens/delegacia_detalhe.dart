@@ -140,12 +140,10 @@ class _DelegaciaDetalheState extends State<DelegaciaDetalhe> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Container(
+                    SizedBox(
                       width: 250.w,
-                      child: Text(
-                        widget.nome!,
-                        style: Styles().smallTextStyle(),
-                      ),
+                      child:
+                          Text(widget.nome!, style: Styles().smallTextStyle()),
                     ),
                   ],
                 ),
@@ -165,7 +163,7 @@ class _DelegaciaDetalheState extends State<DelegaciaDetalhe> {
                         nome: "Juan Matos Silva",
                         id: "02",
                         data: "12/10/2023",
-                        delegacia: "Delegacia de Capela"),
+                        delegacia: "Rascunho"),
                     DelegaciasCardLevantamento(
                         nome: "Juan Matos Silva",
                         id: "01",
@@ -336,61 +334,67 @@ class DelegaciasCardLevantamento extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.symmetric(vertical: 5.h, horizontal: 10.w),
-      child: Material(
-        borderRadius: id == "02"
-            ? const BorderRadius.only(
-                topLeft: Radius.circular(40), topRight: Radius.circular(40))
-            : const BorderRadius.only(
-                bottomLeft: Radius.circular(40),
-                bottomRight: Radius.circular(40)),
-        elevation: 5,
-        color: id == "02"
-            ? AppColors.cSecondaryColor
-            : AppColors.cSecondaryColor.withOpacity(0.8),
-        child: Column(
-          children: [
-            Padding(
-              padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 20.w),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(
-                    id,
-                    style:
-                        Styles().descriptionDelegaciasLevantamentoTextStyle(),
-                  ),
-                  Text(
-                    delegacia,
-                    style: Styles()
-                        .mediumTextStyle()
-                        .copyWith(color: AppColors.cWhiteColor),
-                  ),
-                  const Icon(Icons.remove_red_eye, color: Colors.white70)
-                ],
+    return InkWell(
+      onTap: () {
+        context.push(AppRouterName.resumoLevantamento);
+      },
+      child: Padding(
+        padding: EdgeInsets.symmetric(vertical: 5.h, horizontal: 10.w),
+        child: Material(
+          borderRadius: delegacia != "Rascunho"
+              ? const BorderRadius.only(
+                  topLeft: Radius.circular(40), topRight: Radius.circular(40))
+              : const BorderRadius.only(
+                  bottomLeft: Radius.circular(40),
+                  bottomRight: Radius.circular(40)),
+          elevation: 5,
+          color: delegacia != "Rascunho"
+              ? AppColors.cSecondaryColor
+              : AppColors.cSecondaryColor.withOpacity(0.6),
+          child: Column(
+            children: [
+              Padding(
+                padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 20.w),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                      id,
+                      style:
+                          Styles().descriptionDelegaciasLevantamentoTextStyle(),
+                    ),
+                    Text(
+                      delegacia,
+                      style: Styles().mediumTextStyle().copyWith(
+                          color: delegacia != "Rascunho"
+                              ? AppColors.cWhiteColor
+                              : AppColors.cWhiteColor.withOpacity(0.7)),
+                    ),
+                    const Icon(Icons.remove_red_eye, color: Colors.white70)
+                  ],
+                ),
               ),
-            ),
-            Padding(
-              padding: EdgeInsets.only(top: 10.h, bottom: 10.h, right: 20.w),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  Text(
-                    data,
-                    style:
-                        Styles().descriptionDelegaciasLevantamentoTextStyle(),
-                  ),
-                  Text(
-                    nome,
-                    style:
-                        Styles().descriptionDelegaciasLevantamentoTextStyle(),
-                  ),
-                ],
+              Padding(
+                padding: EdgeInsets.only(top: 10.h, bottom: 10.h, right: 20.w),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    Text(
+                      data,
+                      style:
+                          Styles().descriptionDelegaciasLevantamentoTextStyle(),
+                    ),
+                    Text(
+                      nome,
+                      style:
+                          Styles().descriptionDelegaciasLevantamentoTextStyle(),
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

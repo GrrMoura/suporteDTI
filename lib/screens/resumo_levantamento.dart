@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:suporte_dti/data/sqflite_helper.dart';
 import 'package:suporte_dti/model/itens_equipamento_model.dart';
@@ -9,8 +10,14 @@ import 'package:suporte_dti/utils/app_name.dart';
 import 'package:suporte_dti/utils/app_styles.dart';
 import 'package:suporte_dti/utils/snack_bar_generic.dart';
 
-class ResumoLevantamento extends StatelessWidget {
-  ResumoLevantamento({super.key});
+class ResumoLevantamento extends StatefulWidget {
+  const ResumoLevantamento({super.key});
+
+  @override
+  State<ResumoLevantamento> createState() => _ResumoLevantamentoState();
+}
+
+class _ResumoLevantamentoState extends State<ResumoLevantamento> {
   final DatabaseHelper dbHelper = DatabaseHelper();
 
   @override
@@ -31,61 +38,267 @@ class ResumoLevantamento extends StatelessWidget {
         centerTitle: true,
         backgroundColor: AppColors.cSecondaryColor,
       ),
-      body: Column(
+      body: ListView(
         children: [
           const Header(),
-          //   UltimoLevantamento(),
           LevantamentoAtual(dbHelper: dbHelper),
-          BoxEquipamentos(dbHelper: dbHelper)
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 5.h),
+            child: Container(
+              height: 380.h,
+              decoration: BoxDecoration(
+                  color: AppColors.cSecondaryColor,
+                  borderRadius: BorderRadius.circular(20)),
+              child: ListView(
+                children: [
+                  SizedBox(
+                    height: 380.h,
+                    child: FutureBuilder(
+                        initialData: const [],
+                        future: dbHelper.equipamentos(),
+                        builder: (context, AsyncSnapshot<List> snapshot) {
+                          var data = snapshot.data;
+                          var datalength = data!.length;
+
+                          return datalength == 0
+                              ? Center(
+                                  child: Text(
+                                  "Levantamento ainda não iniciado",
+                                  style: Styles()
+                                      .mediumTextStyle()
+                                      .copyWith(color: Colors.white),
+                                ))
+                              : ListView.builder(
+                                  itemCount: datalength,
+                                  itemBuilder: (context, index) =>
+                                      cardEquipamento(
+                                          context: context,
+                                          index: index,
+                                          equipamento: data[index]));
+                        }),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.cErrorColor),
+                onPressed: () {
+                  setState(() {
+                    dbHelper.deleteAllEquipamentos();
+                    print('Botão descartar pressionado');
+                  });
+                },
+                child: const Text(
+                  'Descartar',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
+                onPressed: () {
+                  // Ação quando o botão "Descartar" é pressionado
+
+                  setState(() {
+                    dbHelper.deleteTable();
+                    print('Botão Finalizar pressionado');
+                  });
+                },
+                child: const Text(
+                  'Finalizar',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+            ],
+          )
         ],
       ),
     );
   }
-}
 
-class BoxEquipamentos extends StatelessWidget {
-  const BoxEquipamentos({super.key, required this.dbHelper});
-  final DatabaseHelper dbHelper;
-  @override
-  Widget build(BuildContext context) {
+  Padding cardEquipamento(
+      {required BuildContext context,
+      required ItemEquipamento equipamento,
+      required int index}) {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
-      child: Container(
-        height: 250.h,
-        decoration: BoxDecoration(
-            color: AppColors.cSecondaryColor,
-            borderRadius: BorderRadius.circular(20)),
-        child: ListView(
-          children: [
-            SizedBox(
-              height: 400,
-              child: FutureBuilder(
-                  initialData: [],
-                  future: dbHelper.equipamentos(),
-                  builder: (context, AsyncSnapshot<List> snapshot) {
-                    var data = snapshot.data;
-                    var datalength = data!.length;
-
-                    return datalength == 0
-                        ? Center(
-                            child: Text(
-                            "Sem Contatos Salvos",
-                            style: Styles().mediumTextStyle(),
-                          ))
-                        : ListView.builder(
-                            itemCount: datalength,
-                            itemBuilder: (context, index) => CardEquipametos(
-                                  index: index,
-                                  equipamento: data[index],
-                                ));
-                  }),
+      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 10.h),
+      child: SizedBox(
+        height: 112.h,
+        child: Card(
+          child: Padding(
+            padding: EdgeInsets.only(left: 10.w, right: 5.w),
+            child: Column(
+              children: [
+                //TODO: ADICIONAR "NÃO INFORMADO NA HORA DE ADCIONAR O ITEM AO BANCO DE DADOS";
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Container(
+                      width: 18.h,
+                      decoration: BoxDecoration(
+                          color: AppColors.cSecondaryColor.withOpacity(0.8),
+                          shape: BoxShape.circle),
+                      child: Center(
+                        child: Text(
+                          '${index + 1}',
+                          style: const TextStyle(
+                              color: Colors.white, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ),
+                    Text(
+                      equipamento.tipoEquipamento!,
+                      style: Styles().smallTextStyle(),
+                      textAlign: TextAlign.center,
+                    ),
+                    IconButton(
+                        onPressed: () {
+                          _showBottomSheet(
+                              context: context, equipamento: equipamento);
+                        },
+                        icon: Icon(Icons.more_vert_outlined, size: 15.sp)),
+                  ],
+                ),
+                InkWell(
+                  onTap: () {
+                    Generic.snackBar(
+                        tipo: AppName.info,
+                        context: context,
+                        mensagem: "Vai para a tela DETALHE");
+                    //context.push(AppRouterName.detalhesEquipamento);
+                  },
+                  child: Padding(
+                    padding: EdgeInsets.only(right: 5.w, left: 5.w),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        SizedBox(
+                          width: 80.w,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "SEAD",
+                                style: Styles()
+                                    .descriptionRestulScan()
+                                    .copyWith(fontSize: AppDimens.smallSize),
+                              ),
+                              Text(
+                                equipamento.patrimonioSead!,
+                                style: Styles().hintTextStyle(),
+                              ),
+                            ],
+                          ),
+                        ),
+                        SizedBox(
+                          width: 80.w,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Patrimônio",
+                                style: Styles()
+                                    .descriptionRestulScan()
+                                    .copyWith(fontSize: AppDimens.smallSize),
+                              ),
+                              SizedBox(
+                                  width: 100.w,
+                                  child: Text(equipamento.patrimonioSsp!,
+                                      style: Styles().hintTextStyle(),
+                                      overflow: TextOverflow.ellipsis)),
+                            ],
+                          ),
+                        ),
+                        SizedBox(
+                          width: 80.w,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Nº Série",
+                                style: Styles()
+                                    .descriptionRestulScan()
+                                    .copyWith(fontSize: AppDimens.smallSize),
+                              ),
+                              Text(equipamento.numeroSerie!,
+                                  style: Styles().hintTextStyle(),
+                                  overflow: TextOverflow.ellipsis),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.only(left: 10.w, right: 10.w, top: 10.h),
+                  child: Row(
+                    children: [
+                      Text(
+                        "Setor: ",
+                        style: Styles().descriptionRestulScan(),
+                      ),
+                      Text(
+                        equipamento.setor ?? "",
+                        style: Styles()
+                            .hintTextStyle()
+                            .copyWith(fontSize: AppDimens.pSize),
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(height: 10.h),
+              ],
             ),
-            // CardEquipametos(
-            //     titulo: "Monitor",
-            //     id: "2",
-            //     setor: "Cartorio",
-            //     patrimonio: "122/13",
-            //     lacre: "1010")
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _showBottomSheet(
+      {required BuildContext context,
+      required ItemEquipamento equipamento}) async {
+    DatabaseHelper dbHelper = DatabaseHelper();
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => Container(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(
+                Icons.edit,
+                color: AppColors.cDescriptionIconColor,
+              ),
+              title: const Text('Editar'),
+              onTap: () {
+                dbHelper.updateEquipamento(equipamento);
+                Navigator.of(context).pop();
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.delete),
+              title: const Text('Deletar'),
+              onTap: () {
+                dbHelper.deleteEquipamento(equipamento.idBanco!);
+                setState(() {});
+
+                context.pop("value");
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.share),
+              title: const Text('Compartilhar'),
+              onTap: () {
+                Navigator.of(context).pop();
+              },
+            ),
           ],
         ),
       ),
@@ -153,10 +366,6 @@ class LevantamentoAtual extends StatelessWidget {
                     );
                   }
                 }))
-            // const InfoResumo(
-            //   titulo: "Equipamentos Cadastrados",
-            //   info: await dbHelper.getEquipamentosCount(),
-            // ),
           ],
         ),
       ),
@@ -170,7 +379,7 @@ class Header extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.only(top: 8.h, left: 10.w, right: 10.w, bottom: 20.h),
+      padding: EdgeInsets.only(left: 10.w, right: 10.w, bottom: 10.h),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -206,124 +415,6 @@ class Header extends StatelessWidget {
         ],
       ),
     );
-  }
-}
-
-class CardEquipametos extends StatelessWidget {
-  const CardEquipametos(
-      {required this.equipamento, required this.index, super.key});
-  final ItemEquipamento equipamento;
-  final int index;
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 10.h),
-      child: Card(
-        child: Padding(
-          padding: EdgeInsets.only(left: 10.w, right: 5.w),
-          child: Column(
-            children: [
-              //TODO: ADICIONAR "NÃO INFORMADO NA HORA DE ADCIONAR O ITEM AO BANCO DE DADOS";
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  SizedBox(width: 50.w, child: Text("${index + 1}")),
-                  SizedBox(
-                      width: 100.w,
-                      child: Text(equipamento.tipoEquipamento!,
-                          textAlign: TextAlign.center)),
-                  SizedBox(
-                    width: 50.w,
-                    child: IconButton(
-                        onPressed: () {
-                          showOptions(context, 'editar');
-                          // Generic.snackBar(
-                          //     tipo: AppName.info,
-                          //     context: context,
-                          //     mensagem: "Vai para a tela edit");
-                        },
-                        icon: Icon(Icons.more_vert_outlined, size: 15.sp)),
-                  ),
-                ],
-              ),
-              InkWell(
-                onTap: () {
-                  Generic.snackBar(
-                      tipo: AppName.info,
-                      context: context,
-                      mensagem: "Vai para a tela DETALHE");
-                  //context.push(AppRouterName.detalhesEquipamento);
-                },
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      children: [
-                        Text(
-                          "Setor",
-                          style: Styles().descriptionRestulScan(),
-                        ),
-                        SizedBox(
-                            width: 100.w,
-                            child: Text(equipamento.descricao!,
-                                textAlign: TextAlign.center)),
-                      ],
-                    ),
-                    Column(
-                      children: [
-                        Text(
-                          "Patrimônio",
-                          style: Styles().descriptionRestulScan(),
-                        ),
-                        SizedBox(
-                            width: 80.w,
-                            child: Text(equipamento.patrimonioSsp!,
-                                textAlign: TextAlign.center)),
-                      ],
-                    ),
-                    Column(
-                      children: [
-                        Text(
-                          "Lacre",
-                          style: Styles().descriptionRestulScan(),
-                        ),
-                        SizedBox(
-                            width: 80.w,
-                            child: Text(equipamento.patrimonioSead!,
-                                textAlign: TextAlign.center)),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              SizedBox(height: 10.h)
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  void showOptions(BuildContext context, String opcao) {
-    // Mostra o menu de opções específico para cada ícone
-    showMenu(
-      context: context,
-      position: RelativeRect.fromLTRB(0, 0, 0, 0),
-      items: [
-        PopupMenuItem(child: Text('Opção 1'), value: 'opcao1'),
-        PopupMenuItem(child: Text('Opção 2'), value: 'opcao2'),
-        PopupMenuItem(child: Text('Opção 3'), value: 'opcao3'),
-      ],
-      elevation: 8.0,
-    ).then((value) {
-      if (value != null) {
-        if (opcao == 'editar') {
-          // Adicione o código para editar aqui
-        } else if (opcao == 'deletar') {
-          // Adicione o código para deletar aqui
-        }
-      }
-    });
   }
 }
 

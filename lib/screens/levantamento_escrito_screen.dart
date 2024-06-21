@@ -1,9 +1,15 @@
+// ignore_for_file: use_build_context_synchronously
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:go_router/go_router.dart';
 import 'package:suporte_dti/controller/consulta_controller.dart';
 import 'package:suporte_dti/data/sqflite_helper.dart';
 import 'package:suporte_dti/model/itens_equipamento_model.dart';
+import 'package:suporte_dti/screens/widgets/loading_default.dart';
 import 'package:suporte_dti/utils/app_colors.dart';
 import 'package:suporte_dti/utils/app_name.dart';
 import 'package:suporte_dti/utils/app_styles.dart';
@@ -19,9 +25,16 @@ class LevantamentoDigitado extends StatefulWidget {
 
 class _LevantamentoDigitadoState extends State<LevantamentoDigitado> {
   ScrollController? _scrollController;
+
   var consultaController = ConsultaController();
   EquipamentoViewModel? model = EquipamentoViewModel(
       itensEquipamentoModels: ItensEquipamentoModels(equipamentos: []));
+
+  @override
+  void dispose() {
+    model!.ocupado = false;
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,9 +49,14 @@ class _LevantamentoDigitadoState extends State<LevantamentoDigitado> {
           children: [
             IconButton(
                 onPressed: () {
+                  model!.ocupado = false;
                   context.pop("value");
                 },
                 icon: const Icon(Icons.arrow_back_ios)),
+            model!.ocupado == true
+                ? Text("Levantamento",
+                    style: TextStyle(color: Colors.white, fontSize: 20.sp))
+                : const Text(""),
             IconButton(
                 onPressed: () {
                   setState(() {});
@@ -49,65 +67,89 @@ class _LevantamentoDigitadoState extends State<LevantamentoDigitado> {
         ),
         iconTheme: const IconThemeData(color: Colors.white),
       ),
-      body: ListView(
-        children: [
-          SizedBox(
-            height: 40.h,
-            child: Stack(
+      body: model!.ocupado == true
+          ? const LoadingDefault()
+          : ListView(
               children: [
-                Container(
-                  width: double.infinity,
-                  color: AppColors.cSecondaryColor,
+                SizedBox(
+                  height: 40.h,
+                  child: Stack(
+                    children: [
+                      Container(
+                        width: double.infinity,
+                        color: AppColors.cSecondaryColor,
+                      ),
+                      Positioned(
+                          left: 115.w,
+                          right: 90.w,
+                          top: 0.h,
+                          child: Text(
+                            "Levantamento",
+                            style:
+                                TextStyle(color: Colors.white, fontSize: 22.sp),
+                          )),
+                    ],
+                  ),
                 ),
-                Positioned(
-                    left: 115.w,
-                    right: 90.w,
-                    top: 0.h,
-                    child: Text(
-                      "Levantamento",
-                      style: TextStyle(color: Colors.white, fontSize: 22.sp),
-                    )),
+                // SizedBox(
+                //   child: SingleChildScrollView(
+                //     child: Column(
+                //       children: [
+                //         searchBar(context, model?.ocupado ?? false, height),
+                //       ],
+                //     ),
+                //   ),
+                // ),
+
+                searchBar(context, model?.ocupado ?? false, height),
+
+                Padding(
+                  padding:
+                      EdgeInsets.symmetric(horizontal: 12.w, vertical: 5.h),
+                  child: Container(
+                    height: height - kToolbarHeight - 140.h,
+                    decoration: BoxDecoration(
+                        color:
+                            model!.itensEquipamentoModels.equipamentos.isEmpty
+                                ? Colors.white
+                                : AppColors.cSecondaryColor,
+                        borderRadius: BorderRadius.circular(20)),
+                    child: SizedBox(
+                      height: height - kToolbarHeight - 115.h,
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(
+                            horizontal: 10.w, vertical: 5.h),
+                        child: GridView.builder(
+                          physics: const BouncingScrollPhysics(
+                              parent: AlwaysScrollableScrollPhysics()),
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 1,
+                                  mainAxisExtent: 220,
+                                  mainAxisSpacing: 15,
+                                  crossAxisSpacing: 15),
+                          controller: _scrollController,
+                          itemCount:
+                              model?.itensEquipamentoModels.equipamentos.length,
+                          itemBuilder: (BuildContext ctxt, int index) {
+                            return CardEquipamentosResultadoLevantamento(
+                                item: model!.itensEquipamentoModels
+                                    .equipamentos[index]);
+                          },
+                        ),
+                      ),
+                    ),
+                  ),
+                )
               ],
             ),
-          ),
-          SizedBox(
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  searchBar(context, model?.ocupado ?? false, height),
-                ],
-              ),
-            ),
-          ),
-          SizedBox(
-            height: height - kToolbarHeight - 115.h,
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.h),
-              child: GridView.builder(
-                physics: const BouncingScrollPhysics(
-                    parent: AlwaysScrollableScrollPhysics()),
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 1,
-                    mainAxisExtent: 220,
-                    mainAxisSpacing: 15,
-                    crossAxisSpacing: 15),
-                controller: _scrollController,
-                itemCount: model?.itensEquipamentoModels.equipamentos.length,
-                itemBuilder: (BuildContext ctxt, int index) {
-                  return CardEquipamentosResultadoLevantamento(
-                      item: model!.itensEquipamentoModels.equipamentos[index]);
-                },
-              ),
-            ),
-          )
-        ],
-      ),
     );
   }
 
   Padding searchBar(BuildContext context, bool ocupado, double? height) {
     return Padding(
-      padding: EdgeInsets.only(top: 20.h, left: 10.w, right: 10.w),
+      padding:
+          EdgeInsets.only(top: 10.h, left: 20.w, right: 20.w, bottom: 10.h),
       child: TextFormField(
         style: Styles().mediumTextStyle(),
         keyboardType: TextInputType.visiblePassword,
@@ -122,10 +164,16 @@ class _LevantamentoDigitadoState extends State<LevantamentoDigitado> {
             });
 
             if (context.mounted) {
+              setState(() {
+                model!.ocupado = true;
+              });
+
               consultaController
                   .buscarEquipamentos(context, model!)
                   .then((value) {
-                setState(() {});
+                setState(() {
+                  model!.ocupado = false;
+                });
               });
             } else {
               Generic.snackBar(
@@ -162,27 +210,54 @@ class _LevantamentoDigitadoState extends State<LevantamentoDigitado> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20.0),
+            ),
             backgroundColor: AppColors.cWhiteColor,
             title: const Text(
-              'Está entrada é ?',
+              'Esta entrada é?',
               textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
             ),
+            content: const Icon(
+              Icons.help_outline,
+              color: AppColors.cSecondaryColor,
+              size: 40,
+            ),
+            actionsAlignment: MainAxisAlignment.center,
             actions: <Widget>[
               ElevatedButton(
-                style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.green,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12.0),
+                  ),
+                ),
                 onPressed: () {
                   Navigator.of(context).pop(AppName.patri);
                 },
-                child: Text(AppName.patri!,
-                    style: const TextStyle(color: AppColors.contentColorBlack)),
+                child: Text(
+                  AppName.patri!,
+                  style: const TextStyle(color: Colors.white),
+                ),
               ),
               ElevatedButton(
-                style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.cSecondaryColor,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12.0),
+                  ),
+                ),
                 onPressed: () {
                   Navigator.of(context).pop(AppName.nSerie);
                 },
-                child: Text(AppName.nSerie!,
-                    style: const TextStyle(color: AppColors.contentColorBlack)),
+                child: Text(
+                  AppName.nSerie!,
+                  style: const TextStyle(color: Colors.white),
+                ),
               ),
             ],
           );
@@ -198,7 +273,7 @@ class _LevantamentoDigitadoState extends State<LevantamentoDigitado> {
             model!.numeroSerie = "";
             model!.patrimonioSead = "";
           }
-        } else {}
+        }
       });
       return true;
     } else {
@@ -224,14 +299,16 @@ class _LevantamentoDigitadoState extends State<LevantamentoDigitado> {
 
 class CardEquipamentosResultadoLevantamento extends StatelessWidget {
   CardEquipamentosResultadoLevantamento({required this.item, super.key});
-  DatabaseHelper dbHelper = DatabaseHelper();
+  final DatabaseHelper dbHelper = DatabaseHelper();
   final ItemEquipamento item;
+
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 10.w),
+      padding: EdgeInsets.symmetric(horizontal: 5.w, vertical: 5.w),
       child: InkWell(
         onTap: () {
+          print("ir para detalhes do equipamento");
           // setState(() {});
           // consultaController
           //     .buscarEquipamentoPorId(context, item)
@@ -248,25 +325,15 @@ class CardEquipamentosResultadoLevantamento extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                SizedBox(height: 3.h),
                 Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 5.w),
-                  child: Row(
-                    children: [
-                      Text("Patr. ", style: Styles().hintTextStyle()),
-                      Flexible(
-                        child: SizedBox(
-                          child: Text(
-                            item.patrimonioSsp ?? "Não informado.",
-                            style: Styles().smallTextStyle(),
-                          ),
-                        ),
-                      ),
-                    ],
+                  padding: EdgeInsets.only(left: 5.w, right: 5.w, top: 3.h),
+                  child: Text(
+                    item.tipoEquipamento!,
+                    style: Styles().mediumTextStyle(),
                   ),
                 ),
-                // Text(marca ?? "Sem marca", style: Styles().smallTextStyle()),
-
+                LinhaDescricaoLevantamento(
+                    informacao: item.patrimonioSsp, nome: "Patrimônio"),
                 LinhaDescricaoLevantamento(
                     informacao: item.fabricante, nome: "Fabricante"),
                 LinhaDescricaoLevantamento(
@@ -281,7 +348,7 @@ class CardEquipamentosResultadoLevantamento extends StatelessWidget {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text("TAG: ", style: Styles().hintTextStyle()),
+                            Text("N° Série: ", style: Styles().hintTextStyle()),
                             Flexible(
                               child: SizedBox(
                                 child: Text(
@@ -300,14 +367,43 @@ class CardEquipamentosResultadoLevantamento extends StatelessWidget {
                     style:
                         ElevatedButton.styleFrom(backgroundColor: Colors.green),
                     onPressed: () async {
-                      await dbHelper.database;
-                      await dbHelper.insertEquipamento(item);
-                      //await dbHelper.deleteTable();
-                      Generic.snackBar(
-                          context: context,
-                          mensagem: "Item adicionado ao levantamento.",
-                          tipo: AppName.info);
-                      //    print(dbHelper.getEquipamento(1));
+                      bool existe =
+                          await dbHelper.produtoExiste(item.idEquipamento!);
+
+                      if (existe) {
+                        return Generic.snackBar(
+                            context: context,
+                            mensagem: "Equipamento já levantado.",
+                            duracao: 1,
+                            tipo: AppName.erro);
+                      } else {
+                        String? setor = await showSetorDialog(context);
+                        if (setor == "Cancelado" || setor == "") {
+                          return Generic.snackBar(
+                              context: context,
+                              mensagem: "É preciso definir um setor",
+                              duracao: 1,
+                              tipo: AppName.erro);
+                        } else {
+                          item.setor = setor;
+                          String x = await dbHelper.insertEquipamento(item);
+
+                          if (x == AppName.sucesso!) {
+                            Generic.snackBar(
+                                context: context,
+                                mensagem: "Item adicionado ao levantamento.",
+                                duracao: 1,
+                                tipo: AppName.info);
+                          } else {
+                            Generic.snackBar(
+                                context: context,
+                                mensagem:
+                                    "Não foi possível adicionar o esquipamento",
+                                duracao: 1,
+                                tipo: AppName.erro);
+                          }
+                        }
+                      }
                     },
                     child: const Text("Adicionar",
                         style: TextStyle(color: Colors.white))),
@@ -318,6 +414,92 @@ class CardEquipamentosResultadoLevantamento extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Future<String?> showSetorDialog(BuildContext context) async {
+    final setorController = TextEditingController();
+
+    return showDialog<String>(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20.0),
+          ),
+          backgroundColor: AppColors.cWhiteColor,
+          title: const Text(
+            'Indicar o Setor',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(
+                Icons.business,
+                color: AppColors.cSecondaryColor,
+                size: 40,
+              ),
+              const SizedBox(height: 20),
+              TextFormField(
+                controller: setorController,
+                decoration: InputDecoration(
+                  hintText: 'Informe o setor',
+                  hintStyle: const TextStyle(color: Colors.grey),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12.0),
+                    borderSide:
+                        const BorderSide(color: AppColors.cSecondaryColor),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12.0),
+                    borderSide:
+                        const BorderSide(color: AppColors.cSecondaryColor),
+                  ),
+                  contentPadding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                ),
+              ),
+            ],
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop("Cancelado");
+              },
+              child: const Text(
+                'Cancelar',
+                style: TextStyle(color: AppColors.cSecondaryColor),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop(setorController.text);
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.cSecondaryColor,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12.0),
+                ),
+              ),
+              child: const Text(
+                'Salvar',
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
+          ],
+        );
+      },
+    ).then((value) {
+      if (value == null || value.isEmpty) {
+        return "Cancelado";
+      }
+      return value;
+    });
   }
 }
 
@@ -350,207 +532,3 @@ class LinhaDescricaoLevantamento extends StatelessWidget {
     );
   }
 }
-
-
-// import 'package:flutter/material.dart';
-// import 'package:flutter_screenutil/flutter_screenutil.dart';
-// import 'package:suporte_dti/utils/app_colors.dart';
-// import 'package:suporte_dti/utils/app_styles.dart';
-
-// class LevantamentoDigitado extends StatefulWidget {
-//   const LevantamentoDigitado({super.key});
-
-//   @override
-//   State<LevantamentoDigitado> createState() => _LevantamentoDigitadoState();
-// }
-
-// class _LevantamentoDigitadoState extends State<LevantamentoDigitado> {
-//   TextEditingController equipamentoCtrl = TextEditingController();
-//   TextEditingController marcaCtrl = TextEditingController();
-//   TextEditingController serviceTagCtrl = TextEditingController();
-//   TextEditingController lotacaoCtrl = TextEditingController();
-//   TextEditingController setorCtrl = TextEditingController();
-//   TextEditingController lacreCtrl = TextEditingController();
-//   TextEditingController convenioCtrl = TextEditingController();
-//   TextEditingController patrimonioCtrl = TextEditingController();
-//   bool isLacre = false;
-//   bool isConvenio = false;
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//         appBar: AppBar(
-//           iconTheme: const IconThemeData(color: Colors.white),
-//           leading: IconButton(
-//               onPressed: () {
-//                 Navigator.of(context).pop();
-//               },
-//               icon: const Icon(Icons.arrow_back_ios_new)),
-//           title: Text("Levantamento",
-//               style: Styles().titleStyle().copyWith(
-//                   color: AppColors.cWhiteColor,
-//                   fontSize: 22.sp,
-//                   fontWeight: FontWeight.normal)),
-//           centerTitle: true,
-//           backgroundColor: AppColors.cSecondaryColor,
-//         ),
-//         body: SingleChildScrollView(
-//           child: Column(
-//             children: [
-//               SizedBox(height: 10.sp),
-//               Row(
-//                 children: [
-//                   SizedBox(width: 10.w),
-//                   Text(
-//                     "Possui convênio?",
-//                     style: Styles().smallTextStyle(),
-//                   ),
-//                   Transform.scale(
-//                     scale: 0.8,
-//                     child: Switch(
-//                         activeColor: AppColors.cSecondaryColor,
-//                         value: isConvenio,
-//                         onChanged: (value) {
-//                           setState(() {
-//                             isConvenio = value;
-//                           });
-//                         }),
-//                   ),
-//                   const Expanded(child: SizedBox(width: 30)),
-//                   Text(
-//                     "Possui Lacre?",
-//                     style: Styles().smallTextStyle(),
-//                   ),
-//                   Transform.scale(
-//                     scale: 0.8,
-//                     child: Switch(
-//                         activeColor: AppColors.cSecondaryColor,
-//                         value: isLacre,
-//                         onChanged: (value) {
-//                           setState(() {
-//                             isLacre = value;
-//                           });
-//                         }),
-//                   ),
-//                   SizedBox(width: 10.w),
-//                 ],
-//               ),
-//               FieldsLevantamentoDigitado(
-//                 lotacaoCtrl: lotacaoCtrl,
-//                 tipo: "Lotação",
-//               ),
-//               FieldsLevantamentoDigitado(
-//                 lotacaoCtrl: setorCtrl,
-//                 tipo: "Setor",
-//               ),
-//               FieldsLevantamentoDigitado(
-//                 lotacaoCtrl: equipamentoCtrl,
-//                 tipo: "Equipamento",
-//               ),
-//               FieldsLevantamentoDigitado(
-//                   lotacaoCtrl: marcaCtrl,
-//                   tipo: "Marca-Modelo",
-//                   keyboardType: TextInputType.visiblePassword),
-//               FieldsLevantamentoDigitado(
-//                   lotacaoCtrl: patrimonioCtrl,
-//                   tipo: "Patrimônio",
-//                   keyboardType: TextInputType.visiblePassword),
-//               FieldsLevantamentoDigitado(
-//                   lotacaoCtrl: serviceTagCtrl,
-//                   tipo: "Sn - Service Tag",
-//                   keyboardType: TextInputType.visiblePassword),
-//               isConvenio == true
-//                   ? FieldsLevantamentoDigitado(
-//                       lotacaoCtrl: convenioCtrl,
-//                       tipo: "Convênio",
-//                       keyboardType: TextInputType.number)
-//                   : Container(),
-//               isLacre == true
-//                   ? FieldsLevantamentoDigitado(
-//                       lotacaoCtrl: lacreCtrl,
-//                       tipo: "Lacre",
-//                       keyboardType: TextInputType.number)
-//                   : Container(),
-//               Row(
-//                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-//                 children: [
-//                   OutlinedButton(
-//                       style: OutlinedButton.styleFrom(
-//                           backgroundColor: AppColors.cSecondaryColor,
-//                           shape: RoundedRectangleBorder(
-//                               borderRadius: BorderRadius.circular(10))),
-//                       onPressed: () {
-//                         //  context.go(AppRouterName.homeController);
-//                       },
-//                       child: Row(
-//                         children: [
-//                           const Icon(
-//                             Icons.plus_one,
-//                             color: Colors.white,
-//                           ),
-//                           Container(width: 10.w),
-//                           Text(
-//                             "Outro",
-//                             style: Styles()
-//                                 .mediumTextStyle()
-//                                 .copyWith(color: Colors.white),
-//                           )
-//                         ],
-//                       )),
-//                   OutlinedButton(
-//                       style: OutlinedButton.styleFrom(
-//                           shape: RoundedRectangleBorder(
-//                               borderRadius: BorderRadius.circular(10))),
-//                       onPressed: () {
-//                         //context.push(AppRouterName.homeController);
-//                       },
-//                       child: Row(
-//                         children: [
-//                           const Icon(Icons.check),
-//                           Container(width: 10.w),
-//                           Text("Concluir", style: Styles().mediumTextStyle())
-//                         ],
-//                       )),
-//                 ],
-//               ),
-//               Container(height: 20.h)
-//             ],
-//           ),
-//         ));
-//   }
-// }
-
-// class FieldsLevantamentoDigitado extends StatelessWidget {
-//   const FieldsLevantamentoDigitado(
-//       {super.key,
-//       required this.lotacaoCtrl,
-//       required this.tipo,
-//       this.keyboardType});
-
-//   final TextEditingController lotacaoCtrl;
-//   final String tipo;
-//   final TextInputType? keyboardType;
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Padding(
-//       padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 10.w),
-//       child: TextFormField(
-//         textInputAction: TextInputAction.next,
-//         controller: lotacaoCtrl,
-//         keyboardType: keyboardType ?? TextInputType.name,
-//         decoration: InputDecoration(
-//             alignLabelWithHint: true,
-//             labelText: tipo,
-//             labelStyle: Styles().mediumTextStyle(),
-//             focusedBorder: OutlineInputBorder(
-//                 borderRadius: BorderRadius.circular(20),
-//                 borderSide: const BorderSide(
-//                     color: AppColors.cSecondaryColor, width: 2)),
-//             enabledBorder: OutlineInputBorder(
-//                 borderRadius: BorderRadius.circular(20),
-//                 borderSide: const BorderSide(
-//                     color: AppColors.cSecondaryColor, width: 2))),
-//       ),
-//     );
-//   }
-// }

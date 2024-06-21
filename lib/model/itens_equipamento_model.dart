@@ -31,7 +31,9 @@ class ItensEquipamentoModels {
 }
 
 class ItemEquipamento {
+  int? idBanco;
   int? idEquipamento;
+  String? setor;
   String? numeroSerie;
   String? patrimonioSead;
   String? patrimonioSsp;
@@ -42,18 +44,19 @@ class ItemEquipamento {
   int? idFabricante;
   int? idModelo;
 
-  ItemEquipamento({
-    this.idEquipamento,
-    this.numeroSerie,
-    this.patrimonioSead,
-    this.idFabricante,
-    this.idModelo,
-    this.modelo,
-    this.descricao,
-    this.fabricante,
-    this.patrimonioSsp,
-    this.tipoEquipamento,
-  });
+  ItemEquipamento(
+      {this.idEquipamento,
+      this.numeroSerie,
+      this.patrimonioSead,
+      this.idFabricante,
+      this.idModelo,
+      this.modelo,
+      this.descricao,
+      this.fabricante,
+      this.patrimonioSsp,
+      this.tipoEquipamento,
+      this.idBanco,
+      this.setor});
 
   ItemEquipamento.fromJson(Map<String, dynamic> json) {
     patrimonioSsp = json['patrimonioSsp'];
@@ -89,6 +92,7 @@ class ItemEquipamento {
     data['fabricante'] = fabricante;
     data['modelo'] = modelo;
     data['tipoEquipamento'] = tipoEquipamento;
+    data['setor'] = setor;
 
     return data;
   }

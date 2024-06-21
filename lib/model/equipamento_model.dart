@@ -16,10 +16,10 @@ class EquipamentoModel {
   String? descricaoSo;
   String? fabricante;
   List<Alocacoes>? alocacoes;
-  String? notaFiscal; //TODO: VER O TIPO NO BANCO
-  int? idTipoAquisicao; //AQUI TMB
+  String? notaFiscal;
+  int? idTipoAquisicao;
   String? tipoAquisicao;
-  int? idUnidadedeAdministrativaDestino; //auqi tmb
+  int? idUnidadedeAdministrativaDestino;
   String? unidadeAtual;
   String? descricaoUnidadeDestino;
   String? descricao;

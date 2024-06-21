@@ -84,7 +84,7 @@ class Rotas {
       GoRoute(
         name: 'resumoLevantamento',
         path: AppRouterName.resumoLevantamento,
-        builder: (context, state) => (ResumoLevantamento()),
+        builder: (context, state) => (const ResumoLevantamento()),
       ),
       GoRoute(
         name: 'qrcCodeResult',

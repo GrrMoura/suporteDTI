@@ -90,7 +90,7 @@ class _DelegaciaDetalheState extends State<DelegaciaDetalhe> {
   @override
   Widget build(BuildContext context) {
     setState(() {});
-    FutureBuilder _futureScreen() {
+    FutureBuilder futureScreen() {
       return FutureBuilder(
           future: consultaController.buscarEquipamentos(context, widget.model!),
           builder: (context, snapshot) {
@@ -107,7 +107,7 @@ class _DelegaciaDetalheState extends State<DelegaciaDetalhe> {
     return Validador.listNotNullAndNotEmpty(
             widget.model?.itensEquipamentoModels.equipamentos)
         ? _listViewScreen()
-        : _futureScreen();
+        : futureScreen();
   }
 
   Widget _listViewScreen() {
@@ -122,11 +122,14 @@ class _DelegaciaDetalheState extends State<DelegaciaDetalhe> {
                 Navigator.of(context).pop();
               },
               icon: const Icon(Icons.arrow_back_ios_new)),
-          title: Text(widget.sigla ?? "",
-              style: Styles().titleStyle().copyWith(
-                  color: AppColors.cWhiteColor,
-                  fontSize: 22.sp,
-                  fontWeight: FontWeight.normal)),
+          title: Padding(
+            padding: EdgeInsets.only(top: 10.h),
+            child: Text(widget.sigla ?? "",
+                style: Styles().titleStyle().copyWith(
+                    color: AppColors.cWhiteColor,
+                    fontSize: 22.sp,
+                    fontWeight: FontWeight.normal)),
+          ),
           centerTitle: true,
           backgroundColor: AppColors.cSecondaryColor,
         ),
@@ -192,15 +195,6 @@ class _DelegaciaDetalheState extends State<DelegaciaDetalhe> {
                       nome:
                           " ${widget.model?.itensEquipamentoModels.equipamentos.length} de ${widget.model?.paginacao!.registros} equipamentos  ")
                   : const Titulos(nome: "  Equipamentos "),
-
-              // GridviewEquipamentos(
-              //   myProducts: myProducts2,
-              //   widget: const CardItensDelegacia(
-              //     marcaModelo: "HP/Z220 Work Station",
-              //     lotacao: "Sala do Diretor",
-              //     patrimonio: "172671",
-              //   ),
-              // ),
               _blocoEquipamento(screenWidth),
             ],
           ),

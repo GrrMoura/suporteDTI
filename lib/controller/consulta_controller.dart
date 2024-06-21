@@ -31,8 +31,6 @@ class ConsultaController {
             model.paginacao!.pagina!, model.paginacao!.totalPaginas!);
       }
 
-//TODO:  ver regra para que consultas com apenas
-// uma página passe no metodo chegou ao final sem acrescentar + 1 a páginas
       Response responseConsulta =
           await ConsultaService.buscarEquipamentos(model);
 
@@ -101,9 +99,7 @@ class ConsultaController {
             context: context,
             mensagem: "Usuário não autenticado ou token encerrado",
           );
-          await Future.delayed(const Duration(
-                  seconds:
-                      3)) //TODO: testar se limpa a stack de paginas e colocar na pagina router pra elmbar
+          await Future.delayed(const Duration(seconds: 3))
               .then((_) => {context.goNamed(AppRouterName.login)});
         }
         Generic.snackBar(

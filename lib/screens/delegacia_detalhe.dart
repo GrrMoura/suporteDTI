@@ -1,9 +1,13 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:suporte_dti/controller/consulta_controller.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:suporte_dti/controller/equipamento_controller.dart';
 import 'package:suporte_dti/model/itens_equipamento_model.dart';
+import 'package:suporte_dti/model/levantamento_model.dart';
 import 'package:suporte_dti/navegacao/app_screens_path.dart';
 import 'package:suporte_dti/screens/widgets/card_item.dart';
 import 'package:suporte_dti/screens/widgets/loading_default.dart';
@@ -29,9 +33,7 @@ class DelegaciaDetalhe extends StatefulWidget {
 
 class _DelegaciaDetalheState extends State<DelegaciaDetalhe> {
   ScrollController? scrollController;
-  ConsultaController consultaController = ConsultaController();
-  EquipamentoViewModel? model = EquipamentoViewModel(
-      itensEquipamentoModels: ItensEquipamentoModels(equipamentos: []));
+  EquipamentoController equipamentoController = EquipamentoController();
 
   @override
   void initState() {
@@ -59,7 +61,7 @@ class _DelegaciaDetalheState extends State<DelegaciaDetalhe> {
               .seChegouAoFinalDaPagina(widget.model!.paginacao!.pagina!)) {
         setState(() {});
 
-        consultaController
+        equipamentoController
             .buscarEquipamentos(context, widget.model!)
             .then((value) {
           setState(() {});
@@ -76,7 +78,7 @@ class _DelegaciaDetalheState extends State<DelegaciaDetalhe> {
   Widget _buildCard(ItemEquipamento itens) {
     return InkWell(
         onTap: () {
-          consultaController
+          equipamentoController
               .buscarEquipamentoPorId(context, itens)
               .then((value) {
             setState(() {});
@@ -92,11 +94,21 @@ class _DelegaciaDetalheState extends State<DelegaciaDetalhe> {
     setState(() {});
     FutureBuilder futureScreen() {
       return FutureBuilder(
-          future: consultaController.buscarEquipamentos(context, widget.model!),
+          future:
+              equipamentoController.buscarEquipamentos(context, widget.model!),
           builder: (context, snapshot) {
             switch (snapshot.connectionState) {
               case ConnectionState.done:
-                return _listViewScreen();
+                if (snapshot.hasError) {
+                  return Container(
+                    color: Colors.white,
+                  );
+                } else if (!snapshot.hasData ||
+                    (snapshot.data as List).isEmpty) {
+                  return _listViewScreen();
+                } else {
+                  return _listViewScreen();
+                }
 
               default:
                 return const LoadingDefault();
@@ -161,32 +173,13 @@ class _DelegaciaDetalheState extends State<DelegaciaDetalhe> {
               SizedBox(
                 height: 350.h,
                 child: ListView(
-                  children: const [
+                  children: [
                     DelegaciasCardLevantamento(
+                        idUnidade: widget.model!.idUnidade!,
                         nome: "Juan Matos Silva",
                         id: "02",
                         data: "12/10/2023",
-                        delegacia: "Rascunho"),
-                    DelegaciasCardLevantamento(
-                        nome: "Juan Matos Silva",
-                        id: "01",
-                        data: "12/10/2023",
-                        delegacia: "Delegacia de Capela"),
-                    DelegaciasCardLevantamento(
-                        nome: "Juan Matos Silva",
-                        id: "02",
-                        data: "12/10/2023",
-                        delegacia: "Delegacia de Capela"),
-                    DelegaciasCardLevantamento(
-                        nome: "Juan Matos Silva",
-                        id: "01",
-                        data: "12/10/2023",
-                        delegacia: "Delegacia de Capela"),
-                    DelegaciasCardLevantamento(
-                        nome: "Juan Matos Silva",
-                        id: "02",
-                        data: "12/10/2023",
-                        delegacia: "Delegacia de Capela"),
+                        delegacia: "Resumo"),
                   ],
                 ),
               ),
@@ -313,36 +306,45 @@ class AddBotao extends StatelessWidget {
 }
 
 class DelegaciasCardLevantamento extends StatelessWidget {
-  const DelegaciasCardLevantamento({
-    super.key,
-    required this.nome,
-    required this.id,
-    required this.data,
-    required this.delegacia,
-  });
+  DelegaciasCardLevantamento(
+      {super.key,
+      required this.nome,
+      required this.id,
+      required this.data,
+      required this.delegacia,
+      required this.idUnidade});
 
   final String nome;
   final String id;
   final String data;
   final String delegacia;
+  final int idUnidade;
+  final LevantamentoModel levantamentoModel = LevantamentoModel();
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () {
-        context.push(AppRouterName.resumoLevantamento);
+      onTap: () async {
+        if (delegacia == "Resumo") {
+          SharedPreferences prefs = await SharedPreferences.getInstance();
+          prefs.setInt("idDelegacia", idUnidade);
+
+          context.push(AppRouterName.resumoLevantamento);
+        } else {
+          print("ola");
+        }
       },
       child: Padding(
         padding: EdgeInsets.symmetric(vertical: 5.h, horizontal: 10.w),
         child: Material(
-          borderRadius: delegacia != "Rascunho"
+          borderRadius: delegacia != "Resumo"
               ? const BorderRadius.only(
                   topLeft: Radius.circular(40), topRight: Radius.circular(40))
               : const BorderRadius.only(
                   bottomLeft: Radius.circular(40),
                   bottomRight: Radius.circular(40)),
           elevation: 5,
-          color: delegacia != "Rascunho"
+          color: delegacia != "Resumo"
               ? AppColors.cSecondaryColor
               : AppColors.cSecondaryColor.withOpacity(0.6),
           child: Column(
@@ -361,7 +363,7 @@ class DelegaciasCardLevantamento extends StatelessWidget {
                     Text(
                       delegacia,
                       style: Styles().mediumTextStyle().copyWith(
-                          color: delegacia != "Rascunho"
+                          color: delegacia != "Resumo"
                               ? AppColors.cWhiteColor
                               : AppColors.cWhiteColor.withOpacity(0.7)),
                     ),

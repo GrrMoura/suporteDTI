@@ -1,13 +1,8 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first, no_leading_underscores_for_local_identifiers, avoid_print, must_be_immutable
-import 'dart:convert';
-import 'dart:io';
+// ignore_for_file: public_member_api_docs, sort_constructors_first, no_leading_underscores_for_local_identifiers, avoid_print, must_be_immutable, use_build_context_synchronously
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:suporte_dti/controller/consulta_controller.dart';
 import 'package:suporte_dti/model/itens_delegacia_model.dart';
 import 'package:suporte_dti/model/equipamentos_historico_model.dart';
 import 'package:suporte_dti/model/equipamento_model.dart';
@@ -31,7 +26,6 @@ class SearchScreen extends StatefulWidget {
 
 class _SearchScreenState extends State<SearchScreen> {
   late List<EquipamentoModel> equipamentoList;
-  final ConsultaController consultaController = ConsultaController();
   EquipamentosHistoricoModel historicoModel = EquipamentosHistoricoModel();
   EquipamentoViewModel? model = EquipamentoViewModel(
       itensEquipamentoModels: ItensEquipamentoModels(equipamentos: []));
@@ -41,15 +35,10 @@ class _SearchScreenState extends State<SearchScreen> {
   SqliteService db = SqliteService();
   // ignore: prefer_typing_uninitialized_variables
 
-  String? semFoto = AppName.semFoto;
-  Uint8List? bytes;
-  bool temFoto = false;
-
   @override
   initState() {
     super.initState();
 
-    pegarFoto();
     pegarIdentificacao();
   }
 
@@ -59,41 +48,11 @@ class _SearchScreenState extends State<SearchScreen> {
     String? nome1 = prefs.getString("nome");
     String? nome2 = prefs.getString("segundoNome");
     String? cpfs = prefs.getString("cpf");
-    //String informacoes = widget.nome;
-
-    // List names = informacoes.split(' ');
     String _nome = "$nome1 $nome2";
     String _cpf = cpfs!;
     name = _nome;
     cpf = _cpf;
-  }
-
-  pegarFoto() async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    bytes = base64Decode(prefs.getString("foto") ?? "");
-    temFoto = prefs.getBool("temFoto") ?? false;
-
     setState(() {});
-  }
-
-  _pickImagefromGallery() async {
-    try {
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-
-      final pickedImage =
-          await ImagePicker().pickImage(source: ImageSource.gallery);
-      if (pickedImage != null) {
-        File? imageFile = File(pickedImage.path);
-        bytes = imageFile.readAsBytesSync();
-        String imageString = base64Encode(bytes!);
-        prefs.setString("foto", imageString);
-        prefs.setBool("temFoto", true);
-
-        setState(() {});
-      } else {}
-    } catch (e) {
-      return null;
-    }
   }
 
   List<EquipamentoModel> todosOsEquipamentos = [];
@@ -113,7 +72,6 @@ class _SearchScreenState extends State<SearchScreen> {
                     const FastSearch(),
                     searchBar(context, model?.ocupado ?? false),
                     SizedBox(height: 25.h),
-                    builderHistorico(),
                   ],
                 ),
               ),
@@ -176,84 +134,6 @@ class _SearchScreenState extends State<SearchScreen> {
     );
   }
 
-  FutureBuilder<List<dynamic>> builderHistorico() {
-    return FutureBuilder(
-        initialData: const [],
-        future: db.getEquipamentos(),
-        builder: (context, AsyncSnapshot<List> snapshot) {
-          var data = snapshot.data;
-          var datalength = data?.length;
-
-          return datalength == 0
-              ? const Center(child: Text("Sem Histórico"))
-              : SizedBox(
-                  height: 160.h,
-                  width: double.infinity,
-                  child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: datalength,
-                      itemBuilder: (context, index) {
-                        String patrimonio = data![index].patrimonio;
-                        String lotacao = data[index].lotacao;
-                        String marca = data[index].marca;
-                        return GestureDetector(
-                          onLongPress: () {
-                            Clipboard.setData(ClipboardData(text: patrimonio));
-
-                            Generic.snackBar(
-                              context: context,
-                              mensagem: "Copiado para área de transferência",
-                              tipo: AppName.sucesso,
-                            );
-                          },
-                          child: Padding(
-                            padding: EdgeInsets.fromLTRB(8.w, 10.h, 8.w, 5.h),
-                            child: SizedBox(
-                              width: 100.w,
-                              child: Material(
-                                color: AppColors.cWhiteColor,
-                                elevation: 4,
-                                borderRadius: BorderRadius.circular(10),
-                                shadowColor: Colors.grey,
-                                child: Column(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.end,
-                                      children: [
-                                        InkWell(
-                                            onTap: () {
-                                              db.deletarEquipamento(patrimonio);
-                                              setState(() {});
-                                            },
-                                            child: const Icon(
-                                                Icons.remove_circle_outline,
-                                                color: Colors.red))
-                                      ],
-                                    ),
-                                    Text(marca,
-                                        style: Styles().smallTextStyle()),
-                                    Image.asset("assets/images/impressora.png",
-                                        height: 70.h),
-                                    Text(patrimonio,
-                                        style: Styles().smallTextStyle()),
-                                    Text(lotacao,
-                                        style: Styles().hintTextStyle()),
-                                    SizedBox(
-                                      height: 3.h,
-                                    )
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                        );
-                      }),
-                );
-        });
-  }
-
   Container heading() {
     return Container(
       color: AppColors.cSecondaryColor,
@@ -268,24 +148,10 @@ class _SearchScreenState extends State<SearchScreen> {
               CircleAvatar(
                 radius: 45.h,
                 backgroundColor: AppColors.cWhiteColor,
-                child: InkWell(
-                  onTap: () async {
-                    await _pickImagefromGallery();
-                    setState(() {
-                      temFoto = true;
-                    });
-                  },
-                  child: CircleAvatar(
+                child: CircleAvatar(
                     backgroundColor: AppColors.cSecondaryColor,
                     radius: 40.h,
-                    backgroundImage: temFoto == false
-                        ? AssetImage(semFoto!)
-                        // ? AssetImage("assets/images/people1.jpg")
-                        : bytes != null
-                            ? MemoryImage(bytes!) as ImageProvider<Object>
-                            : AssetImage(semFoto!),
-                  ),
-                ),
+                    backgroundImage: AssetImage(AppName.semFoto!)),
               ),
               Padding(
                 padding: EdgeInsets.only(left: 5.w, right: 5.w, top: 5.w),
@@ -456,65 +322,6 @@ class PesquisarDelegacias extends StatelessWidget {
     );
   }
 }
-
-// class CardUltimasConsultas extends StatefulWidget {
-//   const CardUltimasConsultas(
-//       {this.lotacao, this.patrimonio, this.db, super.key});
-
-//   final String? patrimonio, lotacao;
-//   final SqliteService? db;
-
-//   @override
-//   State<CardUltimasConsultas> createState() => _CardUltimasConsultasState();
-// }
-
-// class _CardUltimasConsultasState extends State<CardUltimasConsultas> {
-//   @override
-//   Widget build(BuildContext context) {
-//     return GestureDetector(
-//       onLongPress: () {
-//         Clipboard.setData(ClipboardData(text: widget.patrimonio!));
-//         Generic.snackBar(
-//             context: context,
-//             mensagem: "Copiado para área de transferência",
-//             tipo: AppName.sucesso);
-//       },
-//       child: Padding(
-//         padding: EdgeInsets.fromLTRB(8.w, 10.h, 8.w, 0),
-//         child: SizedBox(
-//           width: 100.w,
-//           child: Material(
-//             color: AppColors.cWhiteColor,
-//             elevation: 10,
-//             borderRadius: BorderRadius.circular(10),
-//             shadowColor: Colors.grey,
-//             child: Column(
-//               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//               children: [
-//                 Row(
-//                   mainAxisAlignment: MainAxisAlignment.end,
-//                   children: [
-//                     InkWell(
-//                         onTap: () {
-//                           widget.db!.deletarEquipamento(widget.patrimonio!);
-//                           setState(() {});
-//                         },
-//                         child: const Icon(Icons.remove_circle_outline,
-//                             color: Colors.red))
-//                   ],
-//                 ),
-//                 Image.asset("assets/images/impressora.png", height: 70.h),
-//                 Text(widget.patrimonio!, style: Styles().smallTextStyle()),
-//                 Text(widget.lotacao!, style: Styles().hintTextStyle()),
-//                 SizedBox(height: 3.h),
-//               ],
-//             ),
-//           ),
-//         ),
-//       ),
-//     );
-//   }
-// }
 
 class DelegaciasIcones extends StatelessWidget {
   final String? path;

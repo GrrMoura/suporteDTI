@@ -1,9 +1,13 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:suporte_dti/data/sqflite_helper.dart';
 import 'package:suporte_dti/model/itens_equipamento_model.dart';
+import 'package:suporte_dti/model/levantamento_model.dart';
+import 'package:suporte_dti/screens/widgets/custom_dialog.dart';
 import 'package:suporte_dti/utils/app_colors.dart';
 import 'package:suporte_dti/utils/app_dimens.dart';
 import 'package:suporte_dti/utils/app_name.dart';
@@ -19,6 +23,8 @@ class ResumoLevantamento extends StatefulWidget {
 
 class _ResumoLevantamentoState extends State<ResumoLevantamento> {
   final DatabaseHelper dbHelper = DatabaseHelper();
+  final LevantamentoModel modelLevantamento =
+      LevantamentoModel(equipamentosLevantados: []);
 
   @override
   Widget build(BuildContext context) {
@@ -70,11 +76,17 @@ class _ResumoLevantamentoState extends State<ResumoLevantamento> {
                                 ))
                               : ListView.builder(
                                   itemCount: datalength,
-                                  itemBuilder: (context, index) =>
-                                      cardEquipamento(
-                                          context: context,
-                                          index: index,
-                                          equipamento: data[index]));
+                                  itemBuilder: (context, index) {
+                                    modelLevantamento.equipamentosLevantados ??=
+                                        [];
+                                    modelLevantamento.equipamentosLevantados!
+                                        .add(data[index].idEquipamento);
+
+                                    return cardEquipamento(
+                                        context: context,
+                                        index: index,
+                                        equipamento: data[index]);
+                                  });
                         }),
                   ),
                 ],
@@ -84,29 +96,27 @@ class _ResumoLevantamentoState extends State<ResumoLevantamento> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.cErrorColor),
+              TextButton(
                 onPressed: () {
                   setState(() {
-                    dbHelper.deleteAllEquipamentos();
-                    print('Botão descartar pressionado');
+                    showDiscardConfirmationDialog(context);
                   });
                 },
                 child: const Text(
                   'Descartar',
-                  style: TextStyle(color: Colors.white),
+                  style: TextStyle(color: AppColors.cErrorColor),
                 ),
               ),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
-                onPressed: () {
-                  // Ação quando o botão "Descartar" é pressionado
-
-                  setState(() {
-                    dbHelper.deleteTable();
-                    print('Botão Finalizar pressionado');
-                  });
+                onPressed: () async {
+                  int response = await dbHelper.getEquipamentosCount();
+                  if (response > 0) {
+                    print(modelLevantamento.equipamentosLevantados.toString());
+                  }
+                  // setState(() {
+                  //   debugPrint('Botão Finalizar pressionado');
+                  // });
                 },
                 child: const Text(
                   'Finalizar',
@@ -118,6 +128,64 @@ class _ResumoLevantamentoState extends State<ResumoLevantamento> {
         ],
       ),
     );
+  }
+
+  Future<void> showDiscardConfirmationDialog(BuildContext context) async {
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(20.0)),
+          ),
+          title: const Text(
+            'Confirmar Descarte',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: Colors.redAccent,
+            ),
+          ),
+          content: const Text(
+            'Tem certeza de que deseja descartar o levantamento?',
+            style: TextStyle(
+              color: Colors.black54,
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(false);
+              },
+              child: const Text(
+                'Cancelar',
+                style: TextStyle(
+                  color: Colors.grey,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(true);
+              },
+              child: const Text(
+                'Descartar',
+                style: TextStyle(
+                  color: Colors.redAccent,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    ).then((value) {
+      if (value == true) {
+        setState(() {
+          dbHelper.deleteAllEquipamentos();
+        });
+      }
+    });
   }
 
   Padding cardEquipamento(
@@ -277,16 +345,53 @@ class _ResumoLevantamentoState extends State<ResumoLevantamento> {
                 color: AppColors.cDescriptionIconColor,
               ),
               title: const Text('Editar'),
-              onTap: () {
-                dbHelper.updateEquipamento(equipamento);
-                Navigator.of(context).pop();
+              onTap: () async {
+                String? result = await CustomDialog.show(
+                  context,
+                  title: 'Atualize o Setor',
+                  icon: Icons.business,
+                  hintText: 'Informe o setor',
+                );
+
+                if (result == "Cancelado" || result == "") {
+                  context.pop("value");
+                  return;
+                } else {
+                  equipamento.setor = result;
+                  equipamento.idFabricante = 0;
+                  // RETIRAR DEPOIS DO NA HORA DE SALVAR
+                  equipamento.idModelo = 0;
+//TODO: FAZER  POST PARA ENVIAR OS ITENS
+                  String x = await dbHelper.updateEquipamento(equipamento);
+
+                  if (x == AppName.sucesso!) {
+                    Generic.snackBar(
+                        context: context,
+                        mensagem: "Item Atualizado",
+                        duracao: 1,
+                        tipo: AppName.sucesso);
+                    context.pop("value");
+                    setState(() {});
+                  } else {
+                    Generic.snackBar(
+                        context: context,
+                        mensagem: "Não foi possível atualizar o equipamento",
+                        duracao: 1,
+                        tipo: AppName.erro);
+                    context.pop("value");
+                  }
+                }
+
+                //   Navigator.of(context).pop();
+
+                // dbHelper.updateEquipamento(equipamento);
               },
             ),
             ListTile(
               leading: const Icon(Icons.delete),
               title: const Text('Deletar'),
               onTap: () {
-                dbHelper.deleteEquipamento(equipamento.idBanco!);
+                dbHelper.deleteEquipamentoPorId(equipamento.idBanco!);
                 setState(() {});
 
                 context.pop("value");

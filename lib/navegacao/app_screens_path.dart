@@ -12,7 +12,6 @@ abstract class AppRouterName {
   static const String delegaciaDetalhe = '/delegaciaDetalhe';
   static const String delegaciaLista = '/delegaciaLista';
 
-  static const String updateScreen = '/updateScreen';
   static const String levantamentoScreen = '/levantamentoScreen';
   static const String searchScreen = '/searchScreen';
   static const String recuperarSenhaScreen = '/recuperarSenhaScreen';

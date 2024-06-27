@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:suporte_dti/controller/consulta_controller.dart';
+import 'package:suporte_dti/controller/delegacia_controller.dart';
 import 'package:suporte_dti/model/itens_delegacia_model.dart';
 import 'package:suporte_dti/model/itens_equipamento_model.dart';
 import 'package:suporte_dti/navegacao/app_screens_path.dart';
@@ -22,7 +22,7 @@ class DelegaciaListScreen extends StatefulWidget {
 
 class _DelegaciaListScreenState extends State<DelegaciaListScreen> {
   ScrollController? _scrollController;
-  ConsultaController consultaController = ConsultaController();
+  DelegaciaController delegaciaController = DelegaciaController();
 
   EquipamentoViewModel? modelEquipamento = EquipamentoViewModel(
       itensEquipamentoModels: ItensEquipamentoModels(equipamentos: []));
@@ -133,14 +133,13 @@ class _DelegaciaListScreenState extends State<DelegaciaListScreen> {
       ),
     );
   }
-  // TODO: SABER COMO BLOQUEAR UMA VERSÃO DO ANDROID DE BAIXAR O APP
 
   @override
   Widget build(BuildContext context) {
     // ignore: no_leading_underscores_for_local_identifiers
     FutureBuilder _futureScreen() {
       return FutureBuilder(
-          future: consultaController.buscarDelegacias(context, widget.model!),
+          future: delegaciaController.buscarDelegacias(context, widget.model!),
           builder: (context, snapshot) {
             switch (snapshot.connectionState) {
               case ConnectionState.done:

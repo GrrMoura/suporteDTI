@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:suporte_dti/controller/consulta_controller.dart';
+import 'package:suporte_dti/controller/equipamento_controller.dart';
 import 'package:suporte_dti/model/itens_equipamento_model.dart';
 import 'package:suporte_dti/navegacao/app_screens_path.dart';
 import 'package:suporte_dti/screens/widgets/card_item.dart';
@@ -26,7 +26,7 @@ class ResultadoEquipamentoConsultaScreen extends StatefulWidget {
 class _ResultadoEquipamentoConsultaScreenState
     extends State<ResultadoEquipamentoConsultaScreen> {
   ScrollController? _scrollController;
-  var consultaController = ConsultaController();
+  EquipamentoController equipamentoController = EquipamentoController();
   EquipamentoViewModel? model = EquipamentoViewModel(
       itensEquipamentoModels: ItensEquipamentoModels(equipamentos: []));
 
@@ -53,7 +53,7 @@ class _ResultadoEquipamentoConsultaScreenState
               .seChegouAoFinalDaPagina(widget.model!.paginacao!.pagina!)) {
         setState(() {});
 
-        consultaController
+        equipamentoController
             .buscarEquipamentos(context, widget.model!)
             .then((value) {
           setState(() {});
@@ -71,7 +71,7 @@ class _ResultadoEquipamentoConsultaScreenState
     return InkWell(
         onTap: () {
           // setState(() {});
-          consultaController
+          equipamentoController
               .buscarEquipamentoPorId(context, item)
               .then((value) {
             setState(() {});
@@ -163,7 +163,8 @@ class _ResultadoEquipamentoConsultaScreenState
     // ignore: no_leading_underscores_for_local_identifiers
     FutureBuilder _futureScreen() {
       return FutureBuilder(
-          future: consultaController.buscarEquipamentos(context, widget.model!),
+          future:
+              equipamentoController.buscarEquipamentos(context, widget.model!),
           builder: (context, snapshot) {
             switch (snapshot.connectionState) {
               case ConnectionState.done:

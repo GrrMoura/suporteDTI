@@ -37,7 +37,7 @@ class UsuarioController {
             mensagem: "Usuário não autenticado ou token encerrado",
           );
 
-          return context.go(AppRouterName.login);
+          return context.goNamed(AppRouterName.login);
         }
         Generic.snackBar(
             context: context, mensagem: "Erro - ${response.statusMessage}");

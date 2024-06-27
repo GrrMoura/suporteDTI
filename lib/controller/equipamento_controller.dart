@@ -3,18 +3,16 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:suporte_dti/model/itens_delegacia_model.dart';
 import 'package:suporte_dti/model/equipamento_model.dart';
 import 'package:suporte_dti/model/itens_equipamento_model.dart';
 import 'package:suporte_dti/navegacao/app_screens_path.dart';
-import 'package:suporte_dti/services/consulta_service.dart';
+import 'package:suporte_dti/services/equipamento_service.dart';
 import 'package:suporte_dti/services/dispositivo_service.dart';
 import 'package:suporte_dti/utils/app_name.dart';
 import 'package:suporte_dti/utils/snack_bar_generic.dart';
-import 'package:suporte_dti/viewModel/delegacias_view_model.dart';
 import 'package:suporte_dti/viewModel/equipamento_view_model.dart';
 
-class ConsultaController {
+class EquipamentoController {
   Future<void> buscarEquipamentos(
       BuildContext context, EquipamentoViewModel model) async {
     await DispositivoServices.verificarConexao().then((conectado) async {
@@ -23,7 +21,7 @@ class ConsultaController {
           context: context,
           mensagem: "Sem conexão com a internet.",
         );
-        return null;
+        return;
       }
       if (model.paginacao != null &&
           !model.paginacao!.seChegouAoFinalDaPagina(model.paginacao!.pagina!)) {
@@ -31,8 +29,7 @@ class ConsultaController {
             model.paginacao!.pagina!, model.paginacao!.totalPaginas!);
       }
 
-      Response responseConsulta =
-          await ConsultaService.buscarEquipamentos(model);
+      Response responseConsulta = await EquipamentoService.buscar(model);
 
       if (responseConsulta.statusCode != 200) {
         if (responseConsulta.statusCode == 401) {
@@ -41,7 +38,10 @@ class ConsultaController {
             mensagem: "Erro - ${responseConsulta.statusMessage}",
           );
 
-          return context.push(AppRouterName.login);
+          return context.go(AppRouterName.login);
+          // return await Future.delayed(const Duration(seconds: 2)).then(
+          //   (_) => context.go(AppRouterName.login),
+          // );
         }
 
         if (responseConsulta.statusCode == 422) {
@@ -49,14 +49,14 @@ class ConsultaController {
             context: context,
             mensagem: "Este Dado não existe na base de dados.",
           );
-          return null;
+          return;
         }
 
         Generic.snackBar(
           context: context,
           mensagem: "Erro - ${responseConsulta.data[0]}",
         );
-        return null;
+        return;
       }
 
       pepararModelEquipamentoParaAView(model, responseConsulta);
@@ -83,7 +83,7 @@ class ConsultaController {
         );
       }
 
-      Response response = await ConsultaService.consultaEquipamentoPorId(model);
+      Response response = await EquipamentoService.buscarPorId(model);
 
       if (response.statusCode != 200) {
         if (response.statusCode == 422) {
@@ -115,51 +115,5 @@ class ConsultaController {
 
       context.push(AppRouterName.detalhesEquipamento, extra: equipamentoModel);
     });
-  }
-
-  Future<void> buscarDelegacias(
-      BuildContext context, DelegaciasViewModel model) async {
-    await DispositivoServices.verificarConexao().then((conectado) async {
-      if (!conectado) {
-        Generic.snackBar(
-          context: context,
-          mensagem: "Sem conexão com a internet.",
-        );
-      }
-
-      Response response = await ConsultaService.consultarDelegacias(model);
-
-      if (response.statusCode != 200) {
-        if (response.statusCode == 422) {
-          Generic.snackBar(
-            context: context,
-            tipo: AppName.info,
-            mensagem: "Nenhum resultado encontrado",
-          );
-        }
-
-        if (response.statusCode == 401) {
-          Generic.snackBar(
-            context: context,
-            mensagem: "Usuário não autenticado ou token encerrado",
-          );
-          return context.goNamed(AppRouterName.login);
-        }
-        Generic.snackBar(
-            context: context, mensagem: "${response.statusMessage}");
-
-        return;
-      }
-      pepararModelDelegaciaParaAView(model, response);
-    });
-  }
-
-  void pepararModelDelegaciaParaAView(
-      DelegaciasViewModel model, Response response) {
-    var itensDelegaciaModel = ItensDelegaciaModel.fromJson(response.data);
-
-    model.itensDelegaciaModel!.delegacias
-        .addAll(itensDelegaciaModel.delegacias);
-    model.paginacao = itensDelegaciaModel.paginacao;
   }
 }

@@ -1,12 +1,10 @@
 // ignore_for_file: use_build_context_synchronously
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:go_router/go_router.dart';
-import 'package:suporte_dti/controller/consulta_controller.dart';
+import 'package:suporte_dti/controller/delegacia_controller.dart';
+import 'package:suporte_dti/controller/equipamento_controller.dart';
 import 'package:suporte_dti/data/sqflite_helper.dart';
 import 'package:suporte_dti/model/itens_equipamento_model.dart';
 import 'package:suporte_dti/screens/widgets/loading_default.dart';
@@ -26,7 +24,7 @@ class LevantamentoDigitado extends StatefulWidget {
 class _LevantamentoDigitadoState extends State<LevantamentoDigitado> {
   ScrollController? _scrollController;
 
-  var consultaController = ConsultaController();
+  EquipamentoController equipamentoController = EquipamentoController();
   EquipamentoViewModel? model = EquipamentoViewModel(
       itensEquipamentoModels: ItensEquipamentoModels(equipamentos: []));
 
@@ -168,7 +166,7 @@ class _LevantamentoDigitadoState extends State<LevantamentoDigitado> {
                 model!.ocupado = true;
               });
 
-              consultaController
+              equipamentoController
                   .buscarEquipamentos(context, model!)
                   .then((value) {
                 setState(() {
@@ -308,7 +306,7 @@ class CardEquipamentosResultadoLevantamento extends StatelessWidget {
       padding: EdgeInsets.symmetric(horizontal: 5.w, vertical: 5.w),
       child: InkWell(
         onTap: () {
-          print("ir para detalhes do equipamento");
+          debugPrint("ir para detalhes do equipamento");
           // setState(() {});
           // consultaController
           //     .buscarEquipamentoPorId(context, item)
@@ -368,7 +366,7 @@ class CardEquipamentosResultadoLevantamento extends StatelessWidget {
                         ElevatedButton.styleFrom(backgroundColor: Colors.green),
                     onPressed: () async {
                       bool existe =
-                          await dbHelper.produtoExiste(item.idEquipamento!);
+                          await dbHelper.equipamentoExiste(item.idEquipamento!);
 
                       if (existe) {
                         return Generic.snackBar(
@@ -398,7 +396,7 @@ class CardEquipamentosResultadoLevantamento extends StatelessWidget {
                             Generic.snackBar(
                                 context: context,
                                 mensagem:
-                                    "Não foi possível adicionar o esquipamento",
+                                    "Não foi possível adicionar o equipamento",
                                 duracao: 1,
                                 tipo: AppName.erro);
                           }
@@ -473,7 +471,7 @@ class CardEquipamentosResultadoLevantamento extends StatelessWidget {
               },
               child: const Text(
                 'Cancelar',
-                style: TextStyle(color: AppColors.cSecondaryColor),
+                style: TextStyle(color: AppColors.cErrorColor),
               ),
             ),
             ElevatedButton(

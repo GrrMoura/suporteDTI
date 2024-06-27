@@ -1,12 +1,12 @@
 import 'package:go_router/go_router.dart';
 import 'package:suporte_dti/controller/home_controller.dart';
 import 'package:suporte_dti/model/equipamento_model.dart';
+import 'package:suporte_dti/model/levantamento_model.dart';
 import 'package:suporte_dti/navegacao/app_screens_path.dart';
 import 'package:suporte_dti/screens/delegacia_list.dart';
-import 'package:suporte_dti/screens/edite_screen.dart';
 import 'package:suporte_dti/screens/equipamento_detalhe_screen.dart';
 import 'package:suporte_dti/screens/levantamento_escrito_screen.dart';
-import 'package:suporte_dti/screens/resultado_esquipamento_consulta.dart';
+import 'package:suporte_dti/screens/resultado_equipamento_consulta.dart';
 import 'package:suporte_dti/screens/login_screen.dart';
 import 'package:suporte_dti/screens/qr_code_resultado_screen.dart';
 import 'package:suporte_dti/screens/qr_code_scanner_screen.dart';
@@ -20,7 +20,7 @@ import 'package:suporte_dti/viewModel/equipamento_view_model.dart';
 class Rotas {
   Rotas();
   static final routers = GoRouter(
-    initialLocation: AppRouterName.login,
+    initialLocation: AppRouterName.homeController,
     routes: [
       GoRoute(
         path: AppRouterName.login,
@@ -62,7 +62,7 @@ class Rotas {
       // ),
 
       GoRoute(
-        name: 'resultDelegacia',
+        name: 'delegaciaDetalhe',
         path: AppRouterName.delegaciaDetalhe,
         builder: (context, state) {
           final data = state.extra! as Map<String, dynamic>;
@@ -84,18 +84,16 @@ class Rotas {
       GoRoute(
         name: 'resumoLevantamento',
         path: AppRouterName.resumoLevantamento,
-        builder: (context, state) => (const ResumoLevantamento()),
+        builder: (context, state) {
+          return (const ResumoLevantamento());
+        },
       ),
       GoRoute(
         name: 'qrcCodeResult',
         path: AppRouterName.qrCodeResult,
         builder: (context, state) => (const QrCodeResult()),
       ),
-      GoRoute(
-        name: 'updateScreen',
-        path: AppRouterName.updateScreen,
-        builder: (context, state) => (UpdateScreen()),
-      ),
+
       GoRoute(
         path: AppRouterName.levantamentoDigitadoScreen,
         builder: (context, state) => (const LevantamentoDigitado()),

@@ -38,16 +38,24 @@ class DatabaseHelper {
     final db = await database;
 
     try {
-      await db.insert('equipamento', itens.toDb(),
-          conflictAlgorithm: ConflictAlgorithm.replace);
-      return AppName.sucesso!;
+      bool seExiste = await equipamentoExiste(itens.idEquipamento!);
+      if (seExiste) {
+        return "Equipamento já cadastrado";
+      } else {
+        await db.insert(
+          'equipamento',
+          itens.toDb(),
+          conflictAlgorithm: ConflictAlgorithm.replace,
+        );
+        return AppName.sucesso!;
+      }
     } catch (e) {
-      return "Erro";
+      return "Erro: ${e.toString()}";
     }
   }
 
-  Future<bool> produtoExiste(int idEquipamento) async {
-    final Database db = await database;
+  Future<bool> equipamentoExiste(int idEquipamento) async {
+    final db = await database;
 
     final List<Map<String, dynamic>> resultado = await db.query(
       'equipamento',
@@ -65,7 +73,7 @@ class DatabaseHelper {
       return ItemEquipamento(
         idBanco: maps[i]['id'],
         setor: maps[i]['setor'],
-        idEquipamento: maps[i]['idEquipamento'],
+        idEquipamento: maps[i]['IdEquipamento'],
         numeroSerie: maps[i]['numeroSerie'],
         patrimonioSead: maps[i]['patrimonioSead'],
         patrimonioSsp: maps[i]['patrimonioSsp'],
@@ -84,22 +92,30 @@ class DatabaseHelper {
     return maps.length;
   }
 
-  Future<void> updateEquipamento(ItemEquipamento equipamento) async {
+  Future<String> updateEquipamento(ItemEquipamento equipamento) async {
     final db = await database;
-    await db.update(
-      'equipamento',
-      equipamento.toDb(),
-      where: "idEquipamento = ?",
-      whereArgs: [equipamento.idEquipamento],
-    );
+    try {
+      await db.update(
+        'equipamento',
+        equipamento.toDb(),
+        where: "idEquipamento = ?",
+        whereArgs: [equipamento.idEquipamento],
+      );
+
+      return AppName.sucesso!;
+    } catch (e) {
+      return AppName.erro!;
+    }
   }
 
-  Future<void> deleteEquipamento(int idBanco) async {
+  Future<void> deleteEquipamentoPorId(int idBanco) async {
     final db = await database;
     await db.delete(
       'equipamento',
       where: "id = ?",
       whereArgs: [idBanco],
+
+      ///
     );
   }
 
@@ -109,7 +125,7 @@ class DatabaseHelper {
     await db.delete("equipamento"); // Exclui todos os registros da tabela
   }
 
-  Future<void> deleteTable() async {
+  Future<void> deleteATable() async {
     final db = await database;
     await db.execute("DROP TABLE IF EXISTS equipamento"); //excluir a tabela
   }

@@ -7,13 +7,8 @@ import 'package:suporte_dti/model/dispositivo_model.dart';
 class DispositivoServices {
   static Future<bool> verificarConexao() async {
     var result = await Connectivity().checkConnectivity();
-
-    if (result == ConnectivityResult.mobile ||
-        result == ConnectivityResult.wifi) {
-      return true;
-    }
-
-    return false;
+    return result == ConnectivityResult.mobile ||
+        result == ConnectivityResult.wifi;
   }
 
   static Future<DispositivoModels> carregarInformacoesDispositivo() async {
@@ -31,27 +26,25 @@ class DispositivoServices {
   static Future<DispositivoModels> _readAndroidBuildData(
       AndroidDeviceInfo build) async {
     const AndroidId androidIdPlugin = AndroidId();
-
     final String? androidId = await androidIdPlugin.getId();
 
-    var dispositivo = DispositivoModels(
-        idDispositivo: androidId,
-        fabricante: build.manufacturer,
-        modelo: build.model,
-        so: "Android",
-        versaoSo: build.version.release);
-
-    return dispositivo;
+    return DispositivoModels(
+      idDispositivo: androidId,
+      fabricante: build.manufacturer,
+      modelo: build.model,
+      so: "Android",
+      versaoSo: build.version.release,
+    );
   }
 
   static Future<DispositivoModels> _readIosDeviceInfo(
       IosDeviceInfo data) async {
-    var dispositivo = DispositivoModels(
-        idDispositivo: data.identifierForVendor,
-        fabricante: "Apple",
-        modelo: data.model,
-        so: data.systemName,
-        versaoSo: data.systemVersion);
-    return dispositivo;
+    return DispositivoModels(
+      idDispositivo: data.identifierForVendor,
+      fabricante: "Apple",
+      modelo: data.model,
+      so: data.systemName,
+      versaoSo: data.systemVersion,
+    );
   }
 }

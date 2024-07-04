@@ -7,8 +7,7 @@ import 'package:suporte_dti/viewModel/equipamento_view_model.dart';
 
 class EquipamentoService {
   static Future<Response> buscar(EquipamentoViewModel model) async {
-    var url =
-        ApiServices.concatConsultaIntegradaUrl("Equipamentos/Cadastrados");
+    var url = ApiServices.concatSGIUrl("Equipamentos/Cadastrados");
 
     var options = await AutenticacaoService.getCabecalhoRequisicao();
 
@@ -20,7 +19,7 @@ class EquipamentoService {
   //TODO: ERRO ao clicar na foto e não selecionar nenhuma opcao.
 
   static Future<Response> buscarPorId(ItemEquipamento model) async {
-    var url = ApiServices.concatConsultaIntegradaUrl("Equipamentos/Detalhes");
+    var url = ApiServices.concatSGIUrl("Equipamentos/Detalhes");
 
     var options = await AutenticacaoService.getCabecalhoRequisicao();
 

@@ -14,47 +14,59 @@ import 'package:suporte_dti/viewModel/delegacias_view_model.dart';
 class DelegaciaController {
   Future<void> buscarDelegacias(
       BuildContext context, DelegaciasViewModel model) async {
-    await DispositivoServices.verificarConexao().then((conectado) async {
-      if (!conectado) {
-        Generic.snackBar(
-          context: context,
-          mensagem: "Sem conexão com a internet.",
-        );
+    if (!await DispositivoServices.verificarConexao()) {
+      Generic.snackBar(
+        context: context,
+        mensagem: "Sem conexão com a internet.",
+      );
+      return;
+    }
+
+    try {
+      final response = await DelegaciaService.buscar(model);
+      if (response.statusCode == 200) {
+        _prepararModelDelegaciaParaAView(model, response);
+      } else {
+        _tratarErro(context, response);
       }
-
-      Response response = await DelegaciaService.buscar(model);
-
-      if (response.statusCode != 200) {
-        if (response.statusCode == 422) {
-          Generic.snackBar(
-            context: context,
-            tipo: AppName.info,
-            mensagem: "Nenhum resultado encontrado",
-          );
-        }
-
-        if (response.statusCode == 401) {
-          Generic.snackBar(
-            context: context,
-            mensagem: "Usuário não autenticado ou token encerrado",
-          );
-          return context.goNamed(AppRouterName.login);
-        }
-        Generic.snackBar(
-            context: context, mensagem: "${response.statusMessage}");
-
-        return;
-      }
-      pepararModelDelegaciaParaAView(model, response);
-    });
+    } catch (e) {
+      _tratarErroInesperado(context);
+    }
   }
 
-  void pepararModelDelegaciaParaAView(
+  void _prepararModelDelegaciaParaAView(
       DelegaciasViewModel model, Response response) {
     var itensDelegaciaModel = ItensDelegaciaModel.fromJson(response.data);
-
     model.itensDelegaciaModel!.delegacias
         .addAll(itensDelegaciaModel.delegacias);
     model.paginacao = itensDelegaciaModel.paginacao;
+  }
+
+  void _tratarErro(BuildContext context, Response response) {
+    if (response.statusCode == 422) {
+      Generic.snackBar(
+        context: context,
+        tipo: AppName.info,
+        mensagem: "Nenhum resultado encontrado",
+      );
+    } else if (response.statusCode == 401) {
+      Generic.snackBar(
+        context: context,
+        mensagem: "Usuário não autenticado ou token encerrado",
+      );
+      context.goNamed(AppRouterName.login);
+    } else {
+      Generic.snackBar(
+        context: context,
+        mensagem: "${response.statusMessage}",
+      );
+    }
+  }
+
+  void _tratarErroInesperado(BuildContext context) {
+    Generic.snackBar(
+      context: context,
+      mensagem: "Erro inesperado",
+    );
   }
 }

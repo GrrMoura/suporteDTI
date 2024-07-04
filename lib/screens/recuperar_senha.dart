@@ -25,6 +25,7 @@ class _RecuperarSenhaState extends State<RecuperarSenha> {
   TextEditingController dtNascimentoCtrl = TextEditingController();
   TextEditingController emailCtrl = TextEditingController();
   ResetarSenhaViewModel model = ResetarSenhaViewModel();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -33,189 +34,168 @@ class _RecuperarSenhaState extends State<RecuperarSenha> {
         title: Column(
           children: [
             Text(
-              "Recuperar senha",
-              style: Styles()
-                  .titleStyle()
-                  .copyWith(fontSize: AppDimens.subHeadingSize),
+              "Recuperar Senha",
+              style: Styles().titleStyle().copyWith(
+                    fontSize: AppDimens.subHeadingSize,
+                    color: AppColors.cWhiteColor,
+                  ),
             ),
             Text(
-              "É necessário confirmar algumas informações",
+              "Confirme suas informações",
               style: TextStyle(color: Colors.white, fontSize: 12.sp),
             )
           ],
         ),
         backgroundColor: AppColors.cSecondaryColor,
         leading: IconButton(
-            onPressed: () {
-              context.pop("value");
-            },
-            icon: const Icon(Icons.arrow_back_ios)),
-        iconTheme: const IconThemeData(color: Colors.white),
+          onPressed: () {
+            context.pop("value");
+          },
+          icon: const Icon(Icons.arrow_back_ios),
+        ),
+        elevation: 0,
       ),
-      body: ListView(
-        children: [
-          Column(
-            children: [
-              GenericFormFieldRecuperarSenha(
-                ctrl: cpfCtrl,
-                titulo: "CPF",
-                keyboardType: TextInputType.number,
-                formatter: MaskUtils.maskFormatterCpf(),
-              ),
-              SizedBox(height: 20.h),
-              GenericFormFieldRecuperarSenha(
-                ctrl: dtNascimentoCtrl,
-                titulo: "Data de nascimento",
-                keyboardType: TextInputType.number,
-                formatter: MaskUtils.maskFormatterData(),
-              ),
-              SizedBox(height: 20.h),
-              GenericFormFieldRecuperarSenha(
-                ctrl: emailCtrl,
-                titulo: "E-mail cadastrado",
-                keyboardType: TextInputType.visiblePassword,
-              ),
-            ],
-          ),
-          SizedBox(height: 20.h),
-          Padding(
-            padding: EdgeInsets.only(right: 20.w, left: 20.w),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                SizedBox(
-                  width: 120.w,
-                  child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(
-                                10), // Define o raio desejado
-                          ),
-                          backgroundColor: Colors.red),
-                      onPressed: () {
-                        context.pop(AppRouterName.voltar);
-                      },
-                      child: Text(
-                        "Voltar",
-                        style: TextStyle(
-                            color: AppColors.cWhiteColor, fontSize: 15.sp),
-                      )),
-                ),
-                SizedBox(
-                  width: 120.w,
-                  child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(
-                                10), // Define o raio desejado
-                          ),
-                          backgroundColor: AppColors.cSecondaryColor),
-                      onPressed: () {
-                        String result = testarform(
-                            cpf: cpfCtrl.text,
-                            dtNascimneto: dtNascimentoCtrl.text,
-                            email: emailCtrl.text);
-                        if (result == "OK") {
-                          model.cpf = cpfCtrl.text;
-                          model.dataNascimento = dtNascimentoCtrl.text;
-                          model.email = emailCtrl.text;
-                          model.esqueceuSenha = true;
-                          UsuarioController.resetarSenha(context, model)
-                              .then((value) => {
-                                    Generic.snackBar(
-                                        context: context,
-                                        tipo: AppName.sucesso,
-                                        mensagem:
-                                            'Sua senha foi enviada para email ${emailCtrl.text}'),
-                                    context.pop("value")
-                                  });
-                        } else {
-                          Generic.snackBar(context: context, mensagem: result);
-                        }
-                      },
-                      child: Text(
-                        "Continuar",
-                        style: TextStyle(
-                            color: AppColors.cWhiteColor, fontSize: 15.sp),
-                      )),
-                ),
-              ],
+      body: SingleChildScrollView(
+        padding: EdgeInsets.all(20.w),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            SizedBox(height: 40.h),
+            _buildTextField(
+              controller: cpfCtrl,
+              label: "CPF",
+              keyboardType: TextInputType.number,
+              formatter: MaskUtils.maskFormatterCpf(),
             ),
-          ),
-          SizedBox(height: 20.h),
-        ],
+            SizedBox(height: 20.h),
+            _buildTextField(
+              controller: dtNascimentoCtrl,
+              label: "Data de Nascimento",
+              keyboardType: TextInputType.number,
+              formatter: MaskUtils.maskFormatterData(),
+            ),
+            SizedBox(height: 20.h),
+            _buildTextField(
+              controller: emailCtrl,
+              label: "E-mail Cadastrado",
+              keyboardType: TextInputType.emailAddress,
+            ),
+            SizedBox(height: 40.h),
+            ElevatedButton(
+              onPressed: () => _onContinuePressed(),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.cSecondaryColor,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                padding: EdgeInsets.symmetric(vertical: 15.h),
+              ),
+              child: Text(
+                "Continuar",
+                style: TextStyle(
+                  fontSize: 16.sp,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.cWhiteColor,
+                ),
+              ),
+            ),
+            SizedBox(height: 20.h),
+            TextButton(
+              onPressed: () {
+                context.pop(AppRouterName.voltar);
+              },
+              style: TextButton.styleFrom(
+                padding: EdgeInsets.symmetric(vertical: 15.h),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                  side: const BorderSide(color: Colors.red),
+                ),
+              ),
+              child: Text(
+                "Voltar",
+                style: TextStyle(
+                  fontSize: 16.sp,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.red,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
-}
 
-String testarform({
-  required String cpf,
-  required String dtNascimneto,
-  required String email,
-}) {
-  if (Validador.cpfIsValid(cpf)) {
-    if (Validador.dataNascimentoIsValid(dtNascimento: dtNascimneto)) {
-      if (Validador.emailIsValid(email: email)) {
-        return "OK";
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String label,
+    TextInputType? keyboardType,
+    TextInputFormatter? formatter,
+  }) {
+    return TextFormField(
+      controller: controller,
+      keyboardType: keyboardType,
+      inputFormatters: [formatter ?? FilteringTextInputFormatter.digitsOnly],
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle:
+            Styles().mediumTextStyle().copyWith(color: Colors.grey[700]),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(20),
+          borderSide:
+              const BorderSide(color: AppColors.cSecondaryColor, width: 2),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(20),
+          borderSide:
+              const BorderSide(color: AppColors.cSecondaryColor, width: 2),
+        ),
+        contentPadding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 15.h),
+      ),
+    );
+  }
+
+  void _onContinuePressed() {
+    String result = _validateForm(
+      cpf: cpfCtrl.text,
+      dtNascimento: dtNascimentoCtrl.text,
+      email: emailCtrl.text,
+    );
+    if (result == "OK") {
+      model.cpf = cpfCtrl.text;
+      model.dataNascimento = dtNascimentoCtrl.text;
+      model.email = emailCtrl.text;
+      model.esqueceuSenha = true;
+      UsuarioController.resetarSenha(context, model).then((value) {
+        Generic.snackBar(
+          context: context,
+          tipo: AppName.sucesso,
+          mensagem: 'Sua senha foi enviada para o e-mail ${emailCtrl.text}',
+        );
+        context.pop("value");
+      });
+    } else {
+      Generic.snackBar(context: context, mensagem: result);
+    }
+  }
+
+  String _validateForm({
+    required String cpf,
+    required String dtNascimento,
+    required String email,
+  }) {
+    if (Validador.cpfIsValid(cpf)) {
+      if (Validador.dataNascimentoIsValid(dtNascimento: dtNascimento)) {
+        if (Validador.emailIsValid(email: email)) {
+          return "OK";
+        } else {
+          return "E-mail inválido";
+        }
       } else {
-        return "Email inválido";
+        return "Data de nascimento inválida";
       }
     } else {
-      return "Data de nascimento inválida";
+      return "CPF inválido";
     }
-  } else {
-    return "CPF inválido";
-  }
-}
-
-class GenericFormFieldRecuperarSenha extends StatelessWidget {
-  const GenericFormFieldRecuperarSenha(
-      {super.key,
-      required this.ctrl,
-      this.keyboardType,
-      required this.titulo,
-      this.formatter});
-  final TextEditingController ctrl;
-  final TextInputType? keyboardType;
-  final String titulo;
-  final TextInputFormatter? formatter;
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: EdgeInsets.only(
-            left: 25.w,
-            bottom: 5.h,
-          ),
-          child: Text(
-            titulo,
-            style: Styles().mediumTextStyle(),
-          ),
-        ),
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: 20.w),
-          child: TextFormField(
-            textInputAction: TextInputAction.next,
-            controller: ctrl,
-            inputFormatters: [formatter ?? MaskUtils.padrao()],
-            keyboardType: keyboardType ?? TextInputType.name,
-            decoration: InputDecoration(
-                alignLabelWithHint: true,
-                labelStyle: Styles().mediumTextStyle(),
-                focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(20),
-                    borderSide: const BorderSide(
-                        color: AppColors.cSecondaryColor, width: 2)),
-                enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(20),
-                    borderSide: const BorderSide(
-                        color: AppColors.cSecondaryColor, width: 2))),
-          ),
-        )
-      ],
-    );
   }
 }

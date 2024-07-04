@@ -4,10 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:suporte_dti/controller/equipamento_controller.dart';
 import 'package:suporte_dti/model/itens_equipamento_model.dart';
-import 'package:suporte_dti/model/levantamento_model.dart';
 import 'package:suporte_dti/navegacao/app_screens_path.dart';
 import 'package:suporte_dti/screens/widgets/card_item.dart';
 import 'package:suporte_dti/screens/widgets/loading_default.dart';
@@ -225,6 +223,7 @@ class AddBotao extends StatelessWidget {
   void mostrarAlertaComImagens(BuildContext context) {
     showDialog(
       context: context,
+      barrierDismissible: true,
       builder: (BuildContext context) {
         return AlertDialog(
           backgroundColor: Colors.white,
@@ -247,6 +246,7 @@ class AddBotao extends StatelessWidget {
                   child: InkWell(
                     borderRadius: BorderRadius.circular(10),
                     onTap: () {
+                      context.pop('value');
                       context.push(AppRouterName.levantamentoDigitadoScreen);
                     },
                     child: Image.asset(
@@ -260,6 +260,7 @@ class AddBotao extends StatelessWidget {
                   child: InkWell(
                     borderRadius: BorderRadius.circular(10),
                     onTap: () {
+                      context.pop('value');
                       context.push(AppRouterName.qrCodeScanner);
                     },
                     child: Image.asset(AppName.qrCode!),
@@ -306,7 +307,7 @@ class AddBotao extends StatelessWidget {
 }
 
 class DelegaciasCardLevantamento extends StatelessWidget {
-  DelegaciasCardLevantamento(
+  const DelegaciasCardLevantamento(
       {super.key,
       required this.nome,
       required this.id,
@@ -319,19 +320,15 @@ class DelegaciasCardLevantamento extends StatelessWidget {
   final String data;
   final String delegacia;
   final int idUnidade;
-  final LevantamentoModel levantamentoModel = LevantamentoModel();
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () async {
         if (delegacia == "Resumo") {
-          SharedPreferences prefs = await SharedPreferences.getInstance();
-          prefs.setInt("idDelegacia", idUnidade);
-
-          context.push(AppRouterName.resumoLevantamento);
+          context.push(AppRouterName.resumoLevantamento, extra: idUnidade);
         } else {
-          print("ola");
+          debugPrint("buscandos os levantamentos");
         }
       },
       child: Padding(

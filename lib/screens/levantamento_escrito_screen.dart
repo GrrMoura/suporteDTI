@@ -3,7 +3,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:suporte_dti/controller/delegacia_controller.dart';
 import 'package:suporte_dti/controller/equipamento_controller.dart';
 import 'package:suporte_dti/data/sqflite_helper.dart';
 import 'package:suporte_dti/model/itens_equipamento_model.dart';
@@ -51,10 +50,10 @@ class _LevantamentoDigitadoState extends State<LevantamentoDigitado> {
                   context.pop("value");
                 },
                 icon: const Icon(Icons.arrow_back_ios)),
-            model!.ocupado == true
-                ? Text("Levantamento",
-                    style: TextStyle(color: Colors.white, fontSize: 20.sp))
-                : const Text(""),
+            Text(
+              "Levantamento",
+              style: TextStyle(color: Colors.white, fontSize: 22.sp),
+            ),
             IconButton(
                 onPressed: () {
                   setState(() {});
@@ -69,26 +68,6 @@ class _LevantamentoDigitadoState extends State<LevantamentoDigitado> {
           ? const LoadingDefault()
           : ListView(
               children: [
-                SizedBox(
-                  height: 40.h,
-                  child: Stack(
-                    children: [
-                      Container(
-                        width: double.infinity,
-                        color: AppColors.cSecondaryColor,
-                      ),
-                      Positioned(
-                          left: 115.w,
-                          right: 90.w,
-                          top: 0.h,
-                          child: Text(
-                            "Levantamento",
-                            style:
-                                TextStyle(color: Colors.white, fontSize: 22.sp),
-                          )),
-                    ],
-                  ),
-                ),
                 // SizedBox(
                 //   child: SingleChildScrollView(
                 //     child: Column(
@@ -105,7 +84,7 @@ class _LevantamentoDigitadoState extends State<LevantamentoDigitado> {
                   padding:
                       EdgeInsets.symmetric(horizontal: 12.w, vertical: 5.h),
                   child: Container(
-                    height: height - kToolbarHeight - 140.h,
+                    height: height - kToolbarHeight - 100.h,
                     decoration: BoxDecoration(
                         color:
                             model!.itensEquipamentoModels.equipamentos.isEmpty

@@ -15,69 +15,76 @@ import 'package:suporte_dti/viewModel/login_view_model.dart';
 
 class AutenticacaoController {
   Future<void> logar(BuildContext context, LoginViewModel model) async {
-    await DispositivoServices.verificarConexao().then((conectado) async {
-      model.ocupado = true;
-      if (!conectado) {
-        model.ocupado = false;
+    model.ocupado = true;
 
-        Generic.snackBar(
-            context: context,
-            mensagem:
-                'Sem conexão com a internet. Estabeleça uma conexão e tente novamente');
+    if (!await DispositivoServices.verificarConexao()) {
+      model.ocupado = false;
+      Generic.snackBar(
+        context: context,
+        mensagem:
+            'Sem conexão com a internet. Estabeleça uma conexão e tente novamente',
+      );
+      return;
+    }
 
-        return null;
-      }
-
+    try {
       Response response = await AutenticacaoService.logar(model);
 
-      if (response.statusCode != 200) {
-        model.ocupado = false;
-        if (response.statusCode == 422) {
-          Generic.snackBar(context: context, mensagem: '${response.data[0]}');
+      if (response.statusCode == 200) {
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        Sessao.fromJson(response.data).setSession(prefs, model);
 
-          return null;
-        }
+        LoginController.setCpf(model.login!);
+        LoginController.setSenha(model.senha!);
+        prefs.setBool("lembrar_me", model.lembrarMe!);
 
-        Generic.snackBar(
-            context: context, mensagem: '${response.statusMessage}');
+        String fullName = response.data['usuario'];
+        List<String> names = fullName.split(' ');
+        String primeiroNome = names[0];
+        String segundoNome = names.length > 1 ? names.last : '';
 
-        return null;
+        String dados = "$primeiroNome $segundoNome ${model.login!}";
+        prefs.setString("nome", primeiroNome);
+        prefs.setString("segundoNome", segundoNome);
+        prefs.setInt("idUsuario", response.data["id"]);
+
+        context.go(AppRouterName.homeController, extra: dados);
+      } else {
+        _tratarErrorResponse(context, model, response);
       }
+    } catch (e) {
+      model.ocupado = false;
+      Generic.snackBar(
+        context: context,
+        mensagem: 'Erro ao fazer login: $e',
+      );
+    }
+  }
 
-      SharedPreferences prefs = await SharedPreferences.getInstance();
+  void _tratarErrorResponse(
+      BuildContext context, LoginViewModel model, Response response) {
+    model.ocupado = false;
 
-      Sessao.fromJson(response.data).setSession(prefs, model);
-
-      LoginController.setCpf(model.login!);
-      LoginController.setSenha(model.senha!);
-      prefs.setBool("lembrar_me", model.lembrarMe!);
-
-      String fullName = response.data['usuario'];
-      List names = fullName.split(' ');
-      String primeiroNome = names[0];
-
-      String segundoNome = names[names.length - 1];
-      String cpf = model.login!;
-      String dados = "$primeiroNome $segundoNome $cpf";
-      prefs.setString("nome", primeiroNome);
-      prefs.setString("segundoNome", segundoNome);
-      prefs.setInt("idUsuario", response.data["id"]);
-
-      context.go(AppRouterName.homeController, extra: dados);
-    });
+    if (response.statusCode == 422) {
+      Generic.snackBar(
+        context: context,
+        mensagem: response.data[0],
+      );
+    } else {
+      Generic.snackBar(
+        context: context,
+        mensagem: response.statusMessage!,
+      );
+    }
   }
 
   Future<Sessao> getSessao() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    Sessao sessao = Sessao.getSession(prefs);
-    return sessao;
+    return Sessao.getSession(prefs);
   }
 
   static Future<void> limparSessao() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setString("token", "");
-    prefs.setInt("id", 0);
-    prefs.setBool("alterarSenha", false);
-    prefs.setStringList("regrasAcesso", []);
+    prefs.clear();
   }
 }

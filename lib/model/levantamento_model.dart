@@ -1,36 +1,58 @@
+import 'package:intl/intl.dart';
+
 class LevantamentoModel {
-  List<int>? equipamentosLevantados;
+  List<EquipamentoLevantado>? equipamentosLevantados;
   int? idUnidadeAdministrativa;
-  int? idUsuario;
-  String? dataLevantamento;
+  DateTime? dataLevantamento;
 
   LevantamentoModel({
     this.equipamentosLevantados,
     this.idUnidadeAdministrativa,
-    this.idUsuario,
     this.dataLevantamento,
   });
 
   LevantamentoModel.fromJson(Map<String, dynamic> json) {
     if (json['equipamentosLevantados'] != null) {
-      equipamentosLevantados = <int>[];
+      equipamentosLevantados = <EquipamentoLevantado>[];
       json['equipamentosLevantados'].forEach((v) {
-        equipamentosLevantados!.add(v);
+        equipamentosLevantados!.add(EquipamentoLevantado.fromJson(v));
       });
     }
     idUnidadeAdministrativa = json['idUnidadeAdministrativa'];
-    idUsuario = json['idUsuario'];
-    dataLevantamento = json['dataLevantamento'];
+    dataLevantamento = json['dataLevantamento'] != null
+        ? DateFormat('dd/MM/yyyy').parse(json['dataLevantamento'])
+        : null;
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     if (equipamentosLevantados != null) {
-      data['equipamentosLevantados'] = equipamentosLevantados;
+      data['equipamentosLevantados'] =
+          equipamentosLevantados!.map((v) => v.toJson()).toList();
     }
     data['idUnidadeAdministrativa'] = idUnidadeAdministrativa;
-    data['idUsuario'] = idUsuario;
-    data['dataLevantamento'] = dataLevantamento;
+    data['dataLevantamento'] = dataLevantamento != null
+        ? DateFormat('dd/MM/yyyy').format(dataLevantamento!)
+        : null;
+    return data;
+  }
+}
+
+class EquipamentoLevantado {
+  int? id;
+  String? descricaoSala;
+
+  EquipamentoLevantado({this.id, this.descricaoSala});
+
+  EquipamentoLevantado.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    descricaoSala = json['descricaoSala'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['id'] = id;
+    data['descricaoSala'] = descricaoSala;
     return data;
   }
 }

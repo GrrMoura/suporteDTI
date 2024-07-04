@@ -15,59 +15,33 @@ import 'package:suporte_dti/viewModel/equipamento_view_model.dart';
 class EquipamentoController {
   Future<void> buscarEquipamentos(
       BuildContext context, EquipamentoViewModel model) async {
-    await DispositivoServices.verificarConexao().then((conectado) async {
-      if (!conectado) {
-        Generic.snackBar(
-          context: context,
-          mensagem: "Sem conexão com a internet.",
-        );
-        return;
-      }
-      if (model.paginacao != null &&
-          !model.paginacao!.seChegouAoFinalDaPagina(model.paginacao!.pagina!)) {
-        model.paginacao!.pagina = model.paginacao!.setProximaPagina(
-            model.paginacao!.pagina!, model.paginacao!.totalPaginas!);
-      }
+    if (!await DispositivoServices.verificarConexao()) {
+      Generic.snackBar(
+        context: context,
+        mensagem: "Sem conexão com a internet.",
+      );
+      return;
+    }
 
+    try {
       Response responseConsulta = await EquipamentoService.buscar(model);
 
       if (responseConsulta.statusCode != 200) {
-        if (responseConsulta.statusCode == 401) {
-          Generic.snackBar(
-            context: context,
-            mensagem: "Erro - ${responseConsulta.statusMessage}",
-          );
-
-          return context.go(AppRouterName.login);
-          // return await Future.delayed(const Duration(seconds: 2)).then(
-          //   (_) => context.go(AppRouterName.login),
-          // );
-        }
-
-        if (responseConsulta.statusCode == 422) {
-          Generic.snackBar(
-            context: context,
-            mensagem: "Este Dado não existe na base de dados.",
-          );
-          return;
-        }
-
-        Generic.snackBar(
-          context: context,
-          mensagem: "Erro - ${responseConsulta.data[0]}",
-        );
+        _handleError(context, responseConsulta);
         return;
       }
 
-      pepararModelEquipamentoParaAView(model, responseConsulta);
-    });
+      _updateModelFromResponse(model, responseConsulta);
+    } catch (e) {
+      Generic.snackBar(
+        context: context,
+        mensagem: "Erro inesperado: $e",
+      );
+    }
   }
 
-  void pepararModelEquipamentoParaAView(
-      EquipamentoViewModel model, Response response) {
+  void _updateModelFromResponse(EquipamentoViewModel model, Response response) {
     var itensEquipamentoModel = ItensEquipamentoModels.fromJson(response.data);
-    // ignore: prefer_conditional_assignment
-
     model.itensEquipamentoModels.equipamentos
         .addAll(itensEquipamentoModel.equipamentos);
     model.paginacao = itensEquipamentoModel.paginacao;
@@ -75,45 +49,53 @@ class EquipamentoController {
 
   Future<void> buscarEquipamentoPorId(
       BuildContext context, ItemEquipamento model) async {
-    await DispositivoServices.verificarConexao().then((conectado) async {
-      if (!conectado) {
-        Generic.snackBar(
-          context: context,
-          mensagem: "Sem conexão com a internet.",
-        );
-      }
+    if (!await DispositivoServices.verificarConexao()) {
+      Generic.snackBar(
+        context: context,
+        mensagem: "Sem conexão com a internet.",
+      );
+      return;
+    }
 
+    try {
       Response response = await EquipamentoService.buscarPorId(model);
 
       if (response.statusCode != 200) {
-        if (response.statusCode == 422) {
-          Generic.snackBar(
-            context: context,
-            tipo: AppName.info,
-            mensagem: "Nenhum resultado encontrado",
-          );
-        }
-
-        if (response.statusCode == 401) {
-          Generic.snackBar(
-            context: context,
-            mensagem: "Usuário não autenticado ou token encerrado",
-          );
-          await Future.delayed(const Duration(seconds: 3))
-              .then((_) => {context.goNamed(AppRouterName.login)});
-        }
-        Generic.snackBar(
-          context: context,
-          mensagem: "${response.statusMessage}",
-        );
-
-        return null;
+        _handleError(context, response);
+        return;
       }
 
       EquipamentoModel equipamentoModel =
           EquipamentoModel.fromJson(response.data["detalhes"]);
 
       context.push(AppRouterName.detalhesEquipamento, extra: equipamentoModel);
-    });
+    } catch (e) {
+      Generic.snackBar(
+        context: context,
+        mensagem: "Erro inesperado: $e",
+      );
+    }
+  }
+
+  void _handleError(BuildContext context, Response response) {
+    if (response.statusCode == 401) {
+      Generic.snackBar(
+        context: context,
+        mensagem: "Usuário não autenticado ou token encerrado",
+      );
+      Future.delayed(const Duration(seconds: 3))
+          .then((_) => {context.goNamed(AppRouterName.login)});
+    } else if (response.statusCode == 422) {
+      Generic.snackBar(
+        context: context,
+        tipo: AppName.info,
+        mensagem: "Nenhum resultado encontrado",
+      );
+    } else {
+      Generic.snackBar(
+        context: context,
+        mensagem: "Erro - ${response.statusMessage}",
+      );
+    }
   }
 }

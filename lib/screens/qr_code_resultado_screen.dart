@@ -269,6 +269,7 @@ class ButtonScanResult extends StatelessWidget {
       ScreenshotController screenshotController, EquipamentoModel model) async {
     await screenshotController
         .captureFromWidget(ScreenShoti(
+      height: 400, //TODO:TESTAR PARA VÊ SE VAIDAR ERRO
       model: model,
     ))
         .then((value) async {

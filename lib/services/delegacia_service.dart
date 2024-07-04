@@ -6,7 +6,7 @@ import 'package:suporte_dti/viewModel/delegacias_view_model.dart';
 
 class DelegaciaService {
   static Future<Response> buscar(DelegaciasViewModel model) async {
-    var url = ApiServices.concatDelegaciasUrl(
+    var url = ApiServices.concatIntranetUrl(
         "UnidadesAdministrativas/AtivasSemPaginacao");
 
     var options = await AutenticacaoService.getCabecalhoRequisicao();

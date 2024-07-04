@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:suporte_dti/controller/levantamento_controller.dart';
 import 'package:suporte_dti/data/sqflite_helper.dart';
 import 'package:suporte_dti/model/itens_equipamento_model.dart';
 import 'package:suporte_dti/model/levantamento_model.dart';
@@ -15,8 +16,8 @@ import 'package:suporte_dti/utils/app_styles.dart';
 import 'package:suporte_dti/utils/snack_bar_generic.dart';
 
 class ResumoLevantamento extends StatefulWidget {
-  const ResumoLevantamento({super.key});
-
+  const ResumoLevantamento({super.key, required this.idUnidade});
+  final int idUnidade;
   @override
   State<ResumoLevantamento> createState() => _ResumoLevantamentoState();
 }
@@ -79,14 +80,25 @@ class _ResumoLevantamentoState extends State<ResumoLevantamento> {
                                   itemBuilder: (context, index) {
                                     modelLevantamento.equipamentosLevantados ??=
                                         [];
+
+                                    // Cria um novo EquipamentoLevantado com id e descricao
+                                    EquipamentoLevantado novoEquipamento =
+                                        EquipamentoLevantado(
+                                      id: data[index].idEquipamento,
+                                      descricaoSala: data[index].setor,
+                                    );
+
+                                    // Adiciona o novo EquipamentoLevantado à lista de equipamentos do levantamento
                                     modelLevantamento.equipamentosLevantados!
-                                        .add(data[index].idEquipamento);
+                                        .add(novoEquipamento);
 
                                     return cardEquipamento(
-                                        context: context,
-                                        index: index,
-                                        equipamento: data[index]);
-                                  });
+                                      context: context,
+                                      index: index,
+                                      equipamento: data[index],
+                                    );
+                                  },
+                                );
                         }),
                   ),
                 ],
@@ -112,11 +124,14 @@ class _ResumoLevantamentoState extends State<ResumoLevantamento> {
                 onPressed: () async {
                   int response = await dbHelper.getEquipamentosCount();
                   if (response > 0) {
-                    print(modelLevantamento.equipamentosLevantados.toString());
+                    debugPrint(
+                        modelLevantamento.equipamentosLevantados.toString());
+                    modelLevantamento.idUnidadeAdministrativa =
+                        widget.idUnidade;
+                    modelLevantamento.dataLevantamento = DateTime.now();
+                    LevantamentoController()
+                        .cadastrar(context, modelLevantamento);
                   }
-                  // setState(() {
-                  //   debugPrint('Botão Finalizar pressionado');
-                  // });
                 },
                 child: const Text(
                   'Finalizar',
@@ -219,7 +234,7 @@ class _ResumoLevantamentoState extends State<ResumoLevantamento> {
                       ),
                     ),
                     Text(
-                      equipamento.tipoEquipamento!,
+                      equipamento.tipoEquipamento ?? "",
                       style: Styles().smallTextStyle(),
                       textAlign: TextAlign.center,
                     ),
@@ -256,7 +271,7 @@ class _ResumoLevantamentoState extends State<ResumoLevantamento> {
                                     .copyWith(fontSize: AppDimens.smallSize),
                               ),
                               Text(
-                                equipamento.patrimonioSead!,
+                                equipamento.patrimonioSead ?? "",
                                 style: Styles().hintTextStyle(),
                               ),
                             ],
@@ -275,7 +290,7 @@ class _ResumoLevantamentoState extends State<ResumoLevantamento> {
                               ),
                               SizedBox(
                                   width: 100.w,
-                                  child: Text(equipamento.patrimonioSsp!,
+                                  child: Text(equipamento.patrimonioSsp ?? "",
                                       style: Styles().hintTextStyle(),
                                       overflow: TextOverflow.ellipsis)),
                             ],
@@ -292,7 +307,7 @@ class _ResumoLevantamentoState extends State<ResumoLevantamento> {
                                     .descriptionRestulScan()
                                     .copyWith(fontSize: AppDimens.smallSize),
                               ),
-                              Text(equipamento.numeroSerie!,
+                              Text(equipamento.numeroSerie ?? "",
                                   style: Styles().hintTextStyle(),
                                   overflow: TextOverflow.ellipsis),
                             ],
@@ -361,7 +376,7 @@ class _ResumoLevantamentoState extends State<ResumoLevantamento> {
                   equipamento.idFabricante = 0;
                   // RETIRAR DEPOIS DO NA HORA DE SALVAR
                   equipamento.idModelo = 0;
-//TODO: FAZER  POST PARA ENVIAR OS ITENS
+
                   String x = await dbHelper.updateEquipamento(equipamento);
 
                   if (x == AppName.sucesso!) {

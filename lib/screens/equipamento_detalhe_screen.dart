@@ -87,6 +87,10 @@ class ScreenShoti extends StatelessWidget {
         height: height - kToolbarHeight - 50,
         child: ListView(
           children: [
+            const Divider(
+              color: Colors.white,
+              height: 1,
+            ),
             Container(
               padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 10.w),
               decoration: const BoxDecoration(

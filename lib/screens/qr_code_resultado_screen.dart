@@ -267,21 +267,21 @@ class ButtonScanResult extends StatelessWidget {
 
   void screenShotShare(
       ScreenshotController screenshotController, EquipamentoModel model) async {
-    await screenshotController
-        .captureFromWidget(ScreenShoti(
-      height: 400, //TODO:TESTAR PARA VÊ SE VAIDAR ERRO
-      model: model,
-    ))
-        .then((value) async {
-      Uint8List image = value;
+    // await screenshotController
+    //     .captureFromWidget(ScreenShoti(
+    //   height: 400, //TODO:TESTAR PARA VÊ SE VAIDAR ERRO
+    //   model: model,
+    // ))
+    //     .then((value) async {
+    //   Uint8List image = value;
 
-      final directory = await getApplicationDocumentsDirectory();
-      final imagePath = await File('${directory.path}/captured.png').create();
-      await imagePath.writeAsBytes(image);
+    //   final directory = await getApplicationDocumentsDirectory();
+    //   final imagePath = await File('${directory.path}/captured.png').create();
+    //   await imagePath.writeAsBytes(image);
 
-      XFile imageFileAsXFile = XFile(imagePath.path);
-      await Share.shareXFiles([imageFileAsXFile]);
-    });
+    //   XFile imageFileAsXFile = XFile(imagePath.path);
+    //   await Share.shareXFiles([imageFileAsXFile]);
+    // });
   }
 }
 

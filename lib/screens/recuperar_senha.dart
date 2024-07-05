@@ -51,7 +51,10 @@ class _RecuperarSenhaState extends State<RecuperarSenha> {
           onPressed: () {
             context.pop("value");
           },
-          icon: const Icon(Icons.arrow_back_ios),
+          icon: const Icon(
+            Icons.arrow_back_ios,
+            color: Colors.white,
+          ),
         ),
         elevation: 0,
       ),

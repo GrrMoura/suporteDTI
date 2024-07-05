@@ -1,4 +1,6 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -78,9 +80,8 @@ class SearchScreenState extends State<SearchScreen> {
       color: AppColors.cSecondaryColor,
       height: 160.h,
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Expanded(child: SizedBox(height: 1.h)),
-          Expanded(child: SizedBox(height: 1.h)),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
@@ -98,26 +99,18 @@ class SearchScreenState extends State<SearchScreen> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    FittedBox(
-                      fit: BoxFit.scaleDown,
-                      child: Text(
-                        name,
-                        style: Styles().titleStyle().copyWith(
-                              fontSize: name.length >= 17 ? 16.sp : 22.sp,
-                            ),
-                      ),
+                    Text(
+                      name,
+                      style: Styles().titleStyle().copyWith(
+                            fontSize: name.length > 18 ? 14.sp : 20.sp,
+                          ),
                     ),
-                    Row(
-                      children: [
-                        Text(cpf, style: Styles().subTitleStyle()),
-                      ],
-                    )
+                    Text(cpf, style: Styles().subTitleStyle()),
                   ],
                 ),
-              )
+              ),
             ],
           ),
-          Expanded(child: SizedBox(height: 1.h)),
         ],
       ),
     );

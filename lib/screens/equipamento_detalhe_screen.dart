@@ -115,7 +115,7 @@ class ScreenShoti extends StatelessWidget {
 }
 
 class MarcaModelo extends StatelessWidget {
-  const MarcaModelo({Key? key, required this.model}) : super(key: key);
+  const MarcaModelo({super.key, required this.model});
 
   final EquipamentoModel model;
 
@@ -221,17 +221,20 @@ class ObservacoesDetalhe extends StatelessWidget {
                       ),
                   ],
                 )
-              : Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      "Sem observação.",
-                      style: Styles()
-                          .descriptionDetail()
-                          .copyWith(fontSize: 15.sp),
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
+              : Padding(
+                  padding: EdgeInsets.only(top: 30.h, bottom: 30.h),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        "Sem observação.",
+                        style: Styles()
+                            .descriptionDetail()
+                            .copyWith(fontSize: 15.sp),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
                 ),
         ],
       ),
@@ -240,7 +243,7 @@ class ObservacoesDetalhe extends StatelessWidget {
 }
 
 class UltimaAlocacao extends StatelessWidget {
-  const UltimaAlocacao({Key? key, required this.model}) : super(key: key);
+  const UltimaAlocacao({super.key, required this.model});
 
   final EquipamentoModel model;
 
@@ -308,9 +311,11 @@ class DetalheValor extends StatelessWidget {
       child: Text(
         valor,
         style: Styles().descriptionDetail().copyWith(
+              color: Colors.white70,
               letterSpacing: AppDimens.espacamentoPequeno,
               fontSize: valor.length >= 15 ? 12.sp : 16.sp,
             ),
+        overflow: TextOverflow.ellipsis,
       ),
     );
   }
@@ -329,7 +334,8 @@ class DetalheInformacao extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(titulo, style: Styles().subTitleDetail()),
+          Text(titulo,
+              style: Styles().subTitleDetail().copyWith(color: Colors.black87)),
           Text(informacao,
               style: Styles()
                   .descriptionDetail()

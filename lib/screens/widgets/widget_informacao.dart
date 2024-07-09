@@ -1,6 +1,4 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:suporte_dti/utils/app_styles.dart';
 
@@ -22,9 +20,9 @@ class InformacaoDetalhes extends StatelessWidget {
         children: [
           Text(titulo, style: Styles().subTitleDetail()),
           Text(informacao,
-              style: Styles()
-                  .descriptionDetail()
-                  .copyWith(fontSize: informacao.length >= 15 ? 15 : 20)),
+              style: Styles().descriptionDetail().copyWith(
+                    fontSize: informacao.length >= 15 ? 15 : 20,
+                  )),
         ],
       ),
     );

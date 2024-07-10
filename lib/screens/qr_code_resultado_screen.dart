@@ -1,14 +1,9 @@
-import 'dart:io';
-import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:screenshot/screenshot.dart';
-import 'package:share_plus/share_plus.dart';
 import 'package:suporte_dti/model/equipamento_model.dart';
 import 'package:suporte_dti/navegacao/app_screens_path.dart';
-import 'package:suporte_dti/screens/equipamento_detalhe_screen.dart';
 import 'package:suporte_dti/screens/widgets/app_bar.dart';
 import 'package:suporte_dti/screens/widgets/aux_app_bar.dart';
 import 'package:suporte_dti/utils/app_colors.dart';

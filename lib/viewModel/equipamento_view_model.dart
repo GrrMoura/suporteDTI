@@ -30,6 +30,7 @@ class EquipamentoViewModel {
       required this.itensEquipamentoModels});
 
   Map<String, dynamic> toJson() {
+    print("passei aqui");
     final Map<String, dynamic> data = <String, dynamic>{};
     data['idTipoEquipamento'] = idTipoEquipamento;
     data['idUnidade'] = idUnidade;

@@ -22,6 +22,7 @@ class LevantamentoDigitado extends StatefulWidget {
 
 class _LevantamentoDigitadoState extends State<LevantamentoDigitado> {
   ScrollController? _scrollController;
+  bool isLoading = false;
 
   EquipamentoController equipamentoController = EquipamentoController();
   EquipamentoViewModel? model = EquipamentoViewModel(
@@ -133,24 +134,15 @@ class _LevantamentoDigitadoState extends State<LevantamentoDigitado> {
         textInputAction: TextInputAction.search,
         onFieldSubmitted: ((valor) async {
           if (valor.isNotEmpty) {
-            bool teveConflito = await checkConflict(context, valor);
-            setState(() {
-              if (!teveConflito) {
-                validateInput(valor);
-              }
-            });
-
             if (context.mounted) {
               setState(() {
-                model!.ocupado = true;
+                isLoading = true;
               });
 
-              equipamentoController
-                  .buscarEquipamentos(context, model!)
-                  .then((value) {
-                setState(() {
-                  model!.ocupado = false;
-                });
+              await equipamentoController.buscarEquipamentos(context, model!);
+
+              setState(() {
+                isLoading = false;
               });
             } else {
               Generic.snackBar(
@@ -169,7 +161,7 @@ class _LevantamentoDigitadoState extends State<LevantamentoDigitado> {
           fillColor: AppColors.cWhiteColor,
           filled: true,
           isDense: true,
-          hintText: 'Patrimônio,Tag, SEAD xx',
+          hintText: 'Patrimônio, Tag, SEAD ',
           hintStyle: Styles().hintTextStyle(),
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
           prefixIcon: Icon(Icons.search,
@@ -258,20 +250,20 @@ class _LevantamentoDigitadoState extends State<LevantamentoDigitado> {
     }
   }
 
-  void validateInput(value) {
-    value = value.toUpperCase().replaceAll(' ', '');
-    if (RegExp(r'^[a-zA-Z]+$').hasMatch(value)) {
-      model!.idTipoEquipamento = value; // euqipamento
-    } else if (RegExp(r'^\d{1,7}$').hasMatch(value)) {
-      model!.patrimonioSSP = value;
-    } else if (RegExp(r'^SEAD\d+$').hasMatch(value)) {
-      model!.patrimonioSead = value.replaceAll(RegExp(r'^SEAD'), '');
-    } else if (RegExp(r'^[a-zA-Z0-9]+$').hasMatch(value)) {
-      model!.numeroSerie = value;
-    } else {
-      Generic.snackBar(context: context, mensagem: 'Padrão inválido');
-    }
-  }
+  // void validateInput(value) {
+  //   value = value.toUpperCase().replaceAll(' ', '');
+  //   if (RegExp(r'^[a-zA-Z]+$').hasMatch(value)) {
+  //     model!.idTipoEquipamento = value; // euqipamento
+  //   } else if (RegExp(r'^\d{1,7}$').hasMatch(value)) {
+  //     model!.patrimonioSSP = value;
+  //   } else if (RegExp(r'^SEAD\d+$').hasMatch(value)) {
+  //     model!.patrimonioSead = value.replaceAll(RegExp(r'^SEAD'), '');
+  //   } else if (RegExp(r'^[a-zA-Z0-9]+$').hasMatch(value)) {
+  //     model!.numeroSerie = value;
+  //   } else {
+  //     Generic.snackBar(context: context, mensagem: 'Padrão inválido');
+  //   }
+  // }
 }
 
 class CardEquipamentosResultadoLevantamento extends StatelessWidget {

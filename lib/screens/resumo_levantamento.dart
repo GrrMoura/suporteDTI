@@ -84,7 +84,7 @@ class _ResumoLevantamentoState extends State<ResumoLevantamento> {
                                     // Cria um novo EquipamentoLevantado com id e descricao
                                     EquipamentoLevantado novoEquipamento =
                                         EquipamentoLevantado(
-                                      id: data[index].idEquipamento,
+                                      idEquipamento: data[index].idEquipamento,
                                       descricaoSala: data[index].setor,
                                     );
 

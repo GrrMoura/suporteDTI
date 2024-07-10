@@ -22,6 +22,11 @@ class EquipamentoController {
       );
       return;
     }
+    if (model.paginacao != null &&
+        !model.paginacao!.seChegouAoFinalDaPagina(model.paginacao!.pagina!)) {
+      model.paginacao!.pagina = model.paginacao!.setProximaPagina(
+          model.paginacao!.pagina!, model.paginacao!.totalPaginas!);
+    }
 
     try {
       Response responseConsulta = await EquipamentoService.buscar(model);

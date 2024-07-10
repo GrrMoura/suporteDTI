@@ -4,7 +4,7 @@ class LevantamentoModel {
   List<EquipamentoLevantado>? equipamentosLevantados;
   int? idUnidadeAdministrativa;
   DateTime? dataLevantamento;
-
+  Unidade? unidade;
   LevantamentoModel({
     this.equipamentosLevantados,
     this.idUnidadeAdministrativa,
@@ -39,20 +39,46 @@ class LevantamentoModel {
 }
 
 class EquipamentoLevantado {
-  int? id;
+  int? idEquipamento;
   String? descricaoSala;
 
-  EquipamentoLevantado({this.id, this.descricaoSala});
+  EquipamentoLevantado({this.idEquipamento, this.descricaoSala});
 
   EquipamentoLevantado.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
+    idEquipamento = json['idEquipamento'];
     descricaoSala = json['descricaoSala'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
-    data['id'] = id;
+    data['idEquipamento'] = idEquipamento;
     data['descricaoSala'] = descricaoSala;
     return data;
+  }
+}
+
+class Unidade {
+  int idEquipamento;
+  int idIntranetAntiga;
+  String nome;
+  String sigla;
+  String descricao;
+
+  Unidade({
+    required this.idEquipamento,
+    required this.idIntranetAntiga,
+    required this.nome,
+    required this.sigla,
+    required this.descricao,
+  });
+
+  Map<String, dynamic> toJson() {
+    return {
+      'idEquipamento': idEquipamento,
+      'idIntranetAntiga': idIntranetAntiga,
+      'nome': nome,
+      'sigla': sigla,
+      'descricao': descricao,
+    };
   }
 }

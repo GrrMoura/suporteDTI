@@ -98,7 +98,7 @@ class _DelegaciaListScreenState extends State<DelegaciaListScreen> {
               },
               decoration: const InputDecoration(
                 labelText: "Pesquisar",
-                hintText: "Nome, sigla, n°",
+                hintText: "Nome, sigla,",
                 prefixIcon: Icon(Icons.search),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.all(Radius.circular(16)),

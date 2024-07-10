@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:suporte_dti/model/delegacia_model.dart';
 
 class LevantamentocadastradoModel {
@@ -8,47 +6,42 @@ class LevantamentocadastradoModel {
 
   LevantamentocadastradoModel({this.cadastrados, this.paginacao});
 
-  LevantamentocadastradoModel.fromJson(Map<String, dynamic> json) {
-    if (json['cadastrados'] != null) {
-      cadastrados = <Cadastrados>[];
-      json['cadastrados'].forEach((v) {
-        cadastrados!.add(Cadastrados.fromJson(v));
-      });
-    }
-    paginacao = json['paginacao'] != null
-        ? Paginacao.fromJson(json['paginacao'])
-        : null;
+  factory LevantamentocadastradoModel.fromJson(Map<String, dynamic> json) {
+    return LevantamentocadastradoModel(
+      cadastrados: (json['cadastrados'] as List<dynamic>?)
+          ?.map((e) => Cadastrados.fromJson(e))
+          .toList(),
+      paginacao: json['paginacao'] != null
+          ? Paginacao.fromJson(json['paginacao'])
+          : null,
+    );
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    if (cadastrados != null) {
-      data['cadastrados'] = cadastrados!.map((v) => v.toJson()).toList();
-    }
-    if (paginacao != null) {
-      data['paginacao'] = paginacao!.toJson();
-    }
-    return data;
+    return {
+      'cadastrados': cadastrados?.map((e) => e.toJson()).toList(),
+      'paginacao': paginacao?.toJson(),
+    };
   }
 }
 
 class Cadastrados {
+  Cadastrados({
+    this.idLevantamento,
+    this.unidade,
+    this.usuario,
+    this.dataLevantamento,
+    this.quantidadeEquipamentos,
+    this.assinado,
+    this.levantamentoAssinado,
+  });
   int? idLevantamento;
   String? unidade;
   String? usuario;
   String? dataLevantamento;
   int? quantidadeEquipamentos;
   bool? assinado;
-  Bool? levantamentoAssinado;
-
-  Cadastrados(
-      {this.idLevantamento,
-      this.unidade,
-      this.usuario,
-      this.dataLevantamento,
-      this.quantidadeEquipamentos,
-      this.assinado,
-      this.levantamentoAssinado});
+  bool? levantamentoAssinado;
 
   Cadastrados.fromJson(Map<String, dynamic> json) {
     idLevantamento = json['idLevantamento'];
@@ -57,11 +50,11 @@ class Cadastrados {
     dataLevantamento = json['dataLevantamento'];
     quantidadeEquipamentos = json['quantidadeEquipamentos'];
     assinado = json['assinado'];
-    levantamentoAssinado = json['levantamentoAssinado'];
+    levantamentoAssinado = json['levantamentoAssinado'] ?? false;
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
+    final data = <String, dynamic>{};
     data['idLevantamento'] = idLevantamento;
     data['unidade'] = unidade;
     data['usuario'] = usuario;

@@ -16,18 +16,6 @@ class LevantamentoService {
     return response;
   }
 
-  static Future<Response> verificarEquipamento(LevantamentoModel model) async {
-    var url =
-        ApiServices.concatSGIUrl("Levantamentos/VerificarEquipamentosAlocados");
-    var options = await AutenticacaoService.getCabecalhoRequisicao();
-    var response = await RequestsServices.postOptions(
-      url: url,
-      data: model.toJson(),
-      options: options,
-    );
-    return response;
-  }
-
   static Future<Response> buscarLevantamentoPorIdUnidade(
       LevantamentoModel model) async {
     var url = ApiServices.concatSGIUrl("Levantamentos/Cadastrados");

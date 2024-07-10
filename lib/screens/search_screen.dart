@@ -324,7 +324,8 @@ class PesquisarDelegacias extends StatelessWidget {
 
 class DelegaciasIcones extends StatelessWidget {
   final String? path;
-  final String? name;
+  final String?
+      name; //TODO: LIMPAR O ESQUIPAMENTOS LEVANTADO AO FINALIZAR O RESUMO
 
   const DelegaciasIcones({
     required this.path,

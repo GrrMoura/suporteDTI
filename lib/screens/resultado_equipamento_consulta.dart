@@ -85,6 +85,11 @@ class _ResultadoEquipamentoConsultaScreenState
     return Scaffold(
       backgroundColor: AppColors.cWhiteColor,
       appBar: AppBar(
+        title: Text(
+          "Resultado",
+          style: TextStyle(color: Colors.white, fontSize: 22.sp),
+        ),
+        centerTitle: true,
         backgroundColor: AppColors.cSecondaryColor,
         leading: IconButton(
             onPressed: () {
@@ -95,28 +100,9 @@ class _ResultadoEquipamentoConsultaScreenState
       ),
       body: ListView(
         children: [
+          SizedBox(height: 10.h),
           SizedBox(
-            height: 60.h,
-            child: Stack(
-              children: [
-                Container(
-                  height: 115.h,
-                  width: double.infinity,
-                  color: AppColors.cSecondaryColor,
-                ),
-                Positioned(
-                    left: 120.w,
-                    right: 120.w,
-                    top: 0.h,
-                    child: Text(
-                      "Resultado",
-                      style: TextStyle(color: Colors.white, fontSize: 22.sp),
-                    )),
-              ],
-            ),
-          ),
-          SizedBox(
-            height: screenWidth - kToolbarHeight - 115.h,
+            height: screenWidth - kToolbarHeight - 50.h,
             child: Padding(
               padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.h),
               child: GridView.builder(
@@ -137,21 +123,23 @@ class _ResultadoEquipamentoConsultaScreenState
               ),
             ),
           ),
-          SizedBox(height: 5.h),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                widget.model!.paginacao!.registros! <= 10
-                    ? "${widget.model!.paginacao!.registros!} "
-                    : "${widget.model!.paginacao!.pagina! * 10}  ",
-                style: Styles().smallTextStyle(),
-              ),
-              Text(
-                "de ${widget.model!.paginacao!.registros} equipamentos",
-                style: Styles().smallTextStyle(),
-              )
-            ],
+          Padding(
+            padding: EdgeInsets.symmetric(vertical: 5.h),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  widget.model!.paginacao!.registros! <= 10
+                      ? "${widget.model!.paginacao!.registros!} "
+                      : "${widget.model!.paginacao!.pagina! * 10}  ",
+                  style: Styles().smallTextStyle(),
+                ),
+                Text(
+                  "Total de ${widget.model!.paginacao!.registros} equipamentos",
+                  style: Styles().smallTextStyle(),
+                )
+              ],
+            ),
           )
         ],
       ),

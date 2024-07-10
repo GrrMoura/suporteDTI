@@ -3,6 +3,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:suporte_dti/model/levantamento_cadastrados_model.dart';
 import 'package:suporte_dti/model/levantamento_model.dart';
 import 'package:suporte_dti/navegacao/app_screens_path.dart';
 import 'package:suporte_dti/services/dispositivo_service.dart';
@@ -17,32 +18,45 @@ class LevantamentoController {
     _handleResponse(context, response);
   }
 
-  //colocar essa função em equipamento
-  Future<void> verificarEquipamento(
+  Future<LevantamentocadastradoModel?> buscarLevantamentoPorIdUnidade(
       BuildContext context, LevantamentoModel model) async {
     await _verificarConexao(context);
-    Response response = await LevantamentoService.verificarEquipamento(model);
-    if (response.statusCode == 200) {
-      return;
-    }
-    _handleResponse(context, response);
-    if (response.statusCode == 401) {
-      context.go(AppRouterName.login);
+    LevantamentocadastradoModel levantamentocadastradoModel =
+        LevantamentocadastradoModel();
+
+    try {
+      Response response =
+          await LevantamentoService.buscarLevantamentoPorIdUnidade(model);
+      if (response.statusCode == 200) {
+        _updateModelFromResponse(levantamentocadastradoModel, response);
+        return levantamentocadastradoModel;
+      }
+      _handleResponse(context, response);
+      if (response.statusCode == 401) {
+        context.go(AppRouterName.login);
+      }
+      return null;
+    } catch (e) {
+      Generic.snackBar(
+        context: context,
+        mensagem: "Erro inesperado: $e",
+      );
+      return null;
     }
   }
 
-  Future<void> buscarLevantamentoPorIdUnidade(
-      BuildContext context, LevantamentoModel model) async {
-    await _verificarConexao(context);
-    Response response =
-        await LevantamentoService.buscarLevantamentoPorIdUnidade(model);
-    if (response.statusCode == 200) {
-      return;
+  void _updateModelFromResponse(
+      LevantamentocadastradoModel model, Response response) {
+    var itensLevantamentoModel =
+        LevantamentocadastradoModel.fromJson(response.data);
+
+    if (itensLevantamentoModel.cadastrados != null &&
+        itensLevantamentoModel.cadastrados!.isNotEmpty) {
+      model.cadastrados ??= [];
+      model.cadastrados!.addAll(itensLevantamentoModel.cadastrados!);
     }
-    _handleResponse(context, response);
-    if (response.statusCode == 401) {
-      context.go(AppRouterName.login);
-    }
+
+    model.paginacao = itensLevantamentoModel.paginacao;
   }
 
   Future<void> _verificarConexao(BuildContext context) async {

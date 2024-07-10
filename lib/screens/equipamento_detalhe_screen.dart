@@ -199,27 +199,27 @@ class ObservacoesDetalhe extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const DetalheTitulo("Observações", '3'),
-          model.numeroLacre != null &&
-                  model.numeroLacre!.isNotEmpty &&
-                  model.patrimonioSead != null &&
-                  model.patrimonioSead!.isNotEmpty
-              ? Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    if (model.numeroLacre != null &&
-                        model.numeroLacre!.isNotEmpty)
-                      InformacaoDetalhes(
-                        informacao: model.numeroLacre!,
-                        titulo: "Lacre",
-                      ),
-                    SizedBox(width: 10.w),
-                    if (model.patrimonioSead != null &&
-                        model.patrimonioSead!.isNotEmpty)
-                      InformacaoDetalhes(
-                        informacao: model.patrimonioSead!,
-                        titulo: "SEAD",
-                      ),
-                  ],
+          model.numeroLacre != null || model.patrimonioSead != null
+              ? Padding(
+                  padding: EdgeInsets.only(bottom: 80.h),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (model.numeroLacre != null &&
+                          model.numeroLacre!.isNotEmpty)
+                        InformacaoDetalhes(
+                          informacao: model.numeroLacre!,
+                          titulo: "Lacre",
+                        ),
+                      SizedBox(width: 10.w),
+                      if (model.patrimonioSead != null &&
+                          model.patrimonioSead!.isNotEmpty)
+                        InformacaoDetalhes(
+                          informacao: model.patrimonioSead!,
+                          titulo: "SEAD",
+                        ),
+                    ],
+                  ),
                 )
               : Padding(
                   padding: EdgeInsets.only(top: 30.h, bottom: 30.h),

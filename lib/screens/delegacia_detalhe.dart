@@ -1,13 +1,13 @@
-// ignore_for_file: use_build_context_synchronously
-
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'package:suporte_dti/controller/equipamento_controller.dart';
+import 'package:suporte_dti/controller/levantamento_controller.dart';
 import 'package:suporte_dti/model/itens_equipamento_model.dart';
+import 'package:suporte_dti/model/levantamento_cadastrados_model.dart';
+import 'package:suporte_dti/model/levantamento_model.dart';
 import 'package:suporte_dti/navegacao/app_screens_path.dart';
 import 'package:suporte_dti/screens/widgets/card_item.dart';
 import 'package:suporte_dti/screens/widgets/loading_default.dart';
@@ -23,43 +23,57 @@ class DelegaciaDetalhe extends StatefulWidget {
   final String nome;
   final EquipamentoViewModel? model;
 
-  const DelegaciaDetalhe({
-    super.key,
-    this.sigla,
-    required this.nome,
-    this.model,
-  });
+  const DelegaciaDetalhe(
+      {super.key, this.sigla, required this.nome, this.model});
 
   @override
   State<DelegaciaDetalhe> createState() => _DelegaciaDetalheState();
 }
 
 class _DelegaciaDetalheState extends State<DelegaciaDetalhe> {
-  final ScrollController _scrollController = ScrollController();
-  final EquipamentoController _equipamentoController = EquipamentoController();
+  final ScrollController _scrollCtrl = ScrollController();
+  final EquipamentoController _equipamentoCtlr = EquipamentoController();
+  final LevantamentoController _levantamentoCtrl = LevantamentoController();
+  final LevantamentoModel _levantamentoModel = LevantamentoModel();
+  late Future<LevantamentocadastradoModel?> _levantamentoFuture;
 
   late Future<void> _future;
 
-  bool _isLoading = false;
   Map<int, bool> _isLoadingMap = {};
 
   @override
   void initState() {
     super.initState();
-    _scrollController.addListener(_scrollListener);
-    _future = _fetchData();
+    _scrollCtrl.addListener(_scrollListener);
+    _future = _fetchEquipamento();
+    _levantamentoFuture = _fetchLevantamentos();
   }
 
   @override
   void dispose() {
-    _scrollController.removeListener(_scrollListener);
-    _scrollController.dispose();
+    _scrollCtrl.removeListener(_scrollListener);
+    _scrollCtrl.dispose();
+    widget.model?.itensEquipamentoModels.equipamentos = [];
+    widget.model?.paginacao?.pagina = 1;
+    widget.model?.paginacao?.totalPaginas = 1;
     super.dispose();
   }
 
-  Future<void> _fetchData() async {
+  Future<LevantamentocadastradoModel?> _fetchLevantamentos() async {
     try {
-      await _equipamentoController.buscarEquipamentos(context, widget.model!);
+      return await _levantamentoCtrl.buscarLevantamentoPorIdUnidade(context,
+          LevantamentoModel(idUnidadeAdministrativa: widget.model?.idUnidade));
+    } catch (e) {
+      print("Erro ao buscar levantamentos: $e");
+      return null;
+    }
+  }
+
+  Future<void> _fetchEquipamento() async {
+    try {
+      _levantamentoModel.idUnidadeAdministrativa = widget.model!.idUnidade;
+      await _equipamentoCtlr.buscarEquipamentos(context, widget.model!);
+
       setState(() {});
     } catch (e) {
       print("Erro ao buscar equipamentos: $e");
@@ -67,12 +81,11 @@ class _DelegaciaDetalheState extends State<DelegaciaDetalhe> {
   }
 
   void _scrollListener() {
-    if (_scrollController.position.pixels ==
-        _scrollController.position.maxScrollExtent) {
+    if (_scrollCtrl.position.pixels == _scrollCtrl.position.maxScrollExtent) {
       if (widget.model?.paginacao == null ||
           !widget.model!.paginacao!
               .seChegouAoFinalDaPagina(widget.model!.paginacao!.pagina!)) {
-        _fetchData();
+        _fetchEquipamento();
       } else {
         Generic.snackBar(
           context: context,
@@ -89,20 +102,27 @@ class _DelegaciaDetalheState extends State<DelegaciaDetalhe> {
 
     return InkWell(
       onTap: () async {
+        if (_isLoadingMap[index] == true) return; // Evita múltiplas execuções
+
         setState(() {
           _isLoadingMap[index] =
               true; // Ativa o indicador de carregamento para o índice atual
         });
 
-        await _equipamentoController.buscarEquipamentoPorId(context, item);
-
-        setState(() {
-          _isLoadingMap[index] =
-              false; // Desativa o indicador de carregamento para o índice atual após a resposta
-        });
+        try {
+          await _equipamentoCtlr.buscarEquipamentoPorId(context, item);
+        } catch (e) {
+          print("Erro ao buscar equipamento por ID: $e");
+        } finally {
+          setState(() {
+            _isLoadingMap[index] =
+                false; // Desativa o indicador de carregamento para o índice atual após a resposta
+          });
+        }
       },
-      child:
-          isLoading ? LoadingDefault() : CardEquipamentosResultado(item: item),
+      child: isLoading
+          ? const LoadingDefault()
+          : CardEquipamentosResultado(item: item),
     );
   }
 
@@ -133,91 +153,125 @@ class _DelegaciaDetalheState extends State<DelegaciaDetalhe> {
         centerTitle: true,
         backgroundColor: AppColors.cSecondaryColor,
       ),
-      body: FutureBuilder(
-        future: _future,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(
-                child: Text("Erro ao carregar dados: ${snapshot.error}"));
-          } else {
-            return SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        SizedBox(
-                          width: 250.w,
-                          child: Text(
-                            widget.nome,
-                            style: Styles().smallTextStyle(),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                    const Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Titulos(nome: "  Levantamentos  "),
-                        AddBotao(),
-                      ],
-                    ),
-                    SizedBox(
-                      height: 350.h,
-                      child: ListView(
-                        children: const [
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            SizedBox(height: 5.h),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SizedBox(
+                  child: Text(
+                    widget.nome,
+                    style: Styles().smallTextStyle(),
+                  ),
+                ),
+              ],
+            ),
+            const Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Titulos(nome: "  Levantamentos  "),
+                AddBotao(),
+              ],
+            ),
+            SizedBox(
+              height: 450.h,
+              child: ListView(
+                children: [
+                  FutureBuilder<LevantamentocadastradoModel?>(
+                    future: _levantamentoFuture,
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const LoadingDefault();
+                      } else if (snapshot.hasError) {
+                        return Center(
+                            child: Text(
+                                "Erro ao carregar dados: ${snapshot.error}"));
+                      } else if (!snapshot.hasData ||
+                          snapshot.data!.cadastrados!.isEmpty) {
+                        return const Center(
+                            child: Text("Nenhum levantamento encontrado"));
+                      } else {
+                        List<Widget> levantamentosCards = [];
+                        levantamentosCards.add(
                           DelegaciasCardLevantamento(
-                            idUnidade: 1,
-                            nome: "Juan Matos Silva",
-                            id: "02",
-                            data: "12/10/2023",
+                            idUnidade: widget.model!.idUnidade!,
+                            nome: "",
+                            idLevantamento: 0,
+                            data: formatDate(),
                             delegacia: "Resumo",
+                            quantEquipamento: 0,
                           ),
-                        ],
-                      ),
-                    ),
-                    Titulos(
-                      nome:
-                          " ${widget.model?.itensEquipamentoModels.equipamentos.length} de ${widget.model?.paginacao!.registros} equipamentos  ",
-                    ),
-                    SizedBox(
-                      height: 500.h,
-                      child: GridView.builder(
-                        physics: const BouncingScrollPhysics(
-                            parent: AlwaysScrollableScrollPhysics()),
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          mainAxisExtent: 220,
-                          mainAxisSpacing: 15,
-                          crossAxisSpacing: 15,
-                        ),
-                        controller: _scrollController,
-                        itemCount: widget
-                            .model?.itensEquipamentoModels.equipamentos.length,
-                        itemBuilder: (BuildContext ctxt, int index) {
-                          return _buildCard(
-                              widget.model!.itensEquipamentoModels
-                                  .equipamentos[index],
-                              index);
-                        },
-                      ),
-                    ),
-                  ],
+                        );
+                        for (var levantamento in snapshot.data!.cadastrados!) {
+                          levantamentosCards.add(
+                            DelegaciasCardLevantamento(
+                              idUnidade: widget.model!.idUnidade!,
+                              nome: levantamento.usuario!,
+                              idLevantamento: levantamento.idLevantamento!,
+                              data: levantamento.dataLevantamento!,
+                              delegacia: "",
+                              quantEquipamento:
+                                  levantamento.quantidadeEquipamentos!,
+                            ),
+                          );
+                        }
+                        //TODO: ERRO AO ENTRAR NAS DELEGACIAS, VIA DELACIA LIST, TROCAR FOTO DE SEM IMAGEM DOS EQUIPAMENTOS
+                        //IMPLEMENTAR ASSINATURA DIGITAL E FALAR COM LEADNRO SOBRE A POSIBILIDADE DE SER ASSINADO DIGITALMENTE
+                        return SingleChildScrollView(
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: levantamentosCards,
+                            ),
+                          ),
+                        );
+                      }
+                    },
+                  ),
+                ],
+              ),
+            ),
+            Titulos(
+              nome:
+                  " ${widget.model?.itensEquipamentoModels.equipamentos.length} de ${widget.model?.paginacao!.registros} equipamentos  ",
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 20.w),
+              child: SizedBox(
+                height: 500.h,
+                child: GridView.builder(
+                  physics: const BouncingScrollPhysics(
+                      parent: AlwaysScrollableScrollPhysics()),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    mainAxisExtent: 220,
+                    mainAxisSpacing: 15,
+                    crossAxisSpacing: 15,
+                  ),
+                  controller: _scrollCtrl,
+                  itemCount:
+                      widget.model?.itensEquipamentoModels.equipamentos.length,
+                  itemBuilder: (BuildContext ctxt, int index) {
+                    return _buildCard(
+                        widget
+                            .model!.itensEquipamentoModels.equipamentos[index],
+                        index);
+                  },
                 ),
               ),
-            );
-          }
-        },
+            ),
+          ],
+        ),
       ),
     );
+  }
+
+  String formatDate() {
+    return DateFormat('dd/MM/yyyy').format(DateTime.now());
   }
 }
 
@@ -310,94 +364,6 @@ class AddBotao extends StatelessWidget {
   }
 }
 
-class DelegaciasCardLevantamento extends StatelessWidget {
-  const DelegaciasCardLevantamento(
-      {super.key,
-      required this.nome,
-      required this.id,
-      required this.data,
-      required this.delegacia,
-      required this.idUnidade});
-
-  final String nome;
-  final String id;
-  final String data;
-  final String delegacia;
-  final int idUnidade;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () async {
-        if (delegacia == "Resumo") {
-          context.push(AppRouterName.resumoLevantamento, extra: idUnidade);
-        } else {
-          debugPrint("buscandos os levantamentos");
-        }
-      },
-      child: Padding(
-        padding: EdgeInsets.symmetric(vertical: 5.h, horizontal: 10.w),
-        child: Material(
-          borderRadius: delegacia != "Resumo"
-              ? const BorderRadius.only(
-                  topLeft: Radius.circular(40), topRight: Radius.circular(40))
-              : const BorderRadius.only(
-                  bottomLeft: Radius.circular(40),
-                  bottomRight: Radius.circular(40)),
-          elevation: 5,
-          color: delegacia != "Resumo"
-              ? AppColors.cSecondaryColor
-              : AppColors.cSecondaryColor.withOpacity(0.6),
-          child: Column(
-            children: [
-              Padding(
-                padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 20.w),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Text(
-                      id,
-                      style:
-                          Styles().descriptionDelegaciasLevantamentoTextStyle(),
-                    ),
-                    Text(
-                      delegacia,
-                      style: Styles().mediumTextStyle().copyWith(
-                          color: delegacia != "Resumo"
-                              ? AppColors.cWhiteColor
-                              : AppColors.cWhiteColor.withOpacity(0.7)),
-                    ),
-                    const Icon(Icons.remove_red_eye, color: Colors.white70)
-                  ],
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.only(top: 10.h, bottom: 10.h, right: 20.w),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    Text(
-                      data,
-                      style:
-                          Styles().descriptionDelegaciasLevantamentoTextStyle(),
-                    ),
-                    Text(
-                      nome,
-                      style:
-                          Styles().descriptionDelegaciasLevantamentoTextStyle(),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
 class Titulos extends StatelessWidget {
   const Titulos({required this.nome, super.key});
   final String nome;
@@ -430,42 +396,118 @@ class Titulos extends StatelessWidget {
   }
 }
 
-class CardItensDelegacia extends StatefulWidget {
-  const CardItensDelegacia(
-      {this.lotacao, this.patrimonio, this.marcaModelo, super.key});
+class DelegaciasCardLevantamento extends StatelessWidget {
+  const DelegaciasCardLevantamento(
+      {super.key,
+      required this.nome,
+      required this.idLevantamento,
+      required this.data,
+      required this.delegacia,
+      required this.idUnidade,
+      required this.quantEquipamento});
 
-  final String? patrimonio, lotacao, marcaModelo;
+  final String nome;
+  final int idLevantamento;
+  final String data;
+  final String delegacia;
+  final int idUnidade;
+  final int quantEquipamento;
 
-  @override
-  State<CardItensDelegacia> createState() => _CardItensDelegaciaState();
-}
-
-class _CardItensDelegaciaState extends State<CardItensDelegacia> {
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onLongPress: () {
-        Clipboard.setData(ClipboardData(text: widget.patrimonio!));
-        Generic.snackBar(
-            tipo: AppName.sucesso,
-            context: context,
-            mensagem: "Copiado para área de transferência!");
+    return InkWell(
+      onTap: () async {
+        if (delegacia == "Resumo") {
+          context.push(AppRouterName.resumoLevantamento, extra: idUnidade);
+        } else {
+          //TODO: IMPLEMENTAR CONTROLLER PARA BUSCAR LEVANTAMENTO POR ID;
+        }
       },
-      child: Material(
-        color: AppColors.cWhiteColor,
-        elevation: 5,
-        borderRadius: BorderRadius.circular(10),
-        shadowColor: Colors.grey,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(widget.marcaModelo!, style: Styles().smallTextStyle()),
-            Image.asset("assets/images/impressora.png", height: 70.h),
-            Text(widget.patrimonio!, style: Styles().smallTextStyle()),
-            Text(widget.lotacao!, style: Styles().hintTextStyle()),
-          ],
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+        child: Material(
+          borderRadius: BorderRadius.circular(20),
+          elevation: 5,
+          color: delegacia == "Resumo"
+              ? AppColors.cSecondaryColor.withOpacity(0.6)
+              : AppColors.cSecondaryColor,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: EdgeInsets.all(16.w),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      delegacia == "Resumo"
+                          ? "Resumo"
+                          : "Quantidade de Equipamento # $quantEquipamento",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16.sp,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const Icon(
+                      Icons.remove_red_eye,
+                      color: Colors.white70,
+                    ),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.only(left: 16.w, right: 16.w, bottom: 16.h),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Data: ${formatarData(data)}",
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(0.8),
+                        fontSize: 16.sp,
+                      ),
+                    ),
+                    SizedBox(height: 8.h),
+                    delegacia == "Resumo"
+                        ? Container()
+                        : Text(
+                            "Levantado por ${formatarNome(nome)}",
+                            style: TextStyle(
+                              color: Colors.white.withOpacity(0.8),
+                              fontSize: 16.sp,
+                            ),
+                          ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
+  }
+
+  String formatarNome(String nomeCompleto) {
+    List<String> partes = nomeCompleto.split(' ');
+
+    if (partes.length >= 2) {
+      String primeiroNome = partes[0];
+      String ultimoNome = partes[partes.length - 1];
+      return '$primeiroNome $ultimoNome';
+    } else {
+      return nomeCompleto;
+    }
+  }
+
+  String formatarData(String data) {
+    List<String> partes = data.split('/');
+    String dia = partes[0];
+    String mes = partes[1];
+    String ano = partes[2];
+
+    String anoFormatado = ano.substring(2);
+
+    return '$dia/$mes/$anoFormatado';
   }
 }

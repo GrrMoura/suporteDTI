@@ -34,7 +34,7 @@ class _ResumoLevantamentoState extends State<ResumoLevantamento> {
         iconTheme: const IconThemeData(color: Colors.white),
         leading: IconButton(
             onPressed: () {
-              Navigator.of(context).pop();
+              Navigator.pop(context, "ola");
             },
             icon: const Icon(Icons.arrow_back_ios_new)),
         title: Text("Resumo",
@@ -52,17 +52,17 @@ class _ResumoLevantamentoState extends State<ResumoLevantamento> {
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 5.h),
             child: Container(
-              height: 380.h,
+              height: 370.h,
               decoration: BoxDecoration(
                   color: AppColors.cSecondaryColor,
                   borderRadius: BorderRadius.circular(20)),
               child: ListView(
                 children: [
                   SizedBox(
-                    height: 380.h,
+                    height: 370.h,
                     child: FutureBuilder(
                         initialData: const [],
-                        future: dbHelper.equipamentos(),
+                        future: dbHelper.getEquipamentos(),
                         builder: (context, AsyncSnapshot<List> snapshot) {
                           var data = snapshot.data;
                           var datalength = data!.length;
@@ -105,40 +105,48 @@ class _ResumoLevantamentoState extends State<ResumoLevantamento> {
               ),
             ),
           ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              TextButton(
-                onPressed: () {
-                  setState(() {
-                    showDiscardConfirmationDialog(context);
-                  });
-                },
-                child: const Text(
-                  'Descartar',
-                  style: TextStyle(color: AppColors.cErrorColor),
+          Padding(
+            padding: EdgeInsets.only(bottom: 10.h),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                TextButton(
+                  onPressed: () {
+                    setState(() {
+                      showDiscardConfirmationDialog(context);
+                    });
+                  },
+                  child: const Text(
+                    'Descartar',
+                    style: TextStyle(color: AppColors.cErrorColor),
+                  ),
                 ),
-              ),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
-                onPressed: () async {
-                  int response = await dbHelper.getEquipamentosCount();
-                  if (response > 0) {
-                    debugPrint(
-                        modelLevantamento.equipamentosLevantados.toString());
-                    modelLevantamento.idUnidadeAdministrativa =
-                        widget.idUnidade;
-                    modelLevantamento.dataLevantamento = DateTime.now();
-                    LevantamentoController()
-                        .cadastrar(context, modelLevantamento);
-                  }
-                },
-                child: const Text(
-                  'Finalizar',
-                  style: TextStyle(color: Colors.white),
+                ElevatedButton(
+                  style:
+                      ElevatedButton.styleFrom(backgroundColor: Colors.green),
+                  onPressed: () async {
+                    int response = await dbHelper.getEquipamentosCount();
+                    if (response > 0) {
+                      debugPrint(
+                          modelLevantamento.equipamentosLevantados.toString());
+                      modelLevantamento.idUnidadeAdministrativa =
+                          widget.idUnidade;
+                      modelLevantamento.dataLevantamento = DateTime.now();
+                      LevantamentoController()
+                          .cadastrar(context, modelLevantamento);
+                    } else {
+                      Generic.snackBar(
+                          context: context,
+                          mensagem: "Nenhum produto foi levantado");
+                    }
+                  },
+                  child: const Text(
+                    'Finalizar',
+                    style: TextStyle(color: Colors.white),
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           )
         ],
       ),
@@ -210,7 +218,7 @@ class _ResumoLevantamentoState extends State<ResumoLevantamento> {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 10.h),
       child: SizedBox(
-        height: 112.h,
+        height: 132.h,
         child: Card(
           child: Padding(
             padding: EdgeInsets.only(left: 10.w, right: 5.w),
@@ -318,7 +326,7 @@ class _ResumoLevantamentoState extends State<ResumoLevantamento> {
                   ),
                 ),
                 Padding(
-                  padding: EdgeInsets.only(left: 10.w, right: 10.w, top: 10.h),
+                  padding: EdgeInsets.only(left: 10.w, right: 10.w, top: 5.h),
                   child: Row(
                     children: [
                       Text(
@@ -334,7 +342,6 @@ class _ResumoLevantamentoState extends State<ResumoLevantamento> {
                     ],
                   ),
                 ),
-                SizedBox(height: 10.h),
               ],
             ),
           ),

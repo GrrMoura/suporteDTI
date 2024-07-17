@@ -44,6 +44,7 @@ class Cadastrados {
   bool? levantamentoAssinado;
 
   Cadastrados.fromJson(Map<String, dynamic> json) {
+    print("passei aqui levantamentos cadastrados");
     idLevantamento = json['idLevantamento'];
     unidade = json['unidade'];
     usuario = json['usuario'];

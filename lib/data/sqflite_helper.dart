@@ -66,7 +66,7 @@ class DatabaseHelper {
     return resultado.isNotEmpty;
   }
 
-  Future<List<ItemEquipamento>> equipamentos() async {
+  Future<List<ItemEquipamento>> getEquipamentos() async {
     final db = await database;
     final List<Map<String, dynamic>> maps = await db.query('equipamento');
     return List.generate(maps.length, (i) {
@@ -90,6 +90,14 @@ class DatabaseHelper {
     final db = await database;
     final List<Map<String, dynamic>> maps = await db.query('equipamento');
     return maps.length;
+  }
+
+  Future<bool> temEquipamentosCadastrados() async {
+    final db = await database;
+    final List<Map<String, dynamic>> result =
+        await db.query('equipamento', limit: 1);
+
+    return result.isNotEmpty;
   }
 
   Future<String> updateEquipamento(ItemEquipamento equipamento) async {

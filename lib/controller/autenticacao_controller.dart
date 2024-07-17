@@ -72,12 +72,12 @@ class AutenticacaoController {
       );
     } else {
       Generic.snackBar(
-        context: context,
-        mensagem: response.statusMessage!,
-      );
+          context: context,
+          mensagem: response.statusMessage ?? response.data![0]);
     }
   }
 
+//TODO: MELHORAR O CONFIRMAR DESCARTE AO DESCARTAR RESUMO
   Future<Sessao> getSessao() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     return Sessao.getSession(prefs);

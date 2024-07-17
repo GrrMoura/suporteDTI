@@ -18,4 +18,5 @@ abstract class AppRouterName {
   static const String levantamentoDigitadoScreen =
       '/levantamentoDigitadoScreen';
   static const String resumoLevantamento = '/resumoLevantamento';
+  static const String levantamentoDetalheScreen = '/resumoLevantamento';
 }

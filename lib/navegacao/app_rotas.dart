@@ -1,9 +1,11 @@
 import 'package:go_router/go_router.dart';
 import 'package:suporte_dti/controller/home_controller.dart';
 import 'package:suporte_dti/model/equipamento_model.dart';
+import 'package:suporte_dti/model/levantamento_detalhe.dart';
 import 'package:suporte_dti/navegacao/app_screens_path.dart';
 import 'package:suporte_dti/screens/delegacia_list.dart';
 import 'package:suporte_dti/screens/equipamento_detalhe_screen.dart';
+import 'package:suporte_dti/screens/levantamento_detalhe.dart';
 import 'package:suporte_dti/screens/levantamento_escrito_screen.dart';
 import 'package:suporte_dti/screens/resultado_equipamento_consulta.dart';
 import 'package:suporte_dti/screens/login_screen.dart';
@@ -54,6 +56,17 @@ class Rotas {
           return (const SearchScreen());
         },
       ),
+
+      GoRoute(
+        path: AppRouterName.levantamentoDetalheScreen,
+        builder: (context, state) {
+          int? id = state.extra as int;
+          return (LevantamentoDetalheScreen(
+            idLevantamento: id,
+          ));
+        },
+      ),
+
       // GoRoute(
       //   name: 'qrcCodeResult',
       //   path: AppRouterName.qrCodeResult,

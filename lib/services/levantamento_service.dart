@@ -27,4 +27,16 @@ class LevantamentoService {
     );
     return response;
   }
+
+  static Future<Response> levantamentoDetalhe(int id) async {
+    var idLevantamento = {'idLevantamento': id};
+    var url = ApiServices.concatSGIUrl("Levantamentos/Detalhes");
+    var options = await AutenticacaoService.getCabecalhoRequisicao();
+    var response = await RequestsServices.postOptions(
+      url: url,
+      data: idLevantamento,
+      options: options,
+    );
+    return response;
+  }
 }

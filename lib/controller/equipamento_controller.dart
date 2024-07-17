@@ -32,15 +32,16 @@ class EquipamentoController {
       Response responseConsulta = await EquipamentoService.buscar(model);
 
       if (responseConsulta.statusCode != 200) {
+        if (responseConsulta.data['cadastrados'].isNotEmpty) {
+          _updateModelFromResponse(model, responseConsulta);
+        }
         _handleError(context, responseConsulta);
         return;
       }
-
-      _updateModelFromResponse(model, responseConsulta);
     } catch (e) {
       Generic.snackBar(
         context: context,
-        mensagem: "Erro inesperado: $e",
+        mensagem: "Erro inesperado:",
       );
     }
   }

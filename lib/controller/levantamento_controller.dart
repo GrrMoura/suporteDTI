@@ -3,7 +3,9 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:suporte_dti/data/sqflite_helper.dart';
 import 'package:suporte_dti/model/levantamento_cadastrados_model.dart';
+import 'package:suporte_dti/model/levantamento_detalhe.dart';
 import 'package:suporte_dti/model/levantamento_model.dart';
 import 'package:suporte_dti/navegacao/app_screens_path.dart';
 import 'package:suporte_dti/services/dispositivo_service.dart';
@@ -13,8 +15,15 @@ import 'package:suporte_dti/utils/snack_bar_generic.dart';
 
 class LevantamentoController {
   Future<void> cadastrar(BuildContext context, LevantamentoModel model) async {
+    final DatabaseHelper dbHelper = DatabaseHelper();
     await _verificarConexao(context);
+
     Response response = await LevantamentoService.cadastrar(model);
+    if (response.statusCode == 200) {
+      dbHelper.deleteAllEquipamentos();
+      context.pop("value");
+    }
+
     _handleResponse(context, response);
   }
 
@@ -37,6 +46,36 @@ class LevantamentoController {
       }
       return null;
     } catch (e) {
+      Generic.snackBar(
+        context: context,
+        mensagem: "Erro inesperado: $e",
+      );
+      return null;
+    }
+  }
+
+  Future<DetalheLevantamentoModel?> levantamentoDetalhe(
+      BuildContext context, int idLevantamento) async {
+    await _verificarConexao(context);
+
+    try {
+      Response response =
+          await LevantamentoService.levantamentoDetalhe(idLevantamento);
+
+      if (response.statusCode == 200) {
+        DetalheLevantamentoModel levantamentoModel =
+            DetalheLevantamentoModel.fromJson(response.data);
+
+        return levantamentoModel;
+      } else {
+        _handleResponse(context, response);
+        if (response.statusCode == 401) {
+          context.go(AppRouterName.login);
+        }
+        return null;
+      }
+    } catch (e) {
+      // Trate erros genéricos
       Generic.snackBar(
         context: context,
         mensagem: "Erro inesperado: $e",
@@ -71,11 +110,15 @@ class LevantamentoController {
 
   void _handleResponse(BuildContext context, Response response) {
     if (response.statusCode == 200) {
-      return;
+      return Generic.snackBar(
+        context: context,
+        tipo: AppName.sucesso,
+        mensagem: "Levantamento realizado",
+      );
     }
 
     if (response.statusCode == 422) {
-      Generic.snackBar(
+      return Generic.snackBar(
         context: context,
         tipo: AppName.info,
         mensagem: "Nenhum resultado encontrado",
@@ -87,7 +130,7 @@ class LevantamentoController {
       );
       context.goNamed(AppRouterName.login);
     } else {
-      Generic.snackBar(
+      return Generic.snackBar(
         context: context,
         mensagem: "${response.statusMessage}",
       );

@@ -99,7 +99,7 @@ class _LoginScreenState extends State<LoginScreen> {
       left: 0,
       right: 0,
       child: Container(
-        height: 250.h,
+        height: 4.h,
         decoration: const BoxDecoration(
           color: AppColors.cSecondaryColor,
           borderRadius: BorderRadius.only(
@@ -156,7 +156,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Positioned _buildSwitchRow() {
     return Positioned(
-      top: 460.h,
+      top: 480.h,
       bottom: 60.h,
       left: 30.w,
       right: 40.w,

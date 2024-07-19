@@ -40,7 +40,7 @@ class UsuarioController {
           return context.goNamed(AppRouterName.login);
         }
         Generic.snackBar(
-            context: context, mensagem: "Erro - ${response.statusMessage}");
+            context: context, mensagem: "Erro - ${response.data[0]}");
         return;
       }
       model.esqueceuSenha = false;

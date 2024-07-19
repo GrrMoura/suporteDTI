@@ -71,9 +71,7 @@ class AutenticacaoController {
         mensagem: response.data[0],
       );
     } else {
-      Generic.snackBar(
-          context: context,
-          mensagem: response.statusMessage ?? response.data![0]);
+      Generic.snackBar(context: context, mensagem: response.data![0]);
     }
   }
 

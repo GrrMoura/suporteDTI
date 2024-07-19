@@ -10,5 +10,5 @@ class ConfiguracoesGlobalUtils {
   //static const String Versao_SISTEMA = "3.7.2.1";
 
   //desenvolvimento
-  static const String Versao_SISTEMA = "3.7.1.0";
+  static const String Versao_SISTEMA = "3.7.2.1";
 }

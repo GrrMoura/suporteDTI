@@ -41,7 +41,7 @@ class Cadastrados {
   String? dataLevantamento;
   int? quantidadeEquipamentos;
   bool? assinado;
-  bool? levantamentoAssinado;
+  LevantamentoAssinado? levantamentoAssinado;
 
   Cadastrados.fromJson(Map<String, dynamic> json) {
     print("passei aqui levantamentos cadastrados");
@@ -51,7 +51,9 @@ class Cadastrados {
     dataLevantamento = json['dataLevantamento'];
     quantidadeEquipamentos = json['quantidadeEquipamentos'];
     assinado = json['assinado'];
-    levantamentoAssinado = json['levantamentoAssinado'] ?? false;
+    levantamentoAssinado = json['levantamentoAssinado'] != null
+        ? LevantamentoAssinado.fromJson(json['levantamentoAssinado'])
+        : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -64,5 +66,36 @@ class Cadastrados {
     data['assinado'] = assinado;
     data['levantamentoAssinado'] = levantamentoAssinado;
     return data;
+  }
+}
+
+class LevantamentoAssinado {
+  int? idLevantamentoAssinado;
+  String? tipoArquivo;
+  String? nomeArquivo;
+  String? usuarioAssinatura;
+  int? idUsuarioAssinatura;
+
+  LevantamentoAssinado(
+      {required this.idLevantamentoAssinado,
+      required this.tipoArquivo,
+      required this.nomeArquivo,
+      this.idUsuarioAssinatura,
+      this.usuarioAssinatura});
+
+  Map<String, dynamic> toJson() {
+    return {
+      'idLevantamentoAssinado': idLevantamentoAssinado,
+      'tipoArquivo': tipoArquivo,
+      'nomeArquivo': nomeArquivo,
+    };
+  }
+
+  LevantamentoAssinado.fromJson(Map<String, dynamic> json) {
+    idLevantamentoAssinado = json['idLevantamentoAssinado'];
+    tipoArquivo = json['tipoArquivo'];
+    nomeArquivo = json['nomeArquivo'];
+    usuarioAssinatura = json['usuarioAssinatura'];
+    idUsuarioAssinatura = json['idUsuarioAssinatura'];
   }
 }

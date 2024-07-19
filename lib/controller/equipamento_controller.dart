@@ -31,13 +31,14 @@ class EquipamentoController {
     try {
       Response responseConsulta = await EquipamentoService.buscar(model);
 
-      if (responseConsulta.statusCode != 200) {
+      if (responseConsulta.statusCode == 200) {
         if (responseConsulta.data['cadastrados'].isNotEmpty) {
           _updateModelFromResponse(model, responseConsulta);
         }
-        _handleError(context, responseConsulta);
+
         return;
       }
+      _handleError(context, responseConsulta);
     } catch (e) {
       Generic.snackBar(
         context: context,
@@ -100,7 +101,7 @@ class EquipamentoController {
     } else {
       Generic.snackBar(
         context: context,
-        mensagem: "Erro - ${response.statusMessage}",
+        mensagem: "Erro - ${response.data[0]}",
       );
     }
   }

@@ -58,7 +58,7 @@ class DelegaciaController {
     } else {
       Generic.snackBar(
         context: context,
-        mensagem: "${response.statusMessage}",
+        mensagem: "${response.data[0]}",
       );
     }
   }

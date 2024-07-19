@@ -22,6 +22,10 @@ class LevantamentoController {
     if (response.statusCode == 200) {
       dbHelper.deleteAllEquipamentos();
       context.pop("value");
+      Generic.snackBar(
+          context: context,
+          tipo: AppName.sucesso,
+          mensagem: "Levantamento cadastrado com sucesso");
     }
 
     _handleResponse(context, response);
@@ -37,19 +41,17 @@ class LevantamentoController {
       Response response =
           await LevantamentoService.buscarLevantamentoPorIdUnidade(model);
       if (response.statusCode == 200) {
-        _updateModelFromResponse(levantamentocadastradoModel, response);
-        return levantamentocadastradoModel;
+        if (response.data['cadastrados'].isNotEmpty) {
+          _updateModelFromResponse(levantamentocadastradoModel, response);
+          return levantamentocadastradoModel;
+        }
       }
       _handleResponse(context, response);
-      if (response.statusCode == 401) {
-        context.go(AppRouterName.login);
-      }
+
       return null;
     } catch (e) {
-      Generic.snackBar(
-        context: context,
-        mensagem: "Erro inesperado: $e",
-      );
+      debugPrint("Erro inesperado: $e");
+
       return null;
     }
   }
@@ -69,16 +71,14 @@ class LevantamentoController {
         return levantamentoModel;
       } else {
         _handleResponse(context, response);
-        if (response.statusCode == 401) {
-          context.go(AppRouterName.login);
-        }
+
         return null;
       }
     } catch (e) {
       // Trate erros genéricos
       Generic.snackBar(
         context: context,
-        mensagem: "Erro inesperado: $e",
+        mensagem: "Erro inesperado",
       );
       return null;
     }
@@ -110,11 +110,7 @@ class LevantamentoController {
 
   void _handleResponse(BuildContext context, Response response) {
     if (response.statusCode == 200) {
-      return Generic.snackBar(
-        context: context,
-        tipo: AppName.sucesso,
-        mensagem: "Levantamento realizado",
-      );
+      return;
     }
 
     if (response.statusCode == 422) {
@@ -128,11 +124,12 @@ class LevantamentoController {
         context: context,
         mensagem: "Usuário não autenticado ou token encerrado",
       );
-      context.goNamed(AppRouterName.login);
+
+      context.go(AppRouterName.login);
     } else {
       return Generic.snackBar(
         context: context,
-        mensagem: "${response.statusMessage}",
+        mensagem: "${response.data[0]}",
       );
     }
   }

@@ -175,6 +175,11 @@ class _DelegaciaDetalheState extends State<DelegaciaDetalhe> {
                         for (var levantamento in snapshot.data!.cadastrados!) {
                           levantamentosCards.add(
                             DelegaciasCardLevantamento(
+                              nomeArquivo: levantamento
+                                  .levantamentoAssinado?.nomeArquivo,
+                              idLevantamentoAssinado: levantamento
+                                  .levantamentoAssinado?.idLevantamentoAssinado,
+                              assinado: levantamento.assinado,
                               idUnidade: widget.model!.idUnidade!,
                               nome: levantamento.usuario!,
                               idLevantamento: levantamento.idLevantamento!,
@@ -182,8 +187,10 @@ class _DelegaciaDetalheState extends State<DelegaciaDetalhe> {
                               delegacia: "",
                               quantEquipamento:
                                   levantamento.quantidadeEquipamentos!,
+                              nomeAssinado: levantamento
+                                  .levantamentoAssinado?.usuarioAssinatura,
                             ),
-                          );
+                          ); //TODO: CONSERTAR ISSO AQUI, MUITO POLUIDO
                         }
                         //TODO: ERRO AO ENTRAR NAS DELEGACIAS, VIA DELACIA LIST, TROCAR FOTO DE SEM IMAGEM DOS EQUIPAMENTOS
                         //IMPLEMENTAR ASSINATURA DIGITAL E FALAR COM LEADNRO SOBRE A POSIBILIDADE DE SER ASSINADO DIGITALMENTE
@@ -203,13 +210,11 @@ class _DelegaciaDetalheState extends State<DelegaciaDetalhe> {
                 ],
               ),
             ),
+            //TODO: CoLOCOAR O ICON DE COMPARTILHAR.
             Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                Titulos(
-                  nome:
-                      " ${widget.model?.itensEquipamentoModels.equipamentos.length} de ${widget.model?.paginacao?.registros} equipamentos  ",
-                ),
+                Titulos(nome: formatEquipamentoInfo(widget.model!)),
               ],
             ),
             Padding(
@@ -243,6 +248,14 @@ class _DelegaciaDetalheState extends State<DelegaciaDetalhe> {
     );
   }
 
+  String formatEquipamentoInfo(EquipamentoViewModel model) {
+    int totalEquipamentos = model.itensEquipamentoModels.equipamentos.length;
+    int totalRegistros =
+        totalEquipamentos == 0 ? 0 : (model.paginacao?.registros ?? 0);
+
+    return " $totalEquipamentos de $totalRegistros equipamentos  ";
+  }
+
   Future<void> _temEquipamento() async {
     existemEquipamentos = await _db.temEquipamentosCadastrados();
     setState(() {});
@@ -258,11 +271,11 @@ class _DelegaciaDetalheState extends State<DelegaciaDetalhe> {
 
       if (levantamento == null || levantamento.cadastrados == null) {
         setState(() {
-          _levantamentoHeight = (200.h);
+          _levantamentoHeight = (230.h);
         });
       } else if (levantamento.cadastrados!.length <= 2) {
         setState(() {
-          _levantamentoHeight = 260.h;
+          _levantamentoHeight = 280.h;
         });
       }
       return levantamento;
@@ -455,11 +468,15 @@ class Titulos extends StatelessWidget {
 class DelegaciasCardLevantamento extends StatelessWidget {
   const DelegaciasCardLevantamento(
       {super.key,
+      this.assinado,
+      this.nomeArquivo,
+      this.idLevantamentoAssinado,
       required this.nome,
       required this.idLevantamento,
       required this.data,
       required this.delegacia,
       required this.idUnidade,
+      this.nomeAssinado,
       required this.quantEquipamento});
 
   final String nome;
@@ -468,6 +485,10 @@ class DelegaciasCardLevantamento extends StatelessWidget {
   final String delegacia;
   final int idUnidade;
   final int quantEquipamento;
+  final bool? assinado;
+  final int? idLevantamentoAssinado;
+  final String? nomeArquivo;
+  final String? nomeAssinado;
 
   @override
   Widget build(BuildContext context) {
@@ -476,8 +497,10 @@ class DelegaciasCardLevantamento extends StatelessWidget {
         if (delegacia == "Resumo") {
           context.push(AppRouterName.resumoLevantamento, extra: idUnidade);
         } else {
-          context.push(AppRouterName.levantamentoDetalheScreen,
-              extra: idLevantamento);
+          context.push(AppRouterName.levantamentoDetalheScreen, extra: {
+            'idLevantamento': idLevantamento,
+            "nomeArquivo": nomeArquivo
+          });
         }
       },
       child: Padding(
@@ -533,6 +556,21 @@ class DelegaciasCardLevantamento extends StatelessWidget {
                             style: TextStyle(
                               color: Colors.white.withOpacity(0.8),
                               fontSize: 16.sp,
+                            ),
+                          ),
+                    assinado == true
+                        ? Padding(
+                            padding: EdgeInsets.only(top: 10.h),
+                            child: Text(
+                              "Assinado: $nomeAssinado",
+                              style: TextStyle(color: Colors.grey[400]),
+                            ),
+                          )
+                        : Padding(
+                            padding: EdgeInsets.only(top: 10.h),
+                            child: Text(
+                              "Não assinado",
+                              style: TextStyle(color: Colors.grey[400]),
                             ),
                           ),
                   ],

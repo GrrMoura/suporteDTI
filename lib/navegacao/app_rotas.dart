@@ -1,7 +1,6 @@
 import 'package:go_router/go_router.dart';
 import 'package:suporte_dti/controller/home_controller.dart';
 import 'package:suporte_dti/model/equipamento_model.dart';
-import 'package:suporte_dti/model/levantamento_detalhe.dart';
 import 'package:suporte_dti/navegacao/app_screens_path.dart';
 import 'package:suporte_dti/screens/delegacia_list.dart';
 import 'package:suporte_dti/screens/equipamento_detalhe_screen.dart';
@@ -39,7 +38,6 @@ class Rotas {
           return (const HomeControler());
         },
       ),
-
       GoRoute(
         path: AppRouterName.detalhesEquipamento,
         builder: (context, state) {
@@ -47,7 +45,6 @@ class Rotas {
           return (EquipamentoDetalhe(equipamentoModel: model));
         },
       ),
-
       GoRoute(
         path: AppRouterName.search,
         builder: (context, state) {
@@ -56,23 +53,17 @@ class Rotas {
           return (const SearchScreen());
         },
       ),
-
       GoRoute(
         path: AppRouterName.levantamentoDetalheScreen,
         builder: (context, state) {
-          int? id = state.extra as int;
+          final data = state.extra! as Map<String, dynamic>;
+          print(data['idLevantamento']);
+          print(data['nomeArquivo']);
           return (LevantamentoDetalheScreen(
-            idLevantamento: id,
-          ));
+              idLevantamento: data['idLevantamento'],
+              nomeArquivo: data['nomeArquivo']));
         },
       ),
-
-      // GoRoute(
-      //   name: 'qrcCodeResult',
-      //   path: AppRouterName.qrCodeResult,
-      //   builder: (context, state) => (QrCodeResult()),
-      // ),
-
       GoRoute(
         name: 'delegaciaDetalhe',
         path: AppRouterName.delegaciaDetalhe,
@@ -90,7 +81,6 @@ class Rotas {
           return (DelegaciaListScreen(model: model));
         },
       ),
-
       GoRoute(
         name: 'resumoLevantamento',
         path: AppRouterName.resumoLevantamento,
@@ -104,7 +94,6 @@ class Rotas {
         path: AppRouterName.qrCodeResult,
         builder: (context, state) => (const QrCodeResult()),
       ),
-
       GoRoute(
         path: AppRouterName.levantamentoDigitadoScreen,
         builder: (context, state) => (const LevantamentoDigitado()),

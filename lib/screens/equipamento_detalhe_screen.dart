@@ -35,10 +35,9 @@ class EquipamentoDetalhe extends StatelessWidget {
         backgroundColor: AppColors.cSecondaryColor,
         title: Text(
           "Detalhes do Equipamento",
-          style: Styles().mediumTextStyle().copyWith(
-                color: AppColors.cWhiteColor,
-                fontSize: 18.sp,
-              ),
+          style: Styles()
+              .mediumTextStyle()
+              .copyWith(color: AppColors.cWhiteColor, fontSize: 18.sp),
         ),
         centerTitle: true,
       ),
@@ -147,6 +146,7 @@ class MarcaModelo extends StatelessWidget {
             child: Image.asset(
               AppName.fotoEquipamento(model.tipoEquipamento!),
               height: 140.h,
+              width: 100.w,
               fit: BoxFit.cover,
             ),
           ),

@@ -224,7 +224,6 @@ class _ResumoLevantamentoState extends State<ResumoLevantamento> {
             padding: EdgeInsets.only(left: 10.w, right: 5.w),
             child: Column(
               children: [
-                //TODO: ADICIONAR "NÃO INFORMADO NA HORA DE ADCIONAR O ITEM AO BANCO DE DADOS";
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [

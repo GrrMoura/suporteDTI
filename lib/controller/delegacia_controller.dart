@@ -63,6 +63,31 @@ class DelegaciaController {
     }
   }
 
+  // void _tratarErrorResponse(
+  //     BuildContext context, LoginViewModel model, Response response) {
+  //   model.ocupado = false;
+  //   String mensagemErro;
+
+  //   if (response.data is List) {
+  //     if (response.data.isNotEmpty && response.data[0] != null) {
+  //       mensagemErro = response.data[0];
+  //     } else {
+  //       mensagemErro = response.statusMessage ?? 'Erro desconhecido';
+  //     }
+  //   } else {
+  //     if (response.data == null || response.data == '') {
+  //       mensagemErro = response.statusMessage ?? 'Erro desconhecido';
+  //     } else {
+  //       mensagemErro = response.data;
+  //     }
+  //   }
+
+  //   Generic.snackBar(
+  //     context: context,
+  //     mensagem: mensagemErro,
+  //   );
+  // }
+
   void _tratarErroInesperado(BuildContext context) {
     Generic.snackBar(
       context: context,

@@ -195,8 +195,8 @@ class _DelegaciaListScreenState extends State<DelegaciaListScreen> {
           List.from(widget.model!.itensDelegaciaModel!.delegacias);
       if (query.isNotEmpty) {
         dummySearchList.removeWhere((item) =>
-            !item.nome!.toLowerCase().contains(query) &&
-            !item.sigla!.toLowerCase().contains(query));
+            !(item.nome ?? "").toLowerCase().contains(query) &&
+            !(item.sigla ?? "").toLowerCase().contains(query));
       }
       delegacias.addAll(dummySearchList);
     });

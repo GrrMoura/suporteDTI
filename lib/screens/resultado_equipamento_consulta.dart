@@ -26,6 +26,7 @@ class ResultadoEquipamentoConsultaScreen extends StatefulWidget {
 class _ResultadoEquipamentoConsultaScreenState
     extends State<ResultadoEquipamentoConsultaScreen> {
   ScrollController? _scrollController;
+  bool isLoading = false;
   EquipamentoController equipamentoController = EquipamentoController();
   EquipamentoViewModel? model = EquipamentoViewModel(
       itensEquipamentoModels: ItensEquipamentoModels(equipamentos: []));
@@ -70,7 +71,6 @@ class _ResultadoEquipamentoConsultaScreenState
   Widget _buildCard(ItemEquipamento item) {
     return InkWell(
         onTap: () {
-          // setState(() {});
           equipamentoController
               .buscarEquipamentoPorId(context, item)
               .then((value) {
@@ -101,46 +101,56 @@ class _ResultadoEquipamentoConsultaScreenState
       body: ListView(
         children: [
           SizedBox(height: 10.h),
-          SizedBox(
-            height: screenWidth - kToolbarHeight - 50.h,
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.h),
-              child: GridView.builder(
-                physics: const BouncingScrollPhysics(
-                    parent: AlwaysScrollableScrollPhysics()),
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    mainAxisExtent: 220,
-                    mainAxisSpacing: 15,
-                    crossAxisSpacing: 15),
-                controller: _scrollController,
-                itemCount:
-                    widget.model?.itensEquipamentoModels.equipamentos.length,
-                itemBuilder: (BuildContext ctxt, int index) {
-                  return _buildCard(
-                      widget.model!.itensEquipamentoModels.equipamentos[index]);
-                },
-              ),
-            ),
-          ),
-          Padding(
-            padding: EdgeInsets.symmetric(vertical: 5.h),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  widget.model!.paginacao!.registros! <= 10
-                      ? "${widget.model!.paginacao!.registros!} "
-                      : "${widget.model!.paginacao!.pagina! * 10}  ",
-                  style: Styles().smallTextStyle(),
-                ),
-                Text(
-                  "Total de ${widget.model!.paginacao!.registros} equipamentos",
-                  style: Styles().smallTextStyle(),
+          //  searchBar(context, isLoading, 50),
+          widget.model!.itensEquipamentoModels.equipamentos.isNotEmpty
+              ? SizedBox(
+                  height: screenWidth - kToolbarHeight - 50.h,
+                  child: Padding(
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.h),
+                    child: GridView.builder(
+                      physics: const BouncingScrollPhysics(
+                          parent: AlwaysScrollableScrollPhysics()),
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              mainAxisExtent: 220,
+                              mainAxisSpacing: 15,
+                              crossAxisSpacing: 15),
+                      controller: _scrollController,
+                      itemCount: widget
+                          .model?.itensEquipamentoModels.equipamentos.length,
+                      itemBuilder: (BuildContext ctxt, int index) {
+                        return _buildCard(widget
+                            .model!.itensEquipamentoModels.equipamentos[index]);
+
+                        //TODO:FAZER AQUI, QUANDO ESTIVER VINDO NULO
+                      },
+                    ),
+                  ),
                 )
-              ],
-            ),
-          )
+              : Container(
+                  color: Colors.amber,
+                  height: 100,
+                ),
+          // Padding(
+          //   padding: EdgeInsets.symmetric(vertical: 5.h),
+          //   child: Row(
+          //     mainAxisAlignment: MainAxisAlignment.center,
+          //     children: [
+          //       Text(
+          //         widget.model!.paginacao!.registros! <= 10
+          //             ? "${widget.model!.paginacao!.registros!} "
+          //             : "${widget.model!.paginacao!.pagina! * 10}  ",
+          //         style: Styles().smallTextStyle(),
+          //       ),
+          //       Text(
+          //         "Total de ${widget.model!.paginacao!.registros} equipamentos",
+          //         style: Styles().smallTextStyle(),
+          //       )
+          //     ],
+          //   ),
+          // )
         ],
       ),
     );
@@ -168,6 +178,63 @@ class _ResultadoEquipamentoConsultaScreenState
             widget.model?.itensEquipamentoModels.equipamentos)
         ? _listViewScreen()
         : _futureScreen();
+  }
+
+  Padding searchBar(BuildContext context, bool ocupado, double? height) {
+    return Padding(
+      padding:
+          EdgeInsets.only(top: 10.h, left: 20.w, right: 20.w, bottom: 10.h),
+      child: TextFormField(
+        style: Styles().mediumTextStyle(),
+        keyboardType: TextInputType.visiblePassword,
+        textInputAction: TextInputAction.search,
+        onChanged: (value) {
+          //  model!.patrimonioSSP = value;
+        },
+        onFieldSubmitted: ((valor) async {
+          if (valor.isNotEmpty) {
+            if (context.mounted) {
+              setState(() {
+                model!.itensEquipamentoModels.equipamentos = [];
+                isLoading = true;
+              });
+
+              //   await equipamentoController.buscarEquipamentos(context, model!);
+
+              setState(() {
+                isLoading = false;
+                if (model!.itensEquipamentoModels.equipamentos.isEmpty) {
+                  Generic.snackBar(
+                      context: context,
+                      mensagem: "Não foi encontrado nenhum equipamento",
+                      tipo: AppName.info);
+                }
+              });
+            } else {
+              Generic.snackBar(
+                context: context,
+                mensagem: "Tente novamente",
+              );
+            }
+          } else {
+            Generic.snackBar(
+              context: context,
+              mensagem: "O campo \"pesquisa\" precisa ser preenchido!",
+            );
+          }
+        }),
+        decoration: InputDecoration(
+          fillColor: AppColors.cWhiteColor,
+          filled: true,
+          isDense: true,
+          hintText: 'Patrimônio, Tag, SEAD ',
+          hintStyle: Styles().hintTextStyle(),
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
+          prefixIcon: Icon(Icons.search,
+              size: 25.sp, color: AppColors.cDescriptionIconColor),
+        ),
+      ),
+    );
   }
 
   void validateInput(value) {

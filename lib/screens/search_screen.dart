@@ -32,6 +32,7 @@ class SearchScreenState extends State<SearchScreen> {
 
   String name = "", cpf = "";
   SqliteService db = SqliteService();
+  bool isLoading = false;
 
   @override
   void initState() {
@@ -55,7 +56,7 @@ class SearchScreenState extends State<SearchScreen> {
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
 
-    return model?.ocupado != true
+    return isLoading == false
         ? Scaffold(
             backgroundColor: AppColors.cPrimaryColor,
             body: SizedBox(
@@ -129,12 +130,11 @@ class SearchScreenState extends State<SearchScreen> {
           style: Styles().mediumTextStyle(),
           keyboardType: TextInputType.visiblePassword,
           textInputAction: TextInputAction.search,
+          onChanged: (value) {
+            model!.patrimonioSSP = value;
+          },
           onFieldSubmitted: (value) async {
             if (value.isNotEmpty) {
-              bool teveConflito = await _checkConflict(context, value);
-              if (!teveConflito) {
-                _validateInput(value);
-              }
               if (context.mounted) {
                 context.push(AppRouterName.resultadoEquipamentoConsulta,
                     extra: model);
@@ -324,8 +324,7 @@ class PesquisarDelegacias extends StatelessWidget {
 
 class DelegaciasIcones extends StatelessWidget {
   final String? path;
-  final String?
-      name; //TODO: LIMPAR O ESQUIPAMENTOS LEVANTADO AO FINALIZAR O RESUMO
+  final String? name;
 
   const DelegaciasIcones({
     required this.path,

@@ -14,8 +14,6 @@ class EquipamentoViewModel {
   int? idFabricante;
   int? idModelo;
 
-  bool? ocupado = false;
-
   EquipamentoViewModel(
       {this.idTipoEquipamento,
       this.idUnidade,
@@ -26,11 +24,9 @@ class EquipamentoViewModel {
       this.paginacao,
       this.descricao,
       this.patrimonioSSP,
-      this.ocupado,
       required this.itensEquipamentoModels});
 
   Map<String, dynamic> toJson() {
-    print("passei aqui");
     final Map<String, dynamic> data = <String, dynamic>{};
     data['idTipoEquipamento'] = idTipoEquipamento;
     data['idUnidade'] = idUnidade;

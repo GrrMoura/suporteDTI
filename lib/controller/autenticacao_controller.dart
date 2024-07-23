@@ -64,18 +64,28 @@ class AutenticacaoController {
   void _tratarErrorResponse(
       BuildContext context, LoginViewModel model, Response response) {
     model.ocupado = false;
+    String mensagemErro;
 
-    if (response.statusCode == 422) {
-      Generic.snackBar(
-        context: context,
-        mensagem: response.data[0],
-      );
+    if (response.data is List) {
+      if (response.data.isNotEmpty && response.data[0] != null) {
+        mensagemErro = response.data[0];
+      } else {
+        mensagemErro = response.statusMessage ?? 'Erro desconhecido';
+      }
     } else {
-      Generic.snackBar(context: context, mensagem: response.data![0]);
+      if (response.data == null || response.data == '') {
+        mensagemErro = response.statusMessage ?? 'Erro desconhecido';
+      } else {
+        mensagemErro = response.data;
+      }
     }
+
+    Generic.snackBar(
+      context: context,
+      mensagem: mensagemErro,
+    );
   }
 
-//TODO: MELHORAR O CONFIRMAR DESCARTE AO DESCARTAR RESUMO
   Future<Sessao> getSessao() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     return Sessao.getSession(prefs);

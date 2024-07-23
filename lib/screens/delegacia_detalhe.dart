@@ -41,6 +41,7 @@ class _DelegaciaDetalheState extends State<DelegaciaDetalhe> {
   final LevantamentoModel _levantamentoModel = LevantamentoModel();
   late Future<LevantamentocadastradoModel?> _levantamentoFuture;
   bool existemEquipamentos = false;
+  bool isLoading = false;
 
   final Map<int, bool> _isLoadingMap = {};
   double _levantamentoHeight = 450.h;
@@ -243,6 +244,63 @@ class _DelegaciaDetalheState extends State<DelegaciaDetalhe> {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Padding searchBar(BuildContext context, bool ocupado, double? height) {
+    return Padding(
+      padding:
+          EdgeInsets.only(top: 10.h, left: 20.w, right: 20.w, bottom: 10.h),
+      child: TextFormField(
+        style: Styles().mediumTextStyle(),
+        keyboardType: TextInputType.visiblePassword,
+        textInputAction: TextInputAction.search,
+        onChanged: (value) {
+          widget.model!.patrimonioSSP = value;
+        },
+        onFieldSubmitted: ((valor) async {
+          if (valor.isNotEmpty) {
+            if (context.mounted) {
+              setState(() {
+                widget.model!.itensEquipamentoModels.equipamentos = [];
+                isLoading = true;
+              });
+
+              await _equipamentoCtlr.buscarEquipamentos(context, widget.model!);
+
+              setState(() {
+                isLoading = false;
+                if (widget.model!.itensEquipamentoModels.equipamentos.isEmpty) {
+                  Generic.snackBar(
+                      context: context,
+                      mensagem: "Não foi encontrado nenhum equipamento",
+                      tipo: AppName.info);
+                }
+              });
+            } else {
+              Generic.snackBar(
+                context: context,
+                mensagem: "Tente novamente",
+              );
+            }
+          } else {
+            Generic.snackBar(
+              context: context,
+              mensagem: "O campo \"pesquisa\" precisa ser preenchido!",
+            );
+          }
+        }),
+        decoration: InputDecoration(
+          fillColor: AppColors.cWhiteColor,
+          filled: true,
+          isDense: true,
+          hintText: 'Patrimônio, Tag, SEAD ',
+          hintStyle: Styles().hintTextStyle(),
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
+          prefixIcon: Icon(Icons.search,
+              size: 25.sp, color: AppColors.cDescriptionIconColor),
         ),
       ),
     );

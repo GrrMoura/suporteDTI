@@ -4,7 +4,6 @@ class ApiServices {
   //produção
   // static const String intranetUrl =
   //     "https://intranet.ssp.se.gov.br/API/Intranet/";
-
   // static const String sistema = "https://intranet.ssp.se.gov.br/api/SgiDtiv3/";
 
   // //DESENVOLVIMENTO

@@ -1,6 +1,4 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -170,76 +168,6 @@ class SearchScreenState extends State<SearchScreen> {
       ),
     );
   }
-
-  void _validateInput(String value) {
-    value = value.toUpperCase().replaceAll(' ', '');
-    if (RegExp(r'^[a-zA-Z]+$').hasMatch(value)) {
-      model!.idTipoEquipamento = int.parse(value);
-    } else if (RegExp(r'^\d{1,7}$').hasMatch(value)) {
-      model!.patrimonioSSP = value;
-    } else if (RegExp(r'^SEAD\d+$').hasMatch(value)) {
-      model!.patrimonioSead = value.replaceAll(RegExp(r'^SEAD'), '');
-    } else if (RegExp(r'^[a-zA-Z0-9]+$').hasMatch(value)) {
-      model!.numeroSerie = value;
-    } else {
-      Generic.snackBar(context: context, mensagem: 'Padrão inválido');
-    }
-  }
-
-  Future<bool> _checkConflict(BuildContext context, String input) async {
-    input = input.replaceAll(' ', '');
-    if (RegExp(r'^\d{1,7}$').hasMatch(input) &&
-        RegExp(r'^[a-zA-Z0-9]+$').hasMatch(input)) {
-      var value = await showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            backgroundColor: AppColors.cWhiteColor,
-            title: const Text(
-              'Está entrada é ?',
-              textAlign: TextAlign.center,
-            ),
-            actions: <Widget>[
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
-                onPressed: () {
-                  Navigator.of(context).pop(AppName.patri);
-                },
-                child: Text(
-                  AppName.patri!,
-                  style: const TextStyle(color: AppColors.contentColorBlack),
-                ),
-              ),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
-                onPressed: () {
-                  Navigator.of(context).pop(AppName.nSerie);
-                },
-                child: Text(
-                  AppName.nSerie!,
-                  style: const TextStyle(color: AppColors.contentColorBlack),
-                ),
-              ),
-            ],
-          );
-        },
-      );
-      if (value != null) {
-        if (value == AppName.nSerie) {
-          model!.patrimonioSSP = "";
-          model!.numeroSerie = input;
-          model!.patrimonioSead = "";
-        } else {
-          model!.patrimonioSSP = input;
-          model!.numeroSerie = "";
-          model!.patrimonioSead = "";
-        }
-      }
-      return true;
-    } else {
-      return false;
-    }
-  }
 }
 
 class FastSearch extends StatelessWidget {
@@ -248,7 +176,7 @@ class FastSearch extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.only(top: 20.h),
+      padding: EdgeInsets.only(top: 20.h, left: 5.w),
       child: SizedBox(
         height: 107.h,
         width: double.infinity,
@@ -280,7 +208,7 @@ class PesquisarDelegacias extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 5),
+      padding: EdgeInsets.symmetric(horizontal: 5.w),
       child: Column(
         children: [
           InkWell(
@@ -293,8 +221,8 @@ class PesquisarDelegacias extends StatelessWidget {
                   ));
             },
             child: Container(
-              height: 80.h,
-              width: 80.w,
+              height: 75.h,
+              width: 75.w,
               decoration: BoxDecoration(
                 color: AppColors.cSecondaryColor,
                 boxShadow: const [
@@ -335,7 +263,7 @@ class DelegaciasIcones extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 5),
+      padding: EdgeInsets.symmetric(horizontal: 4.sp),
       child: InkWell(
         highlightColor: Colors.transparent,
         splashFactory: NoSplash.splashFactory,
@@ -375,8 +303,8 @@ class DelegaciasIcones extends StatelessWidget {
         child: Column(
           children: [
             Container(
-              height: 80.h,
-              width: 80.w,
+              height: 75.h,
+              width: 75.w,
               decoration: BoxDecoration(
                 boxShadow: const [
                   BoxShadow(

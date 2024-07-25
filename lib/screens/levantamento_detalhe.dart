@@ -1,16 +1,30 @@
+// ignore_for_file: use_build_context_synchronously
+
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_pdfview/flutter_pdfview.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:intl/intl.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:suporte_dti/controller/levantamento_controller.dart';
 import 'package:suporte_dti/model/levantamento_detalhe.dart';
+import 'package:suporte_dti/screens/pdf_screen.dart';
 import 'package:suporte_dti/utils/app_colors.dart';
 
 class LevantamentoDetalheScreen extends StatefulWidget {
   final int idLevantamento;
   final String nomeArquivo;
+  final bool assinado;
 
   const LevantamentoDetalheScreen(
-      {super.key, required this.idLevantamento, required this.nomeArquivo});
+      {super.key,
+      required this.idLevantamento,
+      required this.nomeArquivo,
+      required this.assinado});
 
   @override
   LevantamentoDetalheScreenState createState() =>
@@ -22,29 +36,185 @@ class LevantamentoDetalheScreenState extends State<LevantamentoDetalheScreen>
   final LevantamentoController _levantamentoController =
       LevantamentoController();
   DetalheLevantamentoModel? _detalheLevantamento;
-  late AnimationController _controller;
-  late Animation<double> _animation;
 
   @override
   void initState() {
     super.initState();
     _carregarDetalhesLevantamento();
-
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 500),
-    );
-    _animation = Tween<double>(begin: 0, end: 1).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
-    );
-
-    _controller.forward();
   }
 
   @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
+  Widget build(BuildContext context) {
+    return Scaffold(
+        appBar: AppBar(
+          title: const Text(
+            'Detalhe do Levantamento',
+            style: TextStyle(color: Colors.white),
+          ),
+          backgroundColor: AppColors.cSecondaryColor,
+          iconTheme: const IconThemeData(color: Colors.white),
+        ),
+        body: _detalheLevantamento == null
+            ? const Center(
+                child: SpinKitSpinningLines(
+                    color: AppColors.contentColorBlue,
+                    size: 120,
+                    duration: Duration(milliseconds: 1500)),
+              )
+            : _buildDetalhes());
+  }
+
+  Widget _buildDetalhes() {
+    final detalhes = _detalheLevantamento!.detalhes!;
+
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          widget.assinado
+              ? _buildInfoRow('Nome do Arquivo', widget.nomeArquivo)
+              : _buildIUploadRow(),
+          SizedBox(height: 16.h),
+          _buildInfoRow('Data Levantamento',
+              DateFormat('dd/MM/yyyy').format(detalhes.dataLevantamento!)),
+          SizedBox(height: 30.h),
+          Text(
+            'Equipamentos Levantados',
+            style: TextStyle(
+                fontSize: 18.sp,
+                fontWeight: FontWeight.bold,
+                color: AppColors.cSecondaryColor),
+          ),
+          SizedBox(height: 12.h),
+          Expanded(
+            child: ListView.builder(
+              shrinkWrap: true,
+              itemCount: detalhes.equipamentosLevantados!.length,
+              itemBuilder: (context, index) {
+                final equipamento = detalhes.equipamentosLevantados![index];
+                return _buildEquipamentoTile(equipamento);
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Padding _buildIUploadRow() {
+    return Padding(
+      padding: EdgeInsets.only(bottom: 8.h, top: 20.h),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Text(
+            'Cadastrar Levantamento Assinado ',
+            style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: AppColors.cSecondaryColor,
+                fontSize: 18.sp),
+          ),
+          InkWell(
+            child: IconButton(
+                onPressed: () {
+                  _downloadPdf();
+                  // _levantamentoController.downloadLevantamentoAssinado(
+                  //     context, widget.idLevantamento);
+                },
+                icon: Icon(
+                  Icons.upload,
+                  size: 35.sp,
+                )),
+          )
+        ],
+      ),
+    );
+  }
+
+  Future<void> _downloadPdf() async {
+    try {
+      var status = await Permission.storage.request();
+      if (!status.isGranted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Permissão de armazenamento negada.'),
+          ),
+        );
+        return;
+      }
+
+      // Inicia o download do PDF
+      final fileName = await _levantamentoController.imprimirLevantamento(
+          context, widget.idLevantamento);
+
+      // Suponha que o arquivo foi salvo no diretório de downloads
+
+      if (fileName != null) {
+        // Use o nome do arquivo retornado
+        final directory = await getExternalStorageDirectory();
+        final filePath =
+            '${directory?.path}/Download/$fileName'; // Caminho completo do arquivo
+
+        if (await File(filePath).exists()) {
+          _showDownloadOptions(filePath);
+        } else {
+          debugPrint('Arquivo não encontrado em: $filePath');
+        }
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Erro ao fazer download do PDF: $e'),
+        ),
+      );
+    }
+  }
+
+  void _showDownloadOptions(String filePath) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('PDF Baixado'),
+          content: const Text('Você gostaria de ler ou compartilhar o PDF?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                _openPdf(filePath);
+              },
+              child: const Text('Ler'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                _sharePdf(filePath);
+              },
+              child: const Text('Compartilhar'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _openPdf(String path) async {
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (context) => PdfViewerScreen(filePath: path)),
+    );
+  }
+
+  Future<void> _sharePdf(String path) async {
+    try {
+      await Share.shareXFiles([XFile(path)]);
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Erro ao compartilhar o PDF: $e'),
+        ),
+      );
+    }
   }
 
   Future<void> _carregarDetalhesLevantamento() async {
@@ -71,67 +241,9 @@ class LevantamentoDetalheScreenState extends State<LevantamentoDetalheScreen>
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Detalhe do Levantamento',
-          style: TextStyle(color: Colors.white),
-        ),
-        backgroundColor: AppColors.cSecondaryColor,
-        iconTheme: const IconThemeData(color: Colors.white),
-      ),
-      body: _detalheLevantamento == null
-          ? const Center(
-              child: CircularProgressIndicator(),
-            )
-          : FadeTransition(
-              opacity: _animation,
-              child: _buildDetalhes(),
-            ),
-    );
-  }
-
-  Widget _buildDetalhes() {
-    final detalhes = _detalheLevantamento!.detalhes!;
-
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          _buildInfoRow('Nome do Arquivo', widget.nomeArquivo),
-          const SizedBox(height: 16.0),
-          _buildInfoRow('Data Levantamento',
-              DateFormat('dd/MM/yyyy').format(detalhes.dataLevantamento!)),
-          SizedBox(height: 30.h),
-          const Text(
-            'Equipamentos Levantados',
-            style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: AppColors.cSecondaryColor),
-          ),
-          const SizedBox(height: 12.0),
-          Expanded(
-            child: ListView.builder(
-              shrinkWrap: true,
-              itemCount: detalhes.equipamentosLevantados!.length,
-              itemBuilder: (context, index) {
-                final equipamento = detalhes.equipamentosLevantados![index];
-                return _buildEquipamentoTile(equipamento);
-              },
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget _buildInfoRow(String label, String value) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      padding: EdgeInsets.symmetric(vertical: 8.h),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
@@ -144,8 +256,22 @@ class LevantamentoDetalheScreenState extends State<LevantamentoDetalheScreen>
           ),
           Text(
             value,
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold),
           ),
+          label == "Nome do Arquivo"
+              ? InkWell(
+                  child: IconButton(
+                      onPressed: () {
+                        _downloadPdf();
+                        // _levantamentoController.downloadLevantamentoAssinado(
+                        //     context, widget.idLevantamento);
+                      },
+                      icon: Icon(
+                        Icons.download,
+                        size: 35.sp,
+                      )),
+                )
+              : Container()
         ],
       ),
     );

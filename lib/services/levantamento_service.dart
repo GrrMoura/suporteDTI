@@ -39,4 +39,22 @@ class LevantamentoService {
     );
     return response;
   }
+
+  static Future<Response> imprimirLevantamento(int id) async {
+    var idLevantamento = {'idLevantamento': id};
+    var url = ApiServices.concatSGIUrl("Levantamentos/ImprimirLevantamento");
+    var options = await AutenticacaoService.getCabecalhoRequisicao();
+    var response = await RequestsServices.postOptionsByteResponse(
+        url: url, data: idLevantamento, options: options);
+    return response;
+  }
+
+  static Future<Response> downloadLevantamento(int id) async {
+    var idLevantamento = {'idLevantamento': id};
+    var url = ApiServices.concatSGIUrl("LevantamentosAssinados/DownloadAnexo");
+    var options = await AutenticacaoService.getCabecalhoRequisicao();
+    var response = await RequestsServices.postOptions(
+        url: url, data: idLevantamento, options: options);
+    return response;
+  }
 }

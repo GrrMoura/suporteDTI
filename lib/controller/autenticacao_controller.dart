@@ -16,16 +16,7 @@ import 'package:suporte_dti/viewModel/login_view_model.dart';
 class AutenticacaoController {
   Future<void> logar(BuildContext context, LoginViewModel model) async {
     model.ocupado = true;
-
-    if (!await DispositivoServices.verificarConexao()) {
-      model.ocupado = false;
-      Generic.snackBar(
-        context: context,
-        mensagem:
-            'Sem conexão com a internet. Estabeleça uma conexão e tente novamente',
-      );
-      return;
-    }
+    await _verificarConexao(context);
 
     try {
       Response response = await AutenticacaoService.logar(model);
@@ -58,6 +49,16 @@ class AutenticacaoController {
         context: context,
         mensagem: 'Erro ao fazer login: $e',
       );
+    }
+  }
+
+  Future<void> _verificarConexao(BuildContext context) async {
+    if (!await DispositivoServices.verificarConexao()) {
+      Generic.snackBar(
+        context: context,
+        mensagem: "Sem conexão com a internet.",
+      );
+      throw Exception("Sem conexão com a internet.");
     }
   }
 

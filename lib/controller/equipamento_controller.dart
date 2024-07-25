@@ -8,7 +8,6 @@ import 'package:suporte_dti/model/itens_equipamento_model.dart';
 import 'package:suporte_dti/navegacao/app_screens_path.dart';
 import 'package:suporte_dti/services/equipamento_service.dart';
 import 'package:suporte_dti/services/dispositivo_service.dart';
-import 'package:suporte_dti/utils/app_name.dart';
 import 'package:suporte_dti/utils/snack_bar_generic.dart';
 import 'package:suporte_dti/viewModel/equipamento_view_model.dart';
 
@@ -38,7 +37,7 @@ class EquipamentoController {
 
         return;
       }
-      _handleError(context, responseConsulta);
+      _tratarErro(context, responseConsulta);
     } catch (e) {
       Generic.snackBar(
         context: context,
@@ -68,7 +67,7 @@ class EquipamentoController {
       Response response = await EquipamentoService.buscarPorId(model);
 
       if (response.statusCode != 200) {
-        _handleError(context, response);
+        _tratarErro(context, response);
         return;
       }
 
@@ -84,25 +83,31 @@ class EquipamentoController {
     }
   }
 
-  void _handleError(BuildContext context, Response response) {
+  void _tratarErro(BuildContext context, Response response) {
+    String mensagemErro;
     if (response.statusCode == 401) {
       Generic.snackBar(
         context: context,
         mensagem: "Usuário não autenticado ou token encerrado",
       );
-      Future.delayed(const Duration(seconds: 3))
-          .then((_) => {context.goNamed(AppRouterName.login)});
-    } else if (response.statusCode == 422) {
-      Generic.snackBar(
-        context: context,
-        tipo: AppName.info,
-        mensagem: "Nenhum resultado encontrado",
-      );
+      // Future.delayed(const Duration(seconds: 3)) TODO: TSTAR SE AINDA DÁ ERRO MESMO SEM O FUTURE
+      //     .then((_) => {context.goNamed(AppRouterName.login)});
+      context.goNamed(AppRouterName.login);
     } else {
-      Generic.snackBar(
-        context: context,
-        mensagem: "Erro - ${response.data[0]}",
-      );
+      if (response.data is List) {
+        if (response.data.isNotEmpty && response.data[0] != null) {
+          mensagemErro = response.data[0];
+        } else {
+          mensagemErro = response.statusMessage ?? 'Erro desconhecido';
+        }
+      } else {
+        if (response.data == null || response.data == '') {
+          mensagemErro = response.statusMessage ?? 'Erro desconhecido';
+        } else {
+          mensagemErro = response.data;
+        }
+      }
+      return Generic.snackBar(context: context, mensagem: mensagemErro);
     }
   }
 }

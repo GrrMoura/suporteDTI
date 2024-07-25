@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -10,39 +12,18 @@ import 'package:suporte_dti/viewModel/dados_usuario_view_model.dart';
 import 'package:suporte_dti/viewModel/resetar_senha_view_model.dart';
 
 class UsuarioController {
-  static Future resetarSenha(
+  static Future<void> resetarSenha(
       BuildContext context, ResetarSenhaViewModel model) async {
-    await DispositivoServices.verificarConexao().then((conectado) async {
-      if (!conectado) {
-        Generic.snackBar(
-            context: context,
-            mensagem:
-                "Sem conexão com a internet. Estabeleça uma conexão e tente novamente.");
-        return;
-      }
+    try {
+      await _verificarConexao(context);
 
       Response response = await UsuarioService.resetarSenha(model);
 
-      if (response.statusCode != 200 && context.mounted) {
-        if (response.statusCode == 422) {
-          return Generic.snackBar(
-              context: context,
-              mensagem:
-                  "Erro - Os dados informados não conferem com os dados cadastrados.");
-        }
-
-        if (response.statusCode == 401) {
-          Generic.snackBar(
-            context: context,
-            mensagem: "Usuário não autenticado ou token encerrado",
-          );
-
-          return context.goNamed(AppRouterName.login);
-        }
-        Generic.snackBar(
-            context: context, mensagem: "Erro - ${response.data[0]}");
+      if (response.statusCode != 200) {
+        _handleErrorResponse(context, response);
         return;
       }
+
       model.esqueceuSenha = false;
       if (context.mounted) {
         Generic.snackBar(
@@ -50,19 +31,21 @@ class UsuarioController {
           mensagem:
               "Instruções e uma nova senha foram enviadas para o e-mail ${model.email!.toLowerCase()}",
         );
-        return;
       }
-    });
+    } catch (e) {
+      // Tratamento de erro pode ser adicionado aqui
+    }
   }
 
-  static Future pegarDadosDoUsuario(BuildContext context) async {
-    await DispositivoServices.verificarConexao().then((conectado) async {
+  static Future<void> pegarDadosDoUsuario(BuildContext context) async {
+    try {
+      bool conectado = await DispositivoServices.verificarConexao();
       if (!conectado) {
         Generic.snackBar(
             context: context,
             mensagem:
                 "Sem conexão com a internet. Estabeleça uma conexão e tente novamente.");
-        return null;
+        return;
       }
 
       Response response = await UsuarioService.pegarDadosDoUsuario();
@@ -70,8 +53,37 @@ class UsuarioController {
       SharedPreferences prefs = await SharedPreferences.getInstance();
 
       Dados.fromJson(response.data).setDados(prefs);
-      return null;
-    });
-    return null;
+    } catch (e) {
+      // Tratamento de erro pode ser adicionado aqui
+    }
+  }
+
+  static Future<void> _verificarConexao(BuildContext context) async {
+    bool conectado = await DispositivoServices.verificarConexao();
+    if (!conectado) {
+      Generic.snackBar(
+        context: context,
+        mensagem: "Sem conexão com a internet.",
+      );
+      throw Exception("Sem conexão com a internet.");
+    }
+  }
+
+  static void _handleErrorResponse(BuildContext context, Response response) {
+    if (response.statusCode == 422) {
+      Generic.snackBar(
+          context: context,
+          mensagem:
+              "Erro - Os dados informados não conferem com os dados cadastrados.");
+    } else if (response.statusCode == 401) {
+      Generic.snackBar(
+        context: context,
+        mensagem: "Usuário não autenticado ou token encerrado",
+      );
+      context.goNamed(AppRouterName.login);
+    } else {
+      Generic.snackBar(
+          context: context, mensagem: "Erro - ${response.data[0]}");
+    }
   }
 }

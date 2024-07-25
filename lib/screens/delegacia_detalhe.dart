@@ -191,10 +191,10 @@ class _DelegaciaDetalheState extends State<DelegaciaDetalhe> {
                               nomeAssinado: levantamento
                                   .levantamentoAssinado?.usuarioAssinatura,
                             ),
-                          ); //TODO: CONSERTAR ISSO AQUI, MUITO POLUIDO
+                          );
+                          //TODO: CONSERTAR ISSO AQUI, MUITO POLUIDO
                         }
-                        //TODO: ERRO AO ENTRAR NAS DELEGACIAS, VIA DELACIA LIST, TROCAR FOTO DE SEM IMAGEM DOS EQUIPAMENTOS
-                        //IMPLEMENTAR ASSINATURA DIGITAL E FALAR COM LEADNRO SOBRE A POSIBILIDADE DE SER ASSINADO DIGITALMENTE
+
                         return SingleChildScrollView(
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
@@ -388,7 +388,7 @@ class _DelegaciaDetalheState extends State<DelegaciaDetalhe> {
         try {
           await _equipamentoCtlr.buscarEquipamentoPorId(context, item);
         } catch (e) {
-          print("Erro ao buscar equipamento por ID: $e");
+          debugPrint("Erro ao buscar equipamento por ID: $e");
         } finally {
           setState(() {
             _isLoadingMap[index] =
@@ -557,7 +557,8 @@ class DelegaciasCardLevantamento extends StatelessWidget {
         } else {
           context.push(AppRouterName.levantamentoDetalheScreen, extra: {
             'idLevantamento': idLevantamento,
-            "nomeArquivo": nomeArquivo
+            "nomeArquivo": nomeArquivo ?? "",
+            'assinado': assinado ?? false
           });
         }
       },
@@ -583,13 +584,9 @@ class DelegaciasCardLevantamento extends StatelessWidget {
                           : "Quantidade de Equipamento # $quantEquipamento",
                       style: TextStyle(
                         color: Colors.white,
-                        fontSize: 16.sp,
+                        fontSize: 15.sp,
                         fontWeight: FontWeight.bold,
                       ),
-                    ),
-                    const Icon(
-                      Icons.remove_red_eye,
-                      color: Colors.white70,
                     ),
                   ],
                 ),

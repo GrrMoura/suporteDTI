@@ -57,11 +57,11 @@ class Rotas {
         path: AppRouterName.levantamentoDetalheScreen,
         builder: (context, state) {
           final data = state.extra! as Map<String, dynamic>;
-          print(data['idLevantamento']);
-          print(data['nomeArquivo']);
+
           return (LevantamentoDetalheScreen(
               idLevantamento: data['idLevantamento'],
-              nomeArquivo: data['nomeArquivo']));
+              nomeArquivo: data['nomeArquivo'],
+              assinado: data['assinado']));
         },
       ),
       GoRoute(

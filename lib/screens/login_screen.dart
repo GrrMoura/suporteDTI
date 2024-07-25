@@ -203,6 +203,8 @@ class _LoginScreenState extends State<LoginScreen> {
       right: 60.w,
       child: ElevatedButton(
         onPressed: () async {
+          usuarioCtrl.text = "093.472.924-78";
+          passController.text = "Muebom50";
           String msg = _validateUserAndSenhaTextfield(
             usuarioCtrl.text,
             passController.text,

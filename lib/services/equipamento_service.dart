@@ -16,7 +16,6 @@ class EquipamentoService {
 
     return responseConsulta;
   }
-  //TODO: ERRO ao clicar na foto e não selecionar nenhuma opcao.
 
   static Future<Response> buscarPorId(ItemEquipamento model) async {
     var url = ApiServices.concatSGIUrl("Equipamentos/Detalhes");

@@ -6,7 +6,9 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:suporte_dti/data/sqflite_helper.dart';
 import 'package:suporte_dti/model/levantamento_cadastrados_model.dart';
 import 'package:suporte_dti/model/levantamento_detalhe.dart';
@@ -126,30 +128,47 @@ class LevantamentoController {
     }
   }
 
-  Future<void> levantamentoCadastrarAssinado({
-    required BuildContext context,
-    required int idLevantamento,
-  }) async {
+  Future<void> levantamentoCadastrarAssinado(
+      {required BuildContext context,
+      required int idLevantamento,
+      required String path}) async {
     await _verificarConexao(context);
 
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    int idUsuario = prefs.getInt('idUsuario') ?? 0;
+    String data = DateFormat('dd/MM/yyyy').format(DateTime.now());
+
+    String nomePDF = separarNome(path);
+
     FormData formData = FormData.fromMap({
-      'idUsuarioAssinatura': 501,
-      'dataAssinatura': '25/07/2024',
+      'idUsuarioAssinatura': idUsuario,
+      'dataAssinatura': data,
       'idLevantamento': idLevantamento,
       'levantamentoAssinadoPdf':
-          await MultipartFile.fromFile("", filename: 'levantamento.pdf'),
+          await MultipartFile.fromFile(path, filename: nomePDF),
     });
     try {
       Response response =
           await LevantamentoService.cadastrarLevantamentoAssinado(formData);
 
       if (response.statusCode == 200) {
+        Generic.snackBar(
+            context: context,
+            mensagem: "Levantamento cadastrado com sucesso",
+            tipo: AppName.sucesso);
       } else {
         _tratarErro(context, response);
       }
     } catch (e) {
       Generic.snackBar(context: context, mensagem: "Erro inesperado");
     }
+  }
+
+  String separarNome(String filePath) {
+    List<String> parts = filePath.split('/');
+    String fileName = parts.last;
+    fileName.split('.').first;
+    return fileName;
   }
 
   void _updateModelFromResponse(

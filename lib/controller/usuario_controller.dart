@@ -39,16 +39,24 @@ class UsuarioController {
 
   static Future<void> pegarDadosDoUsuario(BuildContext context) async {
     try {
-      bool conectado = await DispositivoServices.verificarConexao();
-      if (!conectado) {
-        Generic.snackBar(
-            context: context,
-            mensagem:
-                "Sem conexão com a internet. Estabeleça uma conexão e tente novamente.");
-        return;
-      }
+      await _verificarConexao(context);
 
       Response response = await UsuarioService.pegarDadosDoUsuario();
+
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+
+      Dados.fromJson(response.data).setDados(prefs);
+    } catch (e) {
+      // Tratamento de erro pode ser adicionado aqui
+    }
+  }
+
+  static Future<void> pegarDadosDoUsuarioPeloCpf(
+      BuildContext context, String cpf) async {
+    try {
+      await _verificarConexao(context);
+
+      Response response = await UsuarioService.pegarDadosPeloCpf(cpf);
 
       SharedPreferences prefs = await SharedPreferences.getInstance();
 
@@ -87,3 +95,6 @@ class UsuarioController {
     }
   }
 }
+
+
+// http://intradev.ssp.gov-se/api/intranet/Usuarios/Ativos

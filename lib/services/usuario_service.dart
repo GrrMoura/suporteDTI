@@ -37,4 +37,14 @@ class UsuarioService {
     var response = await RequestsServices.get(url, options);
     return response;
   }
+
+  static Future<Response> pegarDadosPeloCpf(String cpf) async {
+    var cpfUsuario = {'login': cpf};
+    var options = await AutenticacaoService.getCabecalhoRequisicao();
+    var url = ApiServices.concatIntranetUrl("Usuarios/Ativos");
+
+    var response = await RequestsServices.postOptions(
+        url: url, options: options, data: cpfUsuario);
+    return response;
+  }
 }

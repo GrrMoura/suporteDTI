@@ -53,7 +53,7 @@ class LevantamentoService {
 
   static Future<Response> cadastrarLevantamentoAssinado(
       FormData formData) async {
-    var url = ApiServices.concatSGIUrl("Levantamentos/Detalhes");
+    var url = ApiServices.concatSGIUrl("LevantamentosAssinados/Cadastrar");
     var options = await AutenticacaoService.getCabecalhoRequisicao();
     var response = await RequestsServices.postOptions(
         url: url, data: formData, options: options);

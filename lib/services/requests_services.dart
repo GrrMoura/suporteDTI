@@ -40,7 +40,7 @@ class RequestsServices {
 
   static Future<Response> postOptions(
       {required String url,
-      Map<String, dynamic>? data,
+      required dynamic data,
       required Options options}) async {
     try {
       Dio dio = Dio(BaseOptions(

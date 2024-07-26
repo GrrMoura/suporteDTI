@@ -61,18 +61,17 @@ class LevantamentoController {
   }
 
   Future<String?> imprimirLevantamento(
-      BuildContext context, int idLevantamento) async {
+      bool assinado, BuildContext context, int idLevantamento) async {
     await _verificarConexao(context);
-    print("cliquei no down");
+
     try {
-      Response response =
-          await LevantamentoService.imprimirLevantamento(idLevantamento);
+      Response response = await LevantamentoService.imprimirLevantamento(
+          idLevantamento, assinado);
 
       if (response.statusCode == 200) {
         const uuid = Uuid();
-        final fileName = '${uuid.v4()}.pdf'; // Nome do arquivo com UUID
+        final fileName = '${uuid.v4()}.pdf';
 
-        // Obtenha o diretório de armazenamento externo
         final directory = await getExternalStorageDirectory();
         final downloadDirectory = Directory('${directory?.path}/Download');
         if (!await downloadDirectory.exists()) {
@@ -82,20 +81,12 @@ class LevantamentoController {
         final filePath = '${downloadDirectory.path}/$fileName';
         final file = File(filePath);
 
-        // Assuma que a resposta é de tipo List<int>
         final bytes = response.data is List<int>
             ? response.data
-            : utf8.encode(response.data); // Converte se necessário
+            : utf8.encode(response.data);
 
-        try {
-          await file.writeAsBytes(bytes);
-          print('Arquivo salvo em: $filePath');
-          // Retorne o nome do arquivo para uso posterior
-          return fileName;
-        } catch (e) {
-          debugPrint("Erro ao salvar o arquivo: $e");
-          return null;
-        }
+        await file.writeAsBytes(bytes);
+        return fileName;
       } else {
         _tratarErro(context, response);
         return null;
@@ -103,23 +94,6 @@ class LevantamentoController {
     } catch (e) {
       debugPrint("Erro inesperado: $e");
       return null;
-    }
-  }
-
-  Future<void> downloadLevantamentoAssinado(
-      BuildContext context, int idLevantamento) async {
-    await _verificarConexao(context);
-
-    try {
-      Response response =
-          await LevantamentoService.imprimirLevantamento(idLevantamento);
-      if (response.statusCode == 200) {
-        return;
-      } else {
-        _tratarErro(context, response);
-      }
-    } catch (e) {
-      debugPrint("Erro inesperado: $e");
     }
   }
 
@@ -142,12 +116,39 @@ class LevantamentoController {
         return null;
       }
     } catch (e) {
-      // Trate erros genéricos
       Generic.snackBar(
         context: context,
         mensagem: "Erro inesperado",
       );
       return null;
+    }
+  }
+
+  Future<void> levantamentoCadastrarAssinado(
+    BuildContext context,
+    int idLevantamento,
+  ) async {
+    await _verificarConexao(context);
+
+    FormData formData = FormData.fromMap({
+      'idUsuarioAssinatura': 501,
+      'dataAssinatura': '25/07/2024',
+      'idLevantamento': idLevantamento,
+      'levantamentoAssinadoPdf': await MultipartFile.fromFile(pdfFile.path,
+          filename: 'levantamento.pdf'),
+    });
+    try {
+      Response response =
+          await LevantamentoService.cadastrarLevantamentoAssinado(formData);
+
+      if (response.statusCode == 200) {
+        DetalheLevantamentoModel levantamentoModel =
+            DetalheLevantamentoModel.fromJson(response.data);
+      } else {
+        _tratarErro(context, response);
+      }
+    } catch (e) {
+      Generic.snackBar(context: context, mensagem: "Erro inesperado");
     }
   }
 

@@ -40,21 +40,23 @@ class LevantamentoService {
     return response;
   }
 
-  static Future<Response> imprimirLevantamento(int id) async {
+  static Future<Response> imprimirLevantamento(int id, bool assinado) async {
     var idLevantamento = {'idLevantamento': id};
-    var url = ApiServices.concatSGIUrl("Levantamentos/ImprimirLevantamento");
+    var url = assinado
+        ? ApiServices.concatSGIUrl("Levantamentos/ImprimirLevantamento")
+        : "LevantamentosAssinados/DownloadAnexo"; //TODO: TESTAR DOWLOAD ANEXO
     var options = await AutenticacaoService.getCabecalhoRequisicao();
     var response = await RequestsServices.postOptionsByteResponse(
         url: url, data: idLevantamento, options: options);
     return response;
   }
 
-  static Future<Response> downloadLevantamento(int id) async {
-    var idLevantamento = {'idLevantamento': id};
-    var url = ApiServices.concatSGIUrl("LevantamentosAssinados/DownloadAnexo");
+  static Future<Response> cadastrarLevantamentoAssinado(
+      FormData formData) async {
+    var url = ApiServices.concatSGIUrl("Levantamentos/Detalhes");
     var options = await AutenticacaoService.getCabecalhoRequisicao();
     var response = await RequestsServices.postOptions(
-        url: url, data: idLevantamento, options: options);
+        url: url, data: formData, options: options);
     return response;
   }
 }

@@ -1,15 +1,12 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'dart:io';
-
 import 'package:flutter/material.dart';
-import 'package:flutter_pdfview/flutter_pdfview.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:share_plus/share_plus.dart';
 import 'package:suporte_dti/controller/levantamento_controller.dart';
 import 'package:suporte_dti/model/levantamento_detalhe.dart';
 import 'package:suporte_dti/screens/pdf_screen.dart';
@@ -48,11 +45,21 @@ class LevantamentoDetalheScreenState extends State<LevantamentoDetalheScreen>
     return Scaffold(
         appBar: AppBar(
           title: const Text(
-            'Detalhe do Levantamento',
+            ' Detalhes Levantamento',
             style: TextStyle(color: Colors.white),
           ),
           backgroundColor: AppColors.cSecondaryColor,
+          centerTitle: true,
           iconTheme: const IconThemeData(color: Colors.white),
+          actions: [
+            IconButton(
+                onPressed: () {
+                  widget.assinado
+                      ? _downloadLevantamentoAssinado()
+                      : _downloadLevantamento();
+                },
+                icon: const Icon(Icons.download))
+          ],
         ),
         body: _detalheLevantamento == null
             ? const Center(
@@ -118,9 +125,7 @@ class LevantamentoDetalheScreenState extends State<LevantamentoDetalheScreen>
           InkWell(
             child: IconButton(
                 onPressed: () {
-                  _downloadPdf();
-                  // _levantamentoController.downloadLevantamentoAssinado(
-                  //     context, widget.idLevantamento);
+                  _downloadLevantamento();
                 },
                 icon: Icon(
                   Icons.upload,
@@ -132,7 +137,47 @@ class LevantamentoDetalheScreenState extends State<LevantamentoDetalheScreen>
     );
   }
 
-  Future<void> _downloadPdf() async {
+  Future<void> _downloadLevantamento() async {
+    _openPdf('');
+    // try {
+    //   var status = await Permission.storage.request();
+    //   if (!status.isGranted) {
+    //     ScaffoldMessenger.of(context).showSnackBar(
+    //       const SnackBar(
+    //         content: Text('Permissão de armazenamento negada.'),
+    //       ),
+    //     );
+    //     return;
+    //   }
+
+    //   // Inicia o download do PDF
+    //   final fileName = await _levantamentoController.imprimirLevantamento(
+    //       context, widget.idLevantamento);
+
+    //   // Suponha que o arquivo foi salvo no diretório de downloads
+
+    //   if (fileName != null) {
+    //     // Use o nome do arquivo retornado
+    //     final directory = await getExternalStorageDirectory();
+    //     final filePath =
+    //         '${directory?.path}/Download/$fileName'; // Caminho completo do arquivo
+
+    //     if (await File(filePath).exists()) {
+    //       _showDownloadOptions(filePath);
+    //     } else {
+    //       debugPrint('Arquivo não encontrado em: $filePath');
+    //     }
+    //   }
+    // } catch (e) {
+    //   ScaffoldMessenger.of(context).showSnackBar(
+    //     SnackBar(
+    //       content: Text('Erro ao fazer download do PDF: $e'),
+    //     ),
+    //   );
+    // }
+  }
+
+  Future<void> _downloadLevantamentoAssinado() async {
     try {
       var status = await Permission.storage.request();
       if (!status.isGranted) {
@@ -146,7 +191,7 @@ class LevantamentoDetalheScreenState extends State<LevantamentoDetalheScreen>
 
       // Inicia o download do PDF
       final fileName = await _levantamentoController.imprimirLevantamento(
-          context, widget.idLevantamento);
+          widget.assinado, context, widget.idLevantamento);
 
       // Suponha que o arquivo foi salvo no diretório de downloads
 
@@ -157,7 +202,7 @@ class LevantamentoDetalheScreenState extends State<LevantamentoDetalheScreen>
             '${directory?.path}/Download/$fileName'; // Caminho completo do arquivo
 
         if (await File(filePath).exists()) {
-          _showDownloadOptions(filePath);
+          _openPdf(filePath);
         } else {
           debugPrint('Arquivo não encontrado em: $filePath');
         }
@@ -171,50 +216,10 @@ class LevantamentoDetalheScreenState extends State<LevantamentoDetalheScreen>
     }
   }
 
-  void _showDownloadOptions(String filePath) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('PDF Baixado'),
-          content: const Text('Você gostaria de ler ou compartilhar o PDF?'),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-                _openPdf(filePath);
-              },
-              child: const Text('Ler'),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-                _sharePdf(filePath);
-              },
-              child: const Text('Compartilhar'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
   Future<void> _openPdf(String path) async {
     Navigator.of(context).push(
       MaterialPageRoute(builder: (context) => PdfViewerScreen(filePath: path)),
     );
-  }
-
-  Future<void> _sharePdf(String path) async {
-    try {
-      await Share.shareXFiles([XFile(path)]);
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Erro ao compartilhar o PDF: $e'),
-        ),
-      );
-    }
   }
 
   Future<void> _carregarDetalhesLevantamento() async {
@@ -262,7 +267,7 @@ class LevantamentoDetalheScreenState extends State<LevantamentoDetalheScreen>
               ? InkWell(
                   child: IconButton(
                       onPressed: () {
-                        _downloadPdf();
+                        _downloadLevantamento();
                         // _levantamentoController.downloadLevantamentoAssinado(
                         //     context, widget.idLevantamento);
                       },

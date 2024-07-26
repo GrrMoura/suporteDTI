@@ -122,8 +122,9 @@ class _DelegaciaDetalheState extends State<DelegaciaDetalhe> {
                     future: _levantamentoFuture,
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const Center(
-                          child: SpinKitSpinningLines(
+                        return Padding(
+                          padding: EdgeInsets.only(top: 50.h),
+                          child: const SpinKitSpinningLines(
                               color: AppColors.contentColorBlue,
                               size: 120,
                               duration: Duration(milliseconds: 1500)),

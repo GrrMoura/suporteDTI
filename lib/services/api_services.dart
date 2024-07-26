@@ -1,5 +1,3 @@
-import 'dart:developer' as developer;
-
 class ApiServices {
   //produção
   static const String intranetUrl =
@@ -11,11 +9,7 @@ class ApiServices {
 
   // static const String sistema = "http://intradev.ssp.gov-se/api/SgiDtiv3/";
 
-  static String concatIntranetUrl(String url) {
-    developer.log("", name: "Serviço de API");
-
-    return intranetUrl + url;
-  }
+  static String concatIntranetUrl(String url) => intranetUrl + url;
 
   static String concatSGIUrl(String url) => sistema + url;
 }

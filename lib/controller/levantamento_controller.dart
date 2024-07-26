@@ -61,7 +61,9 @@ class LevantamentoController {
   }
 
   Future<String?> imprimirLevantamento(
-      bool assinado, BuildContext context, int idLevantamento) async {
+      {required bool assinado,
+      required BuildContext context,
+      required int idLevantamento}) async {
     await _verificarConexao(context);
 
     try {
@@ -72,13 +74,13 @@ class LevantamentoController {
         const uuid = Uuid();
         final fileName = '${uuid.v4()}.pdf';
 
-        final directory = await getExternalStorageDirectory();
-        final downloadDirectory = Directory('${directory?.path}/Download');
-        if (!await downloadDirectory.exists()) {
-          await downloadDirectory.create(recursive: true);
+        // final directory = await getExternalStorageDirectory();
+        final downloadsDirectory = Directory('/storage/emulated/0/Download');
+        if (!await downloadsDirectory.exists()) {
+          await downloadsDirectory.create(recursive: true);
         }
 
-        final filePath = '${downloadDirectory.path}/$fileName';
+        final filePath = '${downloadsDirectory.path}/$fileName';
         final file = File(filePath);
 
         final bytes = response.data is List<int>
@@ -86,7 +88,7 @@ class LevantamentoController {
             : utf8.encode(response.data);
 
         await file.writeAsBytes(bytes);
-        return fileName;
+        return filePath;
       } else {
         _tratarErro(context, response);
         return null;
@@ -124,26 +126,24 @@ class LevantamentoController {
     }
   }
 
-  Future<void> levantamentoCadastrarAssinado(
-    BuildContext context,
-    int idLevantamento,
-  ) async {
+  Future<void> levantamentoCadastrarAssinado({
+    required BuildContext context,
+    required int idLevantamento,
+  }) async {
     await _verificarConexao(context);
 
     FormData formData = FormData.fromMap({
       'idUsuarioAssinatura': 501,
       'dataAssinatura': '25/07/2024',
       'idLevantamento': idLevantamento,
-      'levantamentoAssinadoPdf': await MultipartFile.fromFile(pdfFile.path,
-          filename: 'levantamento.pdf'),
+      'levantamentoAssinadoPdf':
+          await MultipartFile.fromFile("", filename: 'levantamento.pdf'),
     });
     try {
       Response response =
           await LevantamentoService.cadastrarLevantamentoAssinado(formData);
 
       if (response.statusCode == 200) {
-        DetalheLevantamentoModel levantamentoModel =
-            DetalheLevantamentoModel.fromJson(response.data);
       } else {
         _tratarErro(context, response);
       }

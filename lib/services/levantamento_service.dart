@@ -42,9 +42,9 @@ class LevantamentoService {
 
   static Future<Response> imprimirLevantamento(int id, bool assinado) async {
     var idLevantamento = {'idLevantamento': id};
-    var url = assinado
-        ? ApiServices.concatSGIUrl("Levantamentos/ImprimirLevantamento")
-        : "LevantamentosAssinados/DownloadAnexo"; //TODO: TESTAR DOWLOAD ANEXO
+    var url = ApiServices.concatSGIUrl(assinado
+        ? "LevantamentosAssinados/DownloadAnexo"
+        : "Levantamentos/ImprimirLevantamento");
     var options = await AutenticacaoService.getCabecalhoRequisicao();
     var response = await RequestsServices.postOptionsByteResponse(
         url: url, data: idLevantamento, options: options);

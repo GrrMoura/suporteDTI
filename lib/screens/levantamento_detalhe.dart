@@ -1,12 +1,14 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'dart:io';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:suporte_dti/controller/levantamento_controller.dart';
 import 'package:suporte_dti/model/levantamento_detalhe.dart';
 import 'package:suporte_dti/screens/pdf_screen.dart';
@@ -33,12 +35,28 @@ class LevantamentoDetalheScreenState extends State<LevantamentoDetalheScreen>
   final LevantamentoController _levantamentoController =
       LevantamentoController();
   DetalheLevantamentoModel? _detalheLevantamento;
+  File? _selectedFile;
 
   @override
   void initState() {
     super.initState();
     _carregarDetalhesLevantamento();
   }
+
+  Future<void> _pickFile() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['pdf'],
+    );
+
+    if (result != null) {
+      setState(() {
+        _selectedFile = File(result.files.single.path!);
+      });
+    }
+  }
+
+  Future<void> _uploadFile() async {}
 
   @override
   Widget build(BuildContext context) {
@@ -54,9 +72,7 @@ class LevantamentoDetalheScreenState extends State<LevantamentoDetalheScreen>
           actions: [
             IconButton(
                 onPressed: () {
-                  widget.assinado
-                      ? _downloadLevantamentoAssinado()
-                      : _downloadLevantamento();
+                  _downloadLevantamento();
                 },
                 icon: const Icon(Icons.download))
           ],
@@ -116,7 +132,9 @@ class LevantamentoDetalheScreenState extends State<LevantamentoDetalheScreen>
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Text(
-            'Cadastrar Levantamento Assinado ',
+            _selectedFile == null
+                ? 'Cadastrar Levantamento Assinados'
+                : 'Arquivo selecionado: ${_selectedFile!.path}',
             style: TextStyle(
                 fontWeight: FontWeight.bold,
                 color: AppColors.cSecondaryColor,
@@ -125,7 +143,8 @@ class LevantamentoDetalheScreenState extends State<LevantamentoDetalheScreen>
           InkWell(
             child: IconButton(
                 onPressed: () {
-                  _downloadLevantamento();
+                  debugPrint("apertei adqui");
+                  _pickFile();
                 },
                 icon: Icon(
                   Icons.upload,
@@ -138,70 +157,21 @@ class LevantamentoDetalheScreenState extends State<LevantamentoDetalheScreen>
   }
 
   Future<void> _downloadLevantamento() async {
-    _openPdf('');
-    // try {
-    //   var status = await Permission.storage.request();
-    //   if (!status.isGranted) {
-    //     ScaffoldMessenger.of(context).showSnackBar(
-    //       const SnackBar(
-    //         content: Text('Permissão de armazenamento negada.'),
-    //       ),
-    //     );
-    //     return;
-    //   }
-
-    //   // Inicia o download do PDF
-    //   final fileName = await _levantamentoController.imprimirLevantamento(
-    //       context, widget.idLevantamento);
-
-    //   // Suponha que o arquivo foi salvo no diretório de downloads
-
-    //   if (fileName != null) {
-    //     // Use o nome do arquivo retornado
-    //     final directory = await getExternalStorageDirectory();
-    //     final filePath =
-    //         '${directory?.path}/Download/$fileName'; // Caminho completo do arquivo
-
-    //     if (await File(filePath).exists()) {
-    //       _showDownloadOptions(filePath);
-    //     } else {
-    //       debugPrint('Arquivo não encontrado em: $filePath');
-    //     }
-    //   }
-    // } catch (e) {
-    //   ScaffoldMessenger.of(context).showSnackBar(
-    //     SnackBar(
-    //       content: Text('Erro ao fazer download do PDF: $e'),
-    //     ),
-    //   );
-    // }
-  }
-
-  Future<void> _downloadLevantamentoAssinado() async {
     try {
-      var status = await Permission.storage.request();
+      var status = await Permission.storage.status;
       if (!status.isGranted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Permissão de armazenamento negada.'),
-          ),
-        );
-        return;
+        await Permission.storage.request();
       }
 
-      // Inicia o download do PDF
-      final fileName = await _levantamentoController.imprimirLevantamento(
-          widget.assinado, context, widget.idLevantamento);
+      final filePath = await _levantamentoController.imprimirLevantamento(
+          context: context,
+          idLevantamento: widget.idLevantamento,
+          assinado: widget.assinado);
 
-      // Suponha que o arquivo foi salvo no diretório de downloads
-
-      if (fileName != null) {
-        // Use o nome do arquivo retornado
-        final directory = await getExternalStorageDirectory();
-        final filePath =
-            '${directory?.path}/Download/$fileName'; // Caminho completo do arquivo
-
+      if (filePath != null) {
         if (await File(filePath).exists()) {
+          SharedPreferences prefs = await SharedPreferences.getInstance();
+          prefs.setString("${widget.idLevantamento}", filePath);
           _openPdf(filePath);
         } else {
           debugPrint('Arquivo não encontrado em: $filePath');
@@ -263,20 +233,6 @@ class LevantamentoDetalheScreenState extends State<LevantamentoDetalheScreen>
             value,
             style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold),
           ),
-          label == "Nome do Arquivo"
-              ? InkWell(
-                  child: IconButton(
-                      onPressed: () {
-                        _downloadLevantamento();
-                        // _levantamentoController.downloadLevantamentoAssinado(
-                        //     context, widget.idLevantamento);
-                      },
-                      icon: Icon(
-                        Icons.download,
-                        size: 35.sp,
-                      )),
-                )
-              : Container()
         ],
       ),
     );

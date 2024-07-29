@@ -76,6 +76,8 @@ class AutenticacaoController {
     } else {
       if (response.data == null || response.data == '') {
         mensagemErro = response.statusMessage ?? 'Erro desconhecido';
+      } else if (response.statusCode == 500) {
+        mensagemErro = 'Erro ao acessar o servidor';
       } else {
         mensagemErro = response.data;
       }

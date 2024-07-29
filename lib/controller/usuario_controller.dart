@@ -45,23 +45,23 @@ class UsuarioController {
     }
   }
 
-  static Future<void> pegarDadosDoUsuarioPeloCpf(
+  static Future<Dados> pegarDadosDoUsuarioPeloCpf(
       BuildContext context, String cpf) async {
-    try {
-      await _verificarConexao(context);
+    await _verificarConexao(context);
 
-      Response response = await UsuarioService.pegarDadosPeloCpf(cpf);
-      if (response.statusCode == 200) {
-        if (response.data != null && response.data.isNotEmpty) {
-          SharedPreferences prefs = await SharedPreferences.getInstance();
+    Response response = await UsuarioService.pegarDadosPeloCpf(cpf);
+    if (response.statusCode == 200) {
+      if (response.data != null && response.data.isNotEmpty) {
+        var ativos = response.data['ativos'] as List<dynamic>;
+        var dados = Dados.fromList(ativos);
 
-          Dados.fromJson(response.data[0]);
-        }
+        return dados[0];
       } else {
-        _handleErrorResponse(context, response);
+        throw Exception('Nenhum usuário foi encontrado');
       }
-    } catch (e) {
-      // Tratamento de erro pode ser adicionado aqui
+    } else {
+      _handleErrorResponse(context, response);
+      throw Exception('Erro ao buscar dados do usuário.');
     }
   }
 

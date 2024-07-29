@@ -18,6 +18,7 @@ import 'package:suporte_dti/utils/app_mask.dart';
 import 'package:suporte_dti/utils/app_name.dart';
 import 'package:suporte_dti/utils/app_validator.dart';
 import 'package:suporte_dti/utils/snack_bar_generic.dart';
+import 'package:suporte_dti/viewModel/dados_usuario_view_model.dart';
 
 class LevantamentoDetalheScreen extends StatefulWidget {
   final int idLevantamento;
@@ -64,103 +65,165 @@ class LevantamentoDetalheScreenState extends State<LevantamentoDetalheScreen>
     }
   }
 
-  Future<void> _uploadFile(String path) async {
-    setState(() {
-      isEnviando = true;
-    });
-
+  Future<void> _uploadFile({required int idUsuario}) async {
     await _levantamentoController.levantamentoCadastrarAssinado(
-        context: context, idLevantamento: widget.idLevantamento, path: path);
-
-    setState(() {
-      _carregarDetalhesLevantamento();
-      isEnviando = false;
-    });
+        idUsuario: idUsuario,
+        context: context,
+        idLevantamento: widget.idLevantamento,
+        path: _selectedFile!.path);
   }
 
   Future<String?> showCpfDialog(BuildContext context) async {
     final TextEditingController cpfController = TextEditingController();
+    final TextEditingController nomeController = TextEditingController();
+    bool isEncontrado = false;
+    bool isOcupado = false;
+    bool isUploading = false;
 
-    String? cpf;
+    Dados? dados;
 
     return showDialog<String>(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20.0),
-          ),
-          backgroundColor: AppColors.cWhiteColor,
-          title: const Text(
-            'Usuário da Assinatura',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
+        return StatefulBuilder(
+            builder: (BuildContext context, StateSetter setState) {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20.0),
             ),
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Icon(
-                Icons.person,
-                color: AppColors.cSecondaryColor,
-                size: 40,
+            backgroundColor: AppColors.cWhiteColor,
+            title: const Text(
+              'Usuário da Assinatura',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
               ),
-              const SizedBox(height: 20),
-              TextFormField(
-                controller: cpfController,
-                inputFormatters: [MaskUtils.maskFormatterCpf()],
-                decoration: InputDecoration(
-                  hintText: 'CPF',
-                  hintStyle: const TextStyle(color: Colors.grey),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12.0),
-                    borderSide:
-                        const BorderSide(color: AppColors.cSecondaryColor),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12.0),
-                    borderSide:
-                        const BorderSide(color: AppColors.cSecondaryColor),
-                  ),
-                  contentPadding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.person,
+                    color: AppColors.cSecondaryColor, size: 40),
+                const SizedBox(height: 20),
+                isOcupado == true
+                    ? Padding(
+                        padding: EdgeInsets.symmetric(vertical: 4.h),
+                        child: Center(
+                          child: SpinKitSpinningLines(
+                              color: AppColors.contentColorBlue,
+                              size: 80.h,
+                              duration: const Duration(milliseconds: 1500)),
+                        ),
+                      )
+                    : Container(),
+                isEncontrado == true
+                    ? TextFormField(
+                        controller: nomeController,
+                        readOnly: true,
+                        decoration: InputDecoration(
+                          labelText: 'Nome do Usuário',
+                          labelStyle:
+                              TextStyle(color: Colors.grey, fontSize: 16.sp),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12.0),
+                            borderSide: const BorderSide(
+                                color: AppColors.cSecondaryColor),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12.0),
+                            borderSide: const BorderSide(
+                                color: AppColors.cSecondaryColor),
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 12),
+                        ),
+                      )
+                    : Container(),
+                SizedBox(
+                  height: 6.h,
                 ),
-              ),
+                TextFormField(
+                  controller: cpfController,
+                  inputFormatters: [MaskUtils.maskFormatterCpf()],
+                  decoration: InputDecoration(
+                    hintText: 'CPF',
+                    hintStyle: const TextStyle(color: Colors.grey),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12.0),
+                      borderSide:
+                          const BorderSide(color: AppColors.cSecondaryColor),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12.0),
+                      borderSide:
+                          const BorderSide(color: AppColors.cSecondaryColor),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 12),
+                  ),
+                ),
+              ],
+            ),
+            actions: <Widget>[
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text('Cancelar',
+                        style: TextStyle(color: Colors.red)),
+                  ),
+                  TextButton(
+                    onPressed: () async {
+                      if (Validador.cpfIsValid(cpfController.text)) {
+                        FocusScope.of(context).unfocus();
+                        setState(() {
+                          isOcupado = true;
+                        });
+                        dados =
+                            await UsuarioController.pegarDadosDoUsuarioPeloCpf(
+                                context,
+                                cpfController.text
+                                    .replaceAll(RegExp(r'\D'), ''));
+                        setState(() {
+                          nomeController.text = formatNome(dados!.nome!);
+                          isEncontrado = true;
+                          isOcupado = false;
+                        });
+                      } else {
+                        Generic.snackBar(
+                            context: context,
+                            mensagem: "CPF inválido.",
+                            duracao: 1,
+                            tipo: AppName.erro);
+                      }
+                    },
+                    child: const Text('Procurar',
+                        style: TextStyle(color: AppColors.cSecondaryColor)),
+                  ),
+                  isEncontrado == true
+                      ? TextButton(
+                          onPressed: () async {
+                            setState(() {
+                              isUploading = true;
+                            });
+                            await _uploadFile(idUsuario: dados!.id!);
+                            setState(() {
+                              isUploading = false;
+                            });
+                          },
+                          child: const Text('Continuar',
+                              style: TextStyle(color: Colors.green)),
+                        )
+                      : Container(), //TODO: COLCOAR PRA DAR LOADING AO CLICAR EM CONTINUAR E AO CLICAR FORA CANCELAR A REQUISICAO
+                ],
+              )
             ],
-          ),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(); // Fecha o diálogo sem retorno
-              },
-              child:
-                  const Text('Cancelar', style: TextStyle(color: Colors.red)),
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
-              onPressed: () async {
-                if (Validador.cpfIsValid(cpfController.text)) {
-                  var nome = UsuarioController.pegarDadosDoUsuarioPeloCpf(
-                          context,
-                          cpfController.text.replaceAll(RegExp(r'\D'), ''))
-                      .then((value) {});
-
-                  Navigator.of(context).pop(cpf);
-                } else {
-                  Generic.snackBar(
-                      context: context,
-                      mensagem: "CPF inválido.",
-                      duracao: 1,
-                      tipo: AppName.erro);
-                }
-              },
-              child:
-                  const Text('Procurar', style: TextStyle(color: Colors.white)),
-            ),
-          ],
-        );
+          );
+        });
       },
     );
   }
@@ -299,7 +362,6 @@ class LevantamentoDetalheScreenState extends State<LevantamentoDetalheScreen>
                     ),
                     onPressed: () {
                       showCpfDialog(context);
-                      //  _uploadFile(_selectedFile!.path);
                     },
                   ),
                 )
@@ -309,10 +371,31 @@ class LevantamentoDetalheScreenState extends State<LevantamentoDetalheScreen>
     );
   }
 
+  String formatNome(String nome) {
+    List<String> partes = nome.split(' ');
+
+    if (partes.length <= 2) {
+      return nome;
+    }
+
+    String primeiroNome = partes.first;
+    String ultimoNome = partes.last;
+
+    List<String> iniciais = [];
+    for (int i = 1; i < partes.length - 1; i++) {
+      if (partes[i].length > 1 &&
+          !['de', 'da', 'dos', 'do'].contains(partes[i].toLowerCase())) {
+        iniciais.add('${partes[i][0]}.');
+      }
+    }
+
+    return '$primeiroNome ${iniciais.join(' ')} $ultimoNome';
+  }
+
   String pegarNome(String filePath) {
     List<String> parts = filePath.split('/');
-    String fileName = parts.last; // Obter a última parte do caminho
-    return fileName.split('.').first; // Remover a extensão .pdf
+    String fileName = parts.last;
+    return fileName.split('.').first;
   }
 
   Future<void> _downloadLevantamento() async {

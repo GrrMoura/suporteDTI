@@ -7,7 +7,6 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:suporte_dti/data/sqflite_helper.dart';
 import 'package:suporte_dti/model/levantamento_cadastrados_model.dart';
@@ -131,11 +130,10 @@ class LevantamentoController {
   Future<void> levantamentoCadastrarAssinado(
       {required BuildContext context,
       required int idLevantamento,
+      required int idUsuario,
       required String path}) async {
     await _verificarConexao(context);
 
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    int idUsuario = prefs.getInt('idUsuario') ?? 0;
     String data = DateFormat('dd/MM/yyyy').format(DateTime.now());
 
     String nomePDF = separarNome(path);

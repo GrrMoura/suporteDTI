@@ -1,11 +1,8 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'dart:io';
-import 'dart:nativewrappers/_internal/vm/lib/ffi_allocation_patch.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:intl/intl.dart';
@@ -106,15 +103,16 @@ class LevantamentoDetalheScreenState extends State<LevantamentoDetalheScreen>
             mainAxisSize: MainAxisSize.min,
             children: [
               const Icon(
-                Icons.business,
+                Icons.person,
                 color: AppColors.cSecondaryColor,
                 size: 40,
               ),
               const SizedBox(height: 20),
               TextFormField(
+                controller: cpfController,
                 inputFormatters: [MaskUtils.maskFormatterCpf()],
                 decoration: InputDecoration(
-                  hintText: 'Informe o setor',
+                  hintText: 'CPF',
                   hintStyle: const TextStyle(color: Colors.grey),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12.0),
@@ -141,12 +139,12 @@ class LevantamentoDetalheScreenState extends State<LevantamentoDetalheScreen>
                   const Text('Cancelar', style: TextStyle(color: Colors.red)),
             ),
             ElevatedButton(
-              //TODO: AQUI
               style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
               onPressed: () async {
                 if (Validador.cpfIsValid(cpfController.text)) {
-                  String nome = UsuarioController.pegarDadosDoUsuarioPeloCpf(
-                          context, cpfController.text)
+                  var nome = UsuarioController.pegarDadosDoUsuarioPeloCpf(
+                          context,
+                          cpfController.text.replaceAll(RegExp(r'\D'), ''))
                       .then((value) {});
 
                   Navigator.of(context).pop(cpf);
@@ -207,39 +205,46 @@ class LevantamentoDetalheScreenState extends State<LevantamentoDetalheScreen>
   }
 
   Widget _buildDetalhes() {
+    double height = MediaQuery.of(context).size.height;
     final detalhes = _detalheLevantamento!.detalhes!;
 
     return Padding(
       padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          widget.assinado
-              ? _buildInfoRow('Nome do Arquivo', widget.nomeArquivo)
-              : _buildIUploadRow(),
-          SizedBox(height: 16.h),
-          _buildInfoRow('Data Levantamento',
-              DateFormat('dd/MM/yyyy').format(detalhes.dataLevantamento!)),
-          SizedBox(height: 30.h),
-          Text(
-            'Equipamentos Levantados',
-            style: TextStyle(
-                fontSize: 18.sp,
-                fontWeight: FontWeight.bold,
-                color: AppColors.cSecondaryColor),
+      child: SizedBox(
+        height: height - kToolbarHeight,
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              widget.assinado
+                  ? _buildInfoRow('Nome do Arquivo', widget.nomeArquivo)
+                  : _buildIUploadRow(),
+              SizedBox(height: 16.h),
+              _buildInfoRow('Data Levantamento',
+                  DateFormat('dd/MM/yyyy').format(detalhes.dataLevantamento!)),
+              SizedBox(height: 30.h),
+              Text(
+                'Equipamentos Levantados',
+                style: TextStyle(
+                    fontSize: 18.sp,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.cSecondaryColor),
+              ),
+              SizedBox(height: 12.h),
+              SizedBox(
+                height: 250.h,
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: detalhes.equipamentosLevantados!.length,
+                  itemBuilder: (context, index) {
+                    final equipamento = detalhes.equipamentosLevantados![index];
+                    return _buildEquipamentoTile(equipamento);
+                  },
+                ),
+              ),
+            ],
           ),
-          SizedBox(height: 12.h),
-          Expanded(
-            child: ListView.builder(
-              shrinkWrap: true,
-              itemCount: detalhes.equipamentosLevantados!.length,
-              itemBuilder: (context, index) {
-                final equipamento = detalhes.equipamentosLevantados![index];
-                return _buildEquipamentoTile(equipamento);
-              },
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -293,7 +298,8 @@ class LevantamentoDetalheScreenState extends State<LevantamentoDetalheScreen>
                       style: TextStyle(color: Colors.white),
                     ),
                     onPressed: () {
-                      _uploadFile(_selectedFile!.path);
+                      showCpfDialog(context);
+                      //  _uploadFile(_selectedFile!.path);
                     },
                   ),
                 )

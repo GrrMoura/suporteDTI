@@ -19,18 +19,12 @@ class UsuarioController {
 
       Response response = await UsuarioService.resetarSenha(model);
 
-      if (response.statusCode != 200) {
+      if (response.statusCode == 200) {
+        return Generic.snackBar(
+            context: context,
+            mensagem: "Uma nova senha foi enviada para seu e-mail");
+      } else {
         _handleErrorResponse(context, response);
-        return;
-      }
-
-      model.esqueceuSenha = false;
-      if (context.mounted) {
-        Generic.snackBar(
-          context: context,
-          mensagem:
-              "Instruções e uma nova senha foram enviadas para o e-mail ${model.email!.toLowerCase()}",
-        );
       }
     } catch (e) {
       // Tratamento de erro pode ser adicionado aqui
@@ -57,10 +51,15 @@ class UsuarioController {
       await _verificarConexao(context);
 
       Response response = await UsuarioService.pegarDadosPeloCpf(cpf);
+      if (response.statusCode == 200) {
+        if (response.data != null && response.data.isNotEmpty) {
+          SharedPreferences prefs = await SharedPreferences.getInstance();
 
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-
-      Dados.fromJson(response.data).setDados(prefs);
+          Dados.fromJson(response.data[0]);
+        }
+      } else {
+        _handleErrorResponse(context, response);
+      }
     } catch (e) {
       // Tratamento de erro pode ser adicionado aqui
     }
@@ -78,21 +77,31 @@ class UsuarioController {
   }
 
   static void _handleErrorResponse(BuildContext context, Response response) {
-    if (response.statusCode == 422) {
-      Generic.snackBar(
-          context: context,
-          mensagem:
-              "Erro - Os dados informados não conferem com os dados cadastrados.");
-    } else if (response.statusCode == 401) {
+    String mensagemErro;
+    if (response.statusCode == 401) {
       Generic.snackBar(
         context: context,
         mensagem: "Usuário não autenticado ou token encerrado",
       );
+      // Future.delayed(const Duration(seconds: 3)) TODO: TSTAR SE AINDA DÁ ERRO MESMO SEM O FUTURE
+      //     .then((_) => {context.goNamed(AppRouterName.login)});
       context.goNamed(AppRouterName.login);
-    } else {
-      Generic.snackBar(
-          context: context, mensagem: "Erro - ${response.data[0]}");
     }
+    if (response.data is List) {
+      if (response.data.isNotEmpty && response.data[0] != null) {
+        mensagemErro = response.data[0];
+      } else {
+        mensagemErro = response.statusMessage ?? 'Erro desconhecido';
+      }
+    } else {
+      if (response.data == null || response.data == '') {
+        mensagemErro = response.statusMessage ?? 'Erro desconhecido';
+      } else {
+        mensagemErro = response.data;
+      }
+    }
+
+    return Generic.snackBar(context: context, mensagem: mensagemErro);
   }
 }
 

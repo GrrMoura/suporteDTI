@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:suporte_dti/controller/usuario_controller.dart';
 import 'package:suporte_dti/navegacao/app_screens_path.dart';
+import 'package:suporte_dti/screens/widgets/loading_default.dart';
 import 'package:suporte_dti/utils/app_colors.dart';
 import 'package:suporte_dti/utils/app_dimens.dart';
 import 'package:suporte_dti/utils/app_mask.dart';
@@ -25,7 +27,7 @@ class _RecuperarSenhaState extends State<RecuperarSenha> {
   TextEditingController dtNascimentoCtrl = TextEditingController();
   TextEditingController emailCtrl = TextEditingController();
   ResetarSenhaViewModel model = ResetarSenhaViewModel();
-
+  bool isOcupado = false;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -58,74 +60,78 @@ class _RecuperarSenhaState extends State<RecuperarSenha> {
         ),
         elevation: 0,
       ),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.all(20.w),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            SizedBox(height: 40.h),
-            _buildTextField(
-              controller: cpfCtrl,
-              label: "CPF",
-              keyboardType: TextInputType.number,
-              formatter: MaskUtils.maskFormatterCpf(),
-            ),
-            SizedBox(height: 20.h),
-            _buildTextField(
-              controller: dtNascimentoCtrl,
-              label: "Data de Nascimento",
-              keyboardType: TextInputType.number,
-              formatter: MaskUtils.maskFormatterData(),
-            ),
-            SizedBox(height: 20.h),
-            _buildTextField(
-              controller: emailCtrl,
-              label: "E-mail Cadastrado",
-              keyboardType: TextInputType.emailAddress,
-            ),
-            SizedBox(height: 40.h),
-            ElevatedButton(
-              onPressed: () => _onContinuePressed(),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.cSecondaryColor,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                padding: EdgeInsets.symmetric(vertical: 15.h),
+      body: isOcupado == false
+          ? SingleChildScrollView(
+              padding: EdgeInsets.all(20.w),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  SizedBox(height: 40.h),
+                  _buildTextField(
+                    controller: cpfCtrl,
+                    label: "CPF",
+                    keyboardType: TextInputType.number,
+                    formatter: MaskUtils.maskFormatterCpf(),
+                  ),
+                  SizedBox(height: 20.h),
+                  _buildTextField(
+                    controller: dtNascimentoCtrl,
+                    label: "Data de Nascimento",
+                    keyboardType: TextInputType.number,
+                    formatter: MaskUtils.maskFormatterData(),
+                  ),
+                  SizedBox(height: 20.h),
+                  _buildTextField(
+                    controller: emailCtrl,
+                    label: "E-mail Cadastrado",
+                    keyboardType: TextInputType.emailAddress,
+                  ),
+                  SizedBox(height: 40.h),
+                  ElevatedButton(
+                    onPressed: () {
+                      _onContinuePressed();
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.cSecondaryColor,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      padding: EdgeInsets.symmetric(vertical: 15.h),
+                    ),
+                    child: Text(
+                      "Continuar",
+                      style: TextStyle(
+                        fontSize: 16.sp,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.cWhiteColor,
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 20.h),
+                  TextButton(
+                    onPressed: () {
+                      context.pop(AppRouterName.voltar);
+                    },
+                    style: TextButton.styleFrom(
+                      padding: EdgeInsets.symmetric(vertical: 15.h),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                        side: const BorderSide(color: Colors.red),
+                      ),
+                    ),
+                    child: Text(
+                      "Voltar",
+                      style: TextStyle(
+                        fontSize: 16.sp,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.red,
+                      ),
+                    ),
+                  ),
+                ],
               ),
-              child: Text(
-                "Continuar",
-                style: TextStyle(
-                  fontSize: 16.sp,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.cWhiteColor,
-                ),
-              ),
-            ),
-            SizedBox(height: 20.h),
-            TextButton(
-              onPressed: () {
-                context.pop(AppRouterName.voltar);
-              },
-              style: TextButton.styleFrom(
-                padding: EdgeInsets.symmetric(vertical: 15.h),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
-                  side: const BorderSide(color: Colors.red),
-                ),
-              ),
-              child: Text(
-                "Voltar",
-                style: TextStyle(
-                  fontSize: 16.sp,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.red,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
+            )
+          : const LoadingDefault(),
     );
   }
 
@@ -138,7 +144,7 @@ class _RecuperarSenhaState extends State<RecuperarSenha> {
     return TextFormField(
       controller: controller,
       keyboardType: keyboardType,
-      inputFormatters: [formatter ?? FilteringTextInputFormatter.digitsOnly],
+      inputFormatters: [formatter ?? MaskUtils.padrao()],
       decoration: InputDecoration(
         labelText: label,
         labelStyle:
@@ -165,17 +171,17 @@ class _RecuperarSenhaState extends State<RecuperarSenha> {
       email: emailCtrl.text,
     );
     if (result == "OK") {
+      setState(() {
+        isOcupado = true;
+      });
       model.cpf = cpfCtrl.text;
       model.dataNascimento = dtNascimentoCtrl.text;
       model.email = emailCtrl.text;
       model.esqueceuSenha = true;
-      UsuarioController.resetarSenha(context, model).then((value) {
-        Generic.snackBar(
-          context: context,
-          tipo: AppName.sucesso,
-          mensagem: 'Sua senha foi enviada para o e-mail ${emailCtrl.text}',
-        );
-        context.pop("value");
+      UsuarioController.resetarSenha(context, model);
+
+      setState(() {
+        isOcupado = false;
       });
     } else {
       Generic.snackBar(context: context, mensagem: result);

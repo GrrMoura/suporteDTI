@@ -38,15 +38,17 @@ class Dados {
       this.emailPessoal,
       this.dataNascimento});
 
-  Dados.fromJson(Map<String, dynamic> json) {
-    id = json['dados']['id'];
-    login = json['dados']['login'];
-    cpf = json['dados']['cpf'];
-    nome = json['dados']['nome'];
-    sexo = json['dados']['sexo'];
-    email = json['dados']['email'];
-    emailPessoal = json['dados']['emailPessoal'];
-    dataNascimento = json['dados']['dataNascimento'];
+  factory Dados.fromJson(Map<String, dynamic> json) {
+    return Dados(
+      id: json['id'],
+      login: json['login'],
+      cpf: json['cpf'],
+      nome: json['nome'],
+      sexo: json['sexo'],
+      email: json['email'],
+      emailPessoal: json['emailPessoal'],
+      dataNascimento: json['dataNascimento'],
+    );
   }
 
   Map<String, dynamic> toJson() {

@@ -103,20 +103,16 @@ class LevantamentoDetalheScreenState extends State<LevantamentoDetalheScreen>
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(Icons.person,
-                    color: AppColors.cSecondaryColor, size: 40),
-                const SizedBox(height: 20),
-                isOcupado == true
-                    ? Padding(
-                        padding: EdgeInsets.symmetric(vertical: 4.h),
-                        child: Center(
-                          child: SpinKitSpinningLines(
-                              color: AppColors.contentColorBlue,
-                              size: 80.h,
-                              duration: const Duration(milliseconds: 1500)),
-                        ),
+                isUploading || isOcupado
+                    ? Center(
+                        child: SpinKitSpinningLines(
+                            color: AppColors.contentColorBlue,
+                            size: 80.h,
+                            duration: const Duration(milliseconds: 1500)),
                       )
-                    : Container(),
+                    : const Icon(Icons.person,
+                        color: AppColors.cSecondaryColor, size: 40),
+                const SizedBox(height: 20),
                 isEncontrado == true
                     ? TextFormField(
                         controller: nomeController,
@@ -204,7 +200,7 @@ class LevantamentoDetalheScreenState extends State<LevantamentoDetalheScreen>
                     child: const Text('Procurar',
                         style: TextStyle(color: AppColors.cSecondaryColor)),
                   ),
-                  isEncontrado == true
+                  isEncontrado
                       ? TextButton(
                           onPressed: () async {
                             setState(() {
@@ -295,7 +291,7 @@ class LevantamentoDetalheScreenState extends State<LevantamentoDetalheScreen>
               ),
               SizedBox(height: 12.h),
               SizedBox(
-                height: 250.h,
+                height: 450.h,
                 child: ListView.builder(
                   shrinkWrap: true,
                   itemCount: detalhes.equipamentosLevantados!.length,

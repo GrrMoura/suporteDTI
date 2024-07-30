@@ -7,7 +7,7 @@ import 'package:suporte_dti/viewModel/equipamento_view_model.dart';
 
 class EquipamentoService {
   static Future<Response> buscar(EquipamentoViewModel model) async {
-    var url = ApiServices.concatSGIUrl("Equipamentos/Cadastrados");
+    var url = ApiServices.concatSGIUrl("Equipamentos/Consultar");
 
     var options = await AutenticacaoService.getCabecalhoRequisicao();
 

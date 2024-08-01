@@ -6,8 +6,10 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:suporte_dti/controller/levantamento_controller.dart';
 import 'package:suporte_dti/data/sqflite_helper.dart';
+import 'package:suporte_dti/model/equipamento_model.dart';
 import 'package:suporte_dti/model/itens_equipamento_model.dart';
 import 'package:suporte_dti/model/levantamento_model.dart';
+import 'package:suporte_dti/navegacao/app_screens_path.dart';
 import 'package:suporte_dti/screens/widgets/custom_dialog.dart';
 import 'package:suporte_dti/utils/app_colors.dart';
 import 'package:suporte_dti/utils/app_dimens.dart';
@@ -132,12 +134,14 @@ class _ResumoLevantamentoState extends State<ResumoLevantamento> {
                       modelLevantamento.idUnidadeAdministrativa =
                           widget.idUnidade;
                       modelLevantamento.dataLevantamento = DateTime.now();
-                      LevantamentoController()
+                      await LevantamentoController()
                           .cadastrar(context, modelLevantamento);
+                      setState(() {});
+                      context.pop("ok");
                     } else {
                       Generic.snackBar(
                           context: context,
-                          mensagem: "Nenhum produto foi levantado");
+                          mensagem: "Nenhum equipamento foi levantado");
                     }
                   },
                   child: const Text(
@@ -251,16 +255,15 @@ class _ResumoLevantamentoState extends State<ResumoLevantamento> {
                               context: context, equipamento: equipamento);
                         },
                         icon: Icon(Icons.more_vert_outlined, size: 15.sp)),
-                  ],
+                  ], //TODO COLOCAR OS RESUMOS INDIVIDUAIS POR ID UNIDADE
                 ),
                 InkWell(
-                  onTap: () {
-                    Generic.snackBar(
-                        tipo: AppName.info,
-                        context: context,
-                        mensagem: "Vai para a tela DETALHE");
-                    //context.push(AppRouterName.detalhesEquipamento);
-                  },
+                  // onTap: () {
+                  //   // EquipamentoModel? model;
+                  //   // model?.idEquipamento = equipamento.idEquipamento;
+
+                  //   // context.push(AppRouterName.detalhesEquipamento,extra: equipamento);
+                  // },
                   child: Padding(
                     padding: EdgeInsets.only(right: 5.w, left: 5.w),
                     child: Row(
@@ -280,6 +283,7 @@ class _ResumoLevantamentoState extends State<ResumoLevantamento> {
                               Text(
                                 equipamento.patrimonioSead ?? "",
                                 style: Styles().hintTextStyle(),
+                                overflow: TextOverflow.ellipsis,
                               ),
                             ],
                           ),
@@ -325,7 +329,7 @@ class _ResumoLevantamentoState extends State<ResumoLevantamento> {
                   ),
                 ),
                 Padding(
-                  padding: EdgeInsets.only(left: 10.w, right: 10.w, top: 5.h),
+                  padding: EdgeInsets.only(left: 5.w, right: 10.w, top: 5.h),
                   child: Row(
                     children: [
                       Text(

@@ -13,6 +13,8 @@ class EquipamentoViewModel {
   String? descricao;
   int? idFabricante;
   int? idModelo;
+  bool? noAlmoxarifado;
+  String? tipoEquipamento;
 
   EquipamentoViewModel(
       {this.idTipoEquipamento,
@@ -24,6 +26,7 @@ class EquipamentoViewModel {
       this.paginacao,
       this.descricao,
       this.patrimonioSSP,
+      this.noAlmoxarifado,
       required this.itensEquipamentoModels});
 
   Map<String, dynamic> toJson() {
@@ -35,6 +38,19 @@ class EquipamentoViewModel {
     data['patrimonioSsp'] = patrimonioSSP;
     data['idFabricante'] = idFabricante;
     data['idModelo'] = idModelo;
+    data['descricao'] = descricao;
+
+    if (paginacao != null) {
+      data['paginacao'] = paginacao!.toJson();
+    }
+    return data;
+  }
+
+  Map<String, dynamic> toJsonTeste() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['descricao'] = descricao;
+    data['idUnidade'] = idUnidade;
+
     if (paginacao != null) {
       data['paginacao'] = paginacao!.toJson();
     }

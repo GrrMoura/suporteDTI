@@ -42,7 +42,7 @@ class _DelegaciaDetalheState extends State<DelegaciaDetalhe> {
   late Future<LevantamentocadastradoModel?> _levantamentoFuture;
   bool existemEquipamentos = false;
   bool isLoading = false;
-
+  int quantEquipamento = 0;
   final Map<int, bool> _isLoadingMap = {};
   double _levantamentoHeight = 450.h;
 
@@ -100,10 +100,7 @@ class _DelegaciaDetalheState extends State<DelegaciaDetalhe> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 SizedBox(
-                  child: Text(
-                    widget.nome,
-                    style: Styles().smallTextStyle(),
-                  ),
+                  child: Text(widget.nome, style: Styles().smallTextStyle()),
                 ),
               ],
             ),
@@ -140,12 +137,12 @@ class _DelegaciaDetalheState extends State<DelegaciaDetalhe> {
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              const Icon(Icons.search_off,
-                                  color: Colors.grey, size: 40),
+                              Icon(Icons.search_off,
+                                  color: Colors.grey, size: 35.sp),
                               Text(
                                 "Nenhum levantamento encontrado",
                                 style: TextStyle(
-                                  fontSize: 20.sp,
+                                  fontSize: 16.sp,
                                   color: Colors.grey,
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -193,7 +190,6 @@ class _DelegaciaDetalheState extends State<DelegaciaDetalhe> {
                                   .levantamentoAssinado?.usuarioAssinatura,
                             ),
                           );
-                          //TODO: CONSERTAR ISSO AQUI, MUITO POLUIDO
                         }
 
                         return SingleChildScrollView(
@@ -219,31 +215,34 @@ class _DelegaciaDetalheState extends State<DelegaciaDetalhe> {
                 Titulos(nome: formatEquipamentoInfo(widget.model!)),
               ],
             ),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20.w),
-              child: SizedBox(
-                height: 500.h,
-                child: GridView.builder(
-                  physics: const BouncingScrollPhysics(
-                      parent: AlwaysScrollableScrollPhysics()),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    mainAxisExtent: 220,
-                    mainAxisSpacing: 15,
-                    crossAxisSpacing: 15,
-                  ),
-                  controller: _scrollCtrl,
-                  itemCount:
-                      widget.model?.itensEquipamentoModels.equipamentos.length,
-                  itemBuilder: (BuildContext ctxt, int index) {
-                    return _buildCard(
-                        widget
-                            .model!.itensEquipamentoModels.equipamentos[index],
-                        index);
-                  },
-                ),
-              ),
-            ),
+            quantEquipamento > 0
+                ? Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 20.w),
+                    child: SizedBox(
+                      height: 500.h,
+                      child: GridView.builder(
+                        physics: const BouncingScrollPhysics(
+                            parent: AlwaysScrollableScrollPhysics()),
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          mainAxisExtent: 220,
+                          mainAxisSpacing: 15,
+                          crossAxisSpacing: 15,
+                        ),
+                        controller: _scrollCtrl,
+                        itemCount: widget
+                            .model?.itensEquipamentoModels.equipamentos.length,
+                        itemBuilder: (BuildContext ctxt, int index) {
+                          return _buildCard(
+                              widget.model!.itensEquipamentoModels
+                                  .equipamentos[index],
+                              index);
+                        },
+                      ),
+                    ),
+                  )
+                : Container(),
           ],
         ),
       ),
@@ -333,9 +332,25 @@ class _DelegaciaDetalheState extends State<DelegaciaDetalhe> {
           _levantamentoHeight = (230.h);
         });
       } else if (levantamento.cadastrados!.length <= 2) {
-        setState(() {
-          _levantamentoHeight = 280.h;
-        });
+        if (quantEquipamento == 0) {
+          setState(() {
+            _levantamentoHeight = 450.h;
+          });
+        } else {
+          setState(() {
+            _levantamentoHeight = 280.h;
+          });
+        }
+      } else {
+        if (quantEquipamento > 0) {
+          setState(() {
+            _levantamentoHeight = 280.h;
+          });
+        } else {
+          setState(() {
+            _levantamentoHeight = 450.h;
+          });
+        }
       }
       return levantamento;
     } catch (e) {
@@ -351,7 +366,10 @@ class _DelegaciaDetalheState extends State<DelegaciaDetalhe> {
       _levantamentoModel.idUnidadeAdministrativa = widget.model!.idUnidade;
       await _equipamentoCtlr.buscarEquipamentos(context, widget.model!);
 
-      setState(() {});
+      setState(() {
+        quantEquipamento =
+            widget.model?.itensEquipamentoModels.equipamentos.length ?? 0;
+      });
     } catch (e) {
       debugPrint("erro $e");
     }
@@ -374,16 +392,14 @@ class _DelegaciaDetalheState extends State<DelegaciaDetalhe> {
   }
 
   Widget _buildCard(ItemEquipamento item, int index) {
-    bool isLoading = _isLoadingMap[index] ??
-        false; // Verifica se está carregando para o índice atual
+    bool isLoading = _isLoadingMap[index] ?? false;
 
     return InkWell(
       onTap: () async {
-        if (_isLoadingMap[index] == true) return; // Evita múltiplas execuções
+        if (_isLoadingMap[index] == true) return;
 
         setState(() {
-          _isLoadingMap[index] =
-              true; // Ativa o indicador de carregamento para o índice atual
+          _isLoadingMap[index] = true;
         });
 
         try {
@@ -392,8 +408,7 @@ class _DelegaciaDetalheState extends State<DelegaciaDetalhe> {
           debugPrint("Erro ao buscar equipamento por ID: $e");
         } finally {
           setState(() {
-            _isLoadingMap[index] =
-                false; // Desativa o indicador de carregamento para o índice atual após a resposta
+            _isLoadingMap[index] = false;
           });
         }
       },
@@ -524,7 +539,7 @@ class Titulos extends StatelessWidget {
   }
 }
 
-class DelegaciasCardLevantamento extends StatelessWidget {
+class DelegaciasCardLevantamento extends StatefulWidget {
   const DelegaciasCardLevantamento(
       {super.key,
       this.assinado,
@@ -550,16 +565,28 @@ class DelegaciasCardLevantamento extends StatelessWidget {
   final String? nomeAssinado;
 
   @override
+  State<DelegaciasCardLevantamento> createState() =>
+      _DelegaciasCardLevantamentoState();
+}
+
+class _DelegaciasCardLevantamentoState
+    extends State<DelegaciasCardLevantamento> {
+  @override
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () async {
-        if (delegacia == "Resumo") {
-          context.push(AppRouterName.resumoLevantamento, extra: idUnidade);
+        if (widget.delegacia == "Resumo") {
+          var result = await context.push(AppRouterName.resumoLevantamento,
+              extra: widget.idUnidade);
+
+          if (result == "ok") {
+            setState(() {});
+          }
         } else {
           context.push(AppRouterName.levantamentoDetalheScreen, extra: {
-            'idLevantamento': idLevantamento,
-            "nomeArquivo": nomeArquivo ?? "",
-            'assinado': assinado ?? false
+            'idLevantamento': widget.idLevantamento,
+            "nomeArquivo": widget.nomeArquivo ?? "",
+            'assinado': widget.assinado ?? false
           });
         }
       },
@@ -568,7 +595,7 @@ class DelegaciasCardLevantamento extends StatelessWidget {
         child: Material(
           borderRadius: BorderRadius.circular(20),
           elevation: 5,
-          color: delegacia == "Resumo"
+          color: widget.delegacia == "Resumo"
               ? AppColors.cSecondaryColor.withOpacity(0.6)
               : AppColors.cSecondaryColor,
           child: Column(
@@ -580,9 +607,9 @@ class DelegaciasCardLevantamento extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      delegacia == "Resumo"
+                      widget.delegacia == "Resumo"
                           ? "Resumo"
-                          : "Quantidade de Equipamento # $quantEquipamento",
+                          : "Quantidade de Equipamento # ${widget.quantEquipamento}",
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 15.sp,
@@ -598,37 +625,39 @@ class DelegaciasCardLevantamento extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "Data: ${formatarData(data)}",
+                      "Data: ${formatarData(widget.data)}",
                       style: TextStyle(
                         color: Colors.white.withOpacity(0.8),
                         fontSize: 16.sp,
                       ),
                     ),
                     SizedBox(height: 8.h),
-                    delegacia == "Resumo"
+                    widget.delegacia == "Resumo"
                         ? Container()
                         : Text(
-                            "Levantado por ${formatarNome(nome)}",
+                            "Levantado por ${formatarNome(widget.nome)}",
                             style: TextStyle(
                               color: Colors.white.withOpacity(0.8),
                               fontSize: 16.sp,
                             ),
                           ),
-                    assinado == true
+                    widget.assinado == true
                         ? Padding(
                             padding: EdgeInsets.only(top: 10.h),
                             child: Text(
-                              "Assinado: $nomeAssinado",
+                              "Assinado: ${widget.nomeAssinado}",
                               style: TextStyle(color: Colors.grey[400]),
                             ),
                           )
-                        : Padding(
-                            padding: EdgeInsets.only(top: 10.h),
-                            child: Text(
-                              "Não assinado",
-                              style: TextStyle(color: Colors.grey[400]),
-                            ),
-                          ),
+                        : widget.delegacia == "Resumo"
+                            ? Container()
+                            : Padding(
+                                padding: EdgeInsets.only(top: 10.h),
+                                child: Text(
+                                  "Não assinado",
+                                  style: TextStyle(color: Colors.grey[400]),
+                                ),
+                              ),
                   ],
                 ),
               ),

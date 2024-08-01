@@ -188,14 +188,12 @@ class _ResultadoEquipamentoConsultaScreenState
         style: Styles().mediumTextStyle(),
         keyboardType: TextInputType.visiblePassword,
         textInputAction: TextInputAction.search,
-        onChanged: (value) {
-          //  model!.patrimonioSSP = value;
-        },
         onFieldSubmitted: ((valor) async {
           if (valor.isNotEmpty) {
             if (context.mounted) {
               setState(() {
                 model!.itensEquipamentoModels.equipamentos = [];
+                model!.descricao = valor;
                 isLoading = true;
               });
 
@@ -235,72 +233,5 @@ class _ResultadoEquipamentoConsultaScreenState
         ),
       ),
     );
-  }
-
-  void validateInput(value) {
-    value = value.toUpperCase().replaceAll(' ', '');
-    if (RegExp(r'^[a-zA-Z]+$').hasMatch(value)) {
-      model!.idTipoEquipamento = value; // euqipamento
-    } else if (RegExp(r'^\d{1,7}$').hasMatch(value)) {
-      model!.patrimonioSSP = value;
-    } else if (RegExp(r'^SEAD\d+$').hasMatch(value)) {
-      model!.patrimonioSead = value.replaceAll(RegExp(r'^SEAD'), '');
-    } else if (RegExp(r'^[a-zA-Z0-9]+$').hasMatch(value)) {
-      model!.numeroSerie = value;
-    } else {
-      Generic.snackBar(context: context, mensagem: 'Padrão inválido');
-    }
-  }
-
-  Future<bool> checkConflict(BuildContext context, String input) async {
-    input = input.replaceAll(' ', '');
-    if (RegExp(r'^\d{1,7}$').hasMatch(input) &&
-        RegExp(r'^[a-zA-Z0-9]+$').hasMatch(input)) {
-      await showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            backgroundColor: AppColors.cWhiteColor,
-            title: const Text(
-              'Está entrada é ?',
-              textAlign: TextAlign.center,
-            ),
-            actions: <Widget>[
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
-                onPressed: () {
-                  Navigator.of(context).pop(AppName.patri);
-                },
-                child: Text(AppName.patri!,
-                    style: const TextStyle(color: AppColors.contentColorBlack)),
-              ),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
-                onPressed: () {
-                  Navigator.of(context).pop(AppName.nSerie);
-                },
-                child: Text(AppName.nSerie!,
-                    style: const TextStyle(color: AppColors.contentColorBlack)),
-              ),
-            ],
-          );
-        },
-      ).then((value) {
-        if (value != null) {
-          if (value == AppName.nSerie) {
-            model!.patrimonioSSP = "";
-            model!.numeroSerie = input;
-            model!.patrimonioSead = "";
-          } else {
-            model!.patrimonioSSP = input;
-            model!.numeroSerie = "";
-            model!.patrimonioSead = "";
-          }
-        } else {}
-      });
-      return true;
-    } else {
-      return false;
-    }
   }
 }

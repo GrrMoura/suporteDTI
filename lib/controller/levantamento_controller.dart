@@ -7,7 +7,6 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:suporte_dti/data/sqflite_helper.dart';
 import 'package:suporte_dti/model/levantamento_cadastrados_model.dart';
 import 'package:suporte_dti/model/levantamento_detalhe.dart';
@@ -27,7 +26,7 @@ class LevantamentoController {
     Response response = await LevantamentoService.cadastrar(model);
     if (response.statusCode == 200) {
       dbHelper.deleteAllEquipamentos();
-      context.pop("value");
+
       return Generic.snackBar(
           context: context,
           tipo: AppName.sucesso,
@@ -200,8 +199,7 @@ class LevantamentoController {
         context: context,
         mensagem: "Usuário não autenticado ou token encerrado",
       );
-      // Future.delayed(const Duration(seconds: 3)) TODO: TSTAR SE AINDA DÁ ERRO MESMO SEM O FUTURE
-      //     .then((_) => {context.goNamed(AppRouterName.login)});
+
       context.goNamed(AppRouterName.login);
     } else {
       if (response.data is List) {

@@ -70,7 +70,7 @@ class CustomDialog {
                 Navigator.of(context).pop(controller.text);
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.cErrorColor,
+                backgroundColor: AppColors.cSecondaryColor,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12.0),
                 ),

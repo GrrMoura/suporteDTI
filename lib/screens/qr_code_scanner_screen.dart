@@ -56,111 +56,150 @@ class _QrCodeScannerState extends State<QrCodeScanner> {
       width: 200,
       height: 200,
     );
-
     return Scaffold(
       appBar: AppBar(
-        iconTheme: const IconThemeData(color: Colors.white),
-        leading: IconButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            icon: const Icon(Icons.arrow_back_ios_new)),
-        title: Text("Scanner",
-            style: Styles().titleStyle().copyWith(
-                color: AppColors.cWhiteColor,
-                fontSize: 22.sp,
-                fontWeight: FontWeight.normal)),
-        centerTitle: true,
         backgroundColor: AppColors.cSecondaryColor,
+        automaticallyImplyLeading: false,
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Expanded(
-                child: Stack(
-              fit: StackFit.expand,
-              children: [
-                Center(
-                  child: MobileScanner(
-                    fit: BoxFit.contain,
-                    onDetect: onBarcodeDetect,
-                    overlay: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Align(
-                        alignment: Alignment.bottomCenter,
-                        child: Opacity(
-                          opacity: 0.7,
-                          child: Text(
-                            overlayText,
-                            style: const TextStyle(
-                              backgroundColor: Colors.black26,
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 24,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            maxLines: 1,
-                          ),
-                        ),
-                      ),
-                    ),
-                    controller: controller,
-                    scanWindow: scanWindow,
-                    errorBuilder: (context, error, child) {
-                      return ScannerErrorWidget(error: error);
-                    },
-                  ),
+      body: const Center(
+        child: Padding(
+          padding: EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              Icon(
+                Icons.construction,
+                size: 100,
+                color: AppColors.cSecondaryColor,
+              ),
+              SizedBox(height: 20),
+              Text(
+                'Método para QrCode em Construção',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
                 ),
-                CustomPaint(
-                  painter: ScannerOverlay(scanWindow),
+                textAlign: TextAlign.center,
+              ),
+              SizedBox(height: 20),
+              Text(
+                'Esta funcionalidade está atualmente em desenvolvimento.',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 16,
                 ),
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Align(
-                    alignment: Alignment.topLeft,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        ValueListenableBuilder<TorchState>(
-                          valueListenable: controller.torchState,
-                          builder: (context, value, child) {
-                            final Color iconColor;
-
-                            switch (value) {
-                              case TorchState.off:
-                                iconColor = Colors.black;
-                                break;
-                              case TorchState.on:
-                                iconColor = Colors.yellow;
-                                break;
-                            }
-
-                            return TextButton.icon(
-                              label: Text(
-                                "Lanterna",
-                                style: TextStyle(
-                                    color: Colors.black, fontSize: 15.sp),
-                              ),
-                              onPressed: () => controller.toggleTorch(),
-                              icon: Icon(
-                                Icons.flashlight_on,
-                                color: iconColor,
-                                size: 25.sp,
-                              ),
-                            );
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            )),
-          ],
+              ),
+            ],
+          ),
         ),
       ),
     );
+
+    // return Scaffold(
+    //   appBar: AppBar(
+    //     iconTheme: const IconThemeData(color: Colors.white),
+    //     leading: IconButton(
+    //         onPressed: () {
+    //           Navigator.of(context).pop();
+    //         },
+    //         icon: const Icon(Icons.arrow_back_ios_new)),
+    //     title: Text("Scanner",
+    //         style: Styles().titleStyle().copyWith(
+    //             color: AppColors.cWhiteColor,
+    //             fontSize: 22.sp,
+    //             fontWeight: FontWeight.normal)),
+    //     centerTitle: true,
+    //     backgroundColor: AppColors.cSecondaryColor,
+    //   ),
+    //   body: Center(
+    //     child: Column(
+    //       mainAxisAlignment: MainAxisAlignment.center,
+    //       children: <Widget>[
+    //         Expanded(
+    //             child: Stack(
+    //           fit: StackFit.expand,
+    //           children: [
+    //             Center(
+    //               child: MobileScanner(
+    //                 fit: BoxFit.contain,
+    //                 onDetect: onBarcodeDetect,
+    //                 overlay: Padding(
+    //                   padding: const EdgeInsets.all(16.0),
+    //                   child: Align(
+    //                     alignment: Alignment.bottomCenter,
+    //                     child: Opacity(
+    //                       opacity: 0.7,
+    //                       child: Text(
+    //                         overlayText,
+    //                         style: const TextStyle(
+    //                           backgroundColor: Colors.black26,
+    //                           color: Colors.white,
+    //                           fontWeight: FontWeight.bold,
+    //                           fontSize: 24,
+    //                           overflow: TextOverflow.ellipsis,
+    //                         ),
+    //                         maxLines: 1,
+    //                       ),
+    //                     ),
+    //                   ),
+    //                 ),
+    //                 controller: controller,
+    //                 scanWindow: scanWindow,
+    //                 errorBuilder: (context, error, child) {
+    //                   return ScannerErrorWidget(error: error);
+    //                 },
+    //               ),
+    //             ),
+    //             CustomPaint(
+    //               painter: ScannerOverlay(scanWindow),
+    //             ),
+    //             Padding(
+    //               padding: const EdgeInsets.all(16.0),
+    //               child: Align(
+    //                 alignment: Alignment.topLeft,
+    //                 child: Row(
+    //                   mainAxisAlignment: MainAxisAlignment.start,
+    //                   children: [
+    //                     ValueListenableBuilder<TorchState>(
+    //                       valueListenable: controller.torchState,
+    //                       builder: (context, value, child) {
+    //                         final Color iconColor;
+
+    //                         switch (value) {
+    //                           case TorchState.off:
+    //                             iconColor = Colors.black;
+    //                             break;
+    //                           case TorchState.on:
+    //                             iconColor = Colors.yellow;
+    //                             break;
+    //                         }
+
+    //                         return TextButton.icon(
+    //                           label: Text(
+    //                             "Lanterna",
+    //                             style: TextStyle(
+    //                                 color: Colors.black, fontSize: 15.sp),
+    //                           ),
+    //                           onPressed: () => controller.toggleTorch(),
+    //                           icon: Icon(
+    //                             Icons.flashlight_on,
+    //                             color: iconColor,
+    //                             size: 25.sp,
+    //                           ),
+    //                         );
+    //                       },
+    //                     ),
+    //                   ],
+    //                 ),
+    //               ),
+    //             ),
+    //           ],
+    //         )),
+    //       ],
+    //     ),
+    //   ),
+    // );
   }
 }
 

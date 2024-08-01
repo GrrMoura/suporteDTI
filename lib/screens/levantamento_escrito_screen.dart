@@ -334,7 +334,7 @@ class _LevantamentoDigitadoState extends State<LevantamentoDigitado> {
         keyboardType: TextInputType.visiblePassword,
         textInputAction: TextInputAction.search,
         onChanged: (value) {
-          model!.patrimonioSSP = value;
+          model!.descricao = value;
         },
         onFieldSubmitted: ((valor) async {
           if (valor.isNotEmpty) {
@@ -348,12 +348,6 @@ class _LevantamentoDigitadoState extends State<LevantamentoDigitado> {
 
               setState(() {
                 isLoading = false;
-                if (model!.itensEquipamentoModels.equipamentos.isEmpty) {
-                  Generic.snackBar(
-                      context: context,
-                      mensagem: "Não foi encontrado nenhum equipamento",
-                      tipo: AppName.info);
-                }
               });
             } else {
               Generic.snackBar(
@@ -364,7 +358,7 @@ class _LevantamentoDigitadoState extends State<LevantamentoDigitado> {
           } else {
             Generic.snackBar(
               context: context,
-              mensagem: "O campo \"pesquisa\" precisa ser preenchido!",
+              mensagem: "O campo precisa ser preenchido",
             );
           }
         }),
@@ -381,100 +375,6 @@ class _LevantamentoDigitadoState extends State<LevantamentoDigitado> {
       ),
     );
   }
-
-  Future<bool> checkConflict(BuildContext context, String input) async {
-    input = input.replaceAll(' ', '');
-    if (RegExp(r'^\d{1,7}$').hasMatch(input) &&
-        RegExp(r'^[a-zA-Z0-9]+$').hasMatch(input)) {
-      await showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20.0),
-            ),
-            backgroundColor: AppColors.cWhiteColor,
-            title: const Text(
-              'Esta entrada é?',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            content: const Icon(
-              Icons.help_outline,
-              color: AppColors.cSecondaryColor,
-              size: 40,
-            ),
-            actionsAlignment: MainAxisAlignment.center,
-            actions: <Widget>[
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12.0),
-                  ),
-                ),
-                onPressed: () {
-                  Navigator.of(context).pop(AppName.patri);
-                },
-                child: Text(
-                  AppName.patri!,
-                  style: const TextStyle(color: Colors.white),
-                ),
-              ),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.cSecondaryColor,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12.0),
-                  ),
-                ),
-                onPressed: () {
-                  Navigator.of(context).pop(AppName.nSerie);
-                },
-                child: Text(
-                  AppName.nSerie!,
-                  style: const TextStyle(color: Colors.white),
-                ),
-              ),
-            ],
-          );
-        },
-      ).then((value) {
-        if (value != null) {
-          if (value == AppName.nSerie) {
-            model!.patrimonioSSP = "";
-            model!.numeroSerie = input;
-            model!.patrimonioSead = "";
-          } else {
-            model!.patrimonioSSP = input;
-            model!.numeroSerie = "";
-            model!.patrimonioSead = "";
-          }
-        }
-      });
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  // void validateInput(value) {
-  //   value = value.toUpperCase().replaceAll(' ', '');
-  //   if (RegExp(r'^[a-zA-Z]+$').hasMatch(value)) {
-  //     model!.idTipoEquipamento = value; // euqipamento
-  //   } else if (RegExp(r'^\d{1,7}$').hasMatch(value)) {
-  //     model!.patrimonioSSP = value;
-  //   } else if (RegExp(r'^SEAD\d+$').hasMatch(value)) {
-  //     model!.patrimonioSead = value.replaceAll(RegExp(r'^SEAD'), '');
-  //   } else if (RegExp(r'^[a-zA-Z0-9]+$').hasMatch(value)) {
-  //     model!.numeroSerie = value;
-  //   } else {
-  //     Generic.snackBar(context: context, mensagem: 'Padrão inválido');
-  //   }
-  // }
 }
 
 class LinhaDescricaoLevantamento extends StatelessWidget {

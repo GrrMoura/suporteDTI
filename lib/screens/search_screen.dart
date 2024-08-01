@@ -129,7 +129,7 @@ class SearchScreenState extends State<SearchScreen> {
           keyboardType: TextInputType.visiblePassword,
           textInputAction: TextInputAction.search,
           onChanged: (value) {
-            model!.patrimonioSSP = value;
+            model!.descricao = value;
           },
           onFieldSubmitted: (value) async {
             if (value.isNotEmpty) {

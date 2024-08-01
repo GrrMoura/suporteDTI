@@ -214,7 +214,7 @@ class LevantamentoDetalheScreenState extends State<LevantamentoDetalheScreen>
                           child: const Text('Continuar',
                               style: TextStyle(color: Colors.green)),
                         )
-                      : Container(), //TODO: COLCOAR PRA DAR LOADING AO CLICAR EM CONTINUAR E AO CLICAR FORA CANCELAR A REQUISICAO
+                      : Container(),
                 ],
               )
             ],

@@ -7,9 +7,9 @@ class ItensEquipamentoModels {
   ItensEquipamentoModels({required this.equipamentos, this.paginacao});
 
   ItensEquipamentoModels.fromJson(Map<String, dynamic> json) {
-    if (json['cadastrados'] != null) {
+    if (json['ativos'] != null) {
       equipamentos = [];
-      json['cadastrados'].forEach((v) {
+      json['ativos'].forEach((v) {
         equipamentos.add(ItemEquipamento.fromJson(v));
       });
     }
@@ -21,7 +21,7 @@ class ItensEquipamentoModels {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     if (equipamentos != []) {
-      data['cadastrados'] = equipamentos.map((v) => v.toJson()).toList();
+      data['ativos'] = equipamentos.map((v) => v.toJson()).toList();
     }
     if (paginacao != null) {
       data['paginacao'] = paginacao?.toJson();

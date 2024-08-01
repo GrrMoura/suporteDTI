@@ -8,6 +8,7 @@ import 'package:suporte_dti/model/itens_equipamento_model.dart';
 import 'package:suporte_dti/navegacao/app_screens_path.dart';
 import 'package:suporte_dti/services/equipamento_service.dart';
 import 'package:suporte_dti/services/dispositivo_service.dart';
+import 'package:suporte_dti/utils/app_name.dart';
 import 'package:suporte_dti/utils/snack_bar_generic.dart';
 import 'package:suporte_dti/viewModel/equipamento_view_model.dart';
 
@@ -31,8 +32,13 @@ class EquipamentoController {
       Response responseConsulta = await EquipamentoService.buscar(model);
 
       if (responseConsulta.statusCode == 200) {
-        if (responseConsulta.data['cadastrados'].isNotEmpty) {
+        if (responseConsulta.data['ativos'].isNotEmpty) {
           _updateModelFromResponse(model, responseConsulta);
+        } else {
+          return Generic.snackBar(
+              context: context,
+              mensagem: "Não foi encontrado nenhum equipamento",
+              tipo: AppName.info);
         }
 
         return;

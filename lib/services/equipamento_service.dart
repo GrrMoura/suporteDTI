@@ -3,6 +3,7 @@ import 'package:suporte_dti/model/itens_equipamento_model.dart';
 import 'package:suporte_dti/services/api_services.dart';
 import 'package:suporte_dti/services/autenticacao_service.dart';
 import 'package:suporte_dti/services/requests_services.dart';
+import 'package:suporte_dti/viewModel/equipamento_verificado_view_model.dart';
 import 'package:suporte_dti/viewModel/equipamento_view_model.dart';
 
 class EquipamentoService {
@@ -26,5 +27,29 @@ class EquipamentoService {
         url: url, data: model.toJsonOnlyId(), options: options);
 
     return response;
+  }
+
+  static Future<Response> verificarEquipamentos(
+      EquipamentoVerificadoViewmodel model) async {
+    var url =
+        ApiServices.concatSGIUrl("Levantamentos/VerificarEquipamentosAlocados");
+
+    var options = await AutenticacaoService.getCabecalhoRequisicao();
+
+    var responseConsulta = await RequestsServices.postOptions(
+        url: url, data: model.toJson(), options: options);
+
+    return responseConsulta;
+  }
+
+  static Future<Response> movimentarEquipamentos(FormData formData) async {
+    var url = ApiServices.concatSGIUrl("Equipamentos/Movimentar");
+
+    var options = await AutenticacaoService.getCabecalhoRequisicao();
+
+    var responseConsulta = await RequestsServices.postOptions(
+        url: url, data: formData, options: options);
+
+    return responseConsulta;
   }
 }

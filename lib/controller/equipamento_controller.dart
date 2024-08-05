@@ -10,18 +10,14 @@ import 'package:suporte_dti/services/equipamento_service.dart';
 import 'package:suporte_dti/services/dispositivo_service.dart';
 import 'package:suporte_dti/utils/app_name.dart';
 import 'package:suporte_dti/utils/snack_bar_generic.dart';
+import 'package:suporte_dti/viewModel/equipamento_verificado_view_model.dart';
 import 'package:suporte_dti/viewModel/equipamento_view_model.dart';
 
 class EquipamentoController {
   Future<void> buscarEquipamentos(
       BuildContext context, EquipamentoViewModel model) async {
-    if (!await DispositivoServices.verificarConexao()) {
-      Generic.snackBar(
-        context: context,
-        mensagem: "Sem conexão com a internet.",
-      );
-      return;
-    }
+    await _verificarConexao(context);
+
     if (model.paginacao != null &&
         !model.paginacao!.seChegouAoFinalDaPagina(model.paginacao!.pagina!)) {
       model.paginacao!.pagina = model.paginacao!.setProximaPagina(
@@ -59,15 +55,55 @@ class EquipamentoController {
     model.paginacao = itensEquipamentoModel.paginacao;
   }
 
-  Future<void> buscarEquipamentoPorId(
-      BuildContext context, ItemEquipamento model) async {
-    if (!await DispositivoServices.verificarConexao()) {
+  Future<void> verificarEquipamento(
+      BuildContext context, EquipamentoVerificadoViewmodel model) async {
+    await _verificarConexao(context);
+
+    try {
+      Response responseConsulta =
+          await EquipamentoService.verificarEquipamentos(model);
+
+      if (responseConsulta.statusCode == 200) {
+        return;
+      }
+      _tratarErro(context, responseConsulta);
+    } catch (e) {
       Generic.snackBar(
         context: context,
-        mensagem: "Sem conexão com a internet.",
+        mensagem: "Erro inesperado:",
       );
-      return;
     }
+  }
+
+  Future<void> movimentarEquipamento(
+      BuildContext context, EquipamentoVerificadoViewmodel model) async {
+    await _verificarConexao(context);
+
+    try {
+      FormData formData = FormData.fromMap({
+        'idUnidadeAdministrativa': model.idUnidadeAdministrativa,
+        'idEquipamento': model.idEquipamento,
+        'descricao': model.descricao,
+      });
+
+      Response responseConsulta =
+          await EquipamentoService.movimentarEquipamentos(formData);
+
+      if (responseConsulta.statusCode == 200) {
+        return;
+      }
+      _tratarErro(context, responseConsulta);
+    } catch (e) {
+      Generic.snackBar(
+        context: context,
+        mensagem: "Erro inesperado:",
+      );
+    }
+  }
+
+  Future<void> buscarEquipamentoPorId(
+      BuildContext context, ItemEquipamento model) async {
+    await _verificarConexao(context);
 
     try {
       Response response = await EquipamentoService.buscarPorId(model);
@@ -86,6 +122,16 @@ class EquipamentoController {
         context: context,
         mensagem: "Erro inesperado: $e",
       );
+    }
+  }
+
+  Future<void> _verificarConexao(BuildContext context) async {
+    if (!await DispositivoServices.verificarConexao()) {
+      Generic.snackBar(
+        context: context,
+        mensagem: "Sem conexão com a internet.",
+      );
+      throw Exception("Sem conexão com a internet.");
     }
   }
 

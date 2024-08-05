@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:suporte_dti/controller/equipamento_controller.dart';
 import 'package:suporte_dti/controller/levantamento_controller.dart';
 import 'package:suporte_dti/data/sqflite_helper.dart';
 import 'package:suporte_dti/model/equipamento_model.dart';
@@ -16,6 +17,8 @@ import 'package:suporte_dti/utils/app_dimens.dart';
 import 'package:suporte_dti/utils/app_name.dart';
 import 'package:suporte_dti/utils/app_styles.dart';
 import 'package:suporte_dti/utils/snack_bar_generic.dart';
+import 'package:suporte_dti/viewModel/equipamento_verificado_view_model.dart';
+import 'package:suporte_dti/viewModel/equipamento_view_model.dart';
 
 class ResumoLevantamento extends StatefulWidget {
   const ResumoLevantamento({super.key, required this.idUnidade});
@@ -28,6 +31,8 @@ class _ResumoLevantamentoState extends State<ResumoLevantamento> {
   final DatabaseHelper dbHelper = DatabaseHelper();
   final LevantamentoModel modelLevantamento =
       LevantamentoModel(equipamentosLevantados: []);
+  EquipamentoVerificadoViewmodel equipamentoVerificadoViewmodel =
+      EquipamentoVerificadoViewmodel();
 
   @override
   Widget build(BuildContext context) {
@@ -129,13 +134,16 @@ class _ResumoLevantamentoState extends State<ResumoLevantamento> {
                   onPressed: () async {
                     int response = await dbHelper.getEquipamentosCount();
                     if (response > 0) {
-                      debugPrint(
-                          modelLevantamento.equipamentosLevantados.toString());
-                      modelLevantamento.idUnidadeAdministrativa =
-                          widget.idUnidade;
-                      modelLevantamento.dataLevantamento = DateTime.now();
-                      await LevantamentoController()
-                          .cadastrar(context, modelLevantamento);
+                      // equipamentoViewModel.descricao
+                      EquipamentoController().verificarEquipamento(
+                          context, equipamentoVerificadoViewmodel);
+                      // debugPrint(
+                      //     modelLevantamento.equipamentosLevantados.toString());
+                      // modelLevantamento.idUnidadeAdministrativa =
+                      //     widget.idUnidade;
+                      // modelLevantamento.dataLevantamento = DateTime.now();
+                      // await LevantamentoController()
+                      //     .cadastrar(context, modelLevantamento);
                       setState(() {});
                       context.pop("ok");
                     } else {

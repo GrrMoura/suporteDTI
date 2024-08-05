@@ -1,12 +1,13 @@
 class EquipamentoModel {
   int? idEquipamento;
+  String? descricao;
   int? idFabricante;
   int? idModelo;
-  int? idTipoEquipamento;
   String? modelo;
+  int? idTipoEquipamento;
+
   String? tipoEquipamento;
   String? dataCompra;
-
   String? numeroNotafiscal;
   String? numeroSerie;
   String? numeroSerieSo;
@@ -22,9 +23,11 @@ class EquipamentoModel {
   int? idUnidadedeAdministrativaDestino;
   String? unidadeAtual;
   String? descricaoUnidadeDestino;
-  String? descricao;
+  bool? comAssistenciaEmAberto;
+  bool? assistenciaMenos60Dias;
   String? numeroRegistro;
   String? numeroLacre;
+  bool? selecionado;
 
   EquipamentoModel(
       {this.descricao,
@@ -51,6 +54,9 @@ class EquipamentoModel {
       this.idTipoEquipamento,
       this.alocacoes,
       this.unidadeAtual,
+      this.assistenciaMenos60Dias,
+      this.comAssistenciaEmAberto,
+      this.selecionado,
       this.notaFiscal});
 
   EquipamentoModel.fromJson(Map<String, dynamic> json) {
@@ -85,19 +91,29 @@ class EquipamentoModel {
     numeroRegistro = json['numeroRegistro'];
     numeroLacre = json['numeroLacre'];
   }
-  // Map<String, dynamic> toJson() => {
-  //       'patrimonioSsp': patrimonioSsp,
-  //       'idModelo': idModelo,
-  //       'idTipoEquipamento': idTipoEquipamento,
-  //       'numeroSerie': numeroSerie,
-  //       "alocacoes": alocacoes,
-  //       "unidadeAtual": unidadeAtual,
-  //       "descricao": descricao,
-  //       "idUnidadedeAdministrativaDestino": idUnidadedeAdministrativaDestino,
-  //       "idEquipamento": idEquipamento,
-  //       "idFabricante": idFabricante,
-  //       "patrimonioSead": patrimonioSead,
-  //     };
+  Map<String, dynamic> toJson() {
+    return {
+      'idEquipamento': idEquipamento,
+      'descricao': descricao,
+      'idModelo': idModelo,
+      'modelo': modelo,
+      'tipoEquipamento': tipoEquipamento,
+      'dataCompra': dataCompra,
+      'numeroSerie': numeroSerie,
+      'numeroSerieSo': numeroSerieSo,
+      'enderecoIp': enderecoIp,
+      'patrimonioSead': patrimonioSead,
+      'patrimonioSsp': patrimonioSsp,
+      'descricaoSo': descricaoSo,
+      'fabricante': fabricante,
+      'comAssistenciaEmAberto': comAssistenciaEmAberto,
+      'assistenciaMenos60Dias': assistenciaMenos60Dias,
+      'alocacoes': alocacoes?.map((e) => e.toJson()).toList() ?? [],
+      'notaFiscal': notaFiscal,
+      'numeroLacre': numeroLacre,
+      'selecionado': selecionado,
+    };
+  }
 }
 
 class Alocacoes {

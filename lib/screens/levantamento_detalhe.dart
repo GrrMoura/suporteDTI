@@ -30,7 +30,7 @@ class LevantamentoDetalheScreen extends StatefulWidget {
       required this.idLevantamento,
       required this.nomeArquivo,
       required this.assinado});
-
+//TODO: AO FECHAR OU CONFIRMAR O LEVANTAMENTO FAZER ATUALIZAR A TELA
   @override
   LevantamentoDetalheScreenState createState() =>
       LevantamentoDetalheScreenState();

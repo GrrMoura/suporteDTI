@@ -6,7 +6,6 @@ import 'package:go_router/go_router.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:suporte_dti/navegacao/app_screens_path.dart';
 import 'package:suporte_dti/utils/app_colors.dart';
-import 'package:suporte_dti/utils/app_styles.dart';
 
 class QrCodeScanner extends StatefulWidget {
   const QrCodeScanner({super.key});

@@ -1,7 +1,5 @@
 // ignore_for_file: use_build_context_synchronously
 
-import 'dart:ffi';
-
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -14,7 +12,6 @@ import 'package:suporte_dti/services/equipamento_service.dart';
 import 'package:suporte_dti/services/dispositivo_service.dart';
 import 'package:suporte_dti/utils/app_name.dart';
 import 'package:suporte_dti/utils/snack_bar_generic.dart';
-import 'package:suporte_dti/viewModel/equipamento_verificado_view_model.dart';
 import 'package:suporte_dti/viewModel/equipamento_view_model.dart';
 
 class EquipamentoController {
@@ -84,10 +81,10 @@ class EquipamentoController {
     }
   }
 
-  Future<void> movimentarEquipamento({
+  Future<int> movimentarEquipamento({
     required BuildContext context,
     required String descricao,
-    required Int idUnidade,
+    required int idUnidade,
     required int idEquipamento,
   }) async {
     await _verificarConexao(context);
@@ -103,14 +100,16 @@ class EquipamentoController {
           await EquipamentoService.movimentarEquipamentos(formData);
 
       if (responseConsulta.statusCode == 200) {
-        return;
+        return 200;
       }
       _tratarErro(context, responseConsulta);
+      return 0;
     } catch (e) {
       Generic.snackBar(
         context: context,
         mensagem: "Erro inesperado:",
       );
+      return 0;
     }
   }
 

@@ -34,154 +34,156 @@ class _ResumoLevantamentoState extends State<ResumoLevantamento> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        iconTheme: const IconThemeData(color: Colors.white),
-        leading: IconButton(
-            onPressed: () {
-              Navigator.pop(context, "ola");
-            },
-            icon: const Icon(Icons.arrow_back_ios_new)),
-        title: Text("Resumo",
-            style: Styles().titleStyle().copyWith(
-                color: AppColors.cWhiteColor,
-                fontSize: 22.sp,
-                fontWeight: FontWeight.normal)),
-        centerTitle: true,
-        backgroundColor: AppColors.cSecondaryColor,
-      ),
+      appBar: _buildAppBar(context),
       body: ListView(
         children: [
           const Header(),
           LevantamentoAtual(dbHelper: dbHelper),
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 5.h),
-            child: Container(
-              height: 370.h,
-              decoration: BoxDecoration(
-                  color: AppColors.cSecondaryColor,
-                  borderRadius: BorderRadius.circular(20)),
-              child: ListView(
-                children: [
-                  SizedBox(
-                    height: 370.h,
-                    child: FutureBuilder(
-                        initialData: const [],
-                        future: dbHelper.getEquipamentos(),
-                        builder: (context, AsyncSnapshot<List> snapshot) {
-                          var data = snapshot.data;
-                          var datalength = data!.length;
-
-                          return datalength == 0
-                              ? Center(
-                                  child: Text(
-                                  "Levantamento ainda não iniciado",
-                                  style: Styles()
-                                      .mediumTextStyle()
-                                      .copyWith(color: Colors.white),
-                                ))
-                              : ListView.builder(
-                                  itemCount: datalength,
-                                  itemBuilder: (context, index) {
-                                    modelLevantamento.equipamentosLevantados ??=
-                                        [];
-
-                                    // Cria um novo EquipamentoLevantado com id e descricao
-                                    EquipamentoLevantado novoEquipamento =
-                                        EquipamentoLevantado(
-                                      idEquipamento: data[index].idEquipamento,
-                                      descricaoSala: data[index].setor,
-                                    );
-
-                                    // Adiciona o novo EquipamentoLevantado à lista de equipamentos do levantamento
-                                    modelLevantamento.equipamentosLevantados!
-                                        .add(novoEquipamento);
-
-                                    return cardEquipamento(
-                                      context: context,
-                                      index: index,
-                                      equipamento: data[index],
-                                    );
-                                  },
-                                );
-                        }),
-                  ),
-                ],
-              ),
-            ),
+            child: _buildEquipamentoContainer(),
           ),
-          Padding(
-            padding: EdgeInsets.only(bottom: 10.h),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                TextButton(
-                  onPressed: () {
-                    setState(() {
-                      showDiscardConfirmationDialog(context);
-                    });
-                  },
-                  child: const Text(
-                    'Descartar',
-                    style: TextStyle(color: AppColors.cErrorColor),
-                  ),
-                ),
-                ElevatedButton(
-                  style:
-                      ElevatedButton.styleFrom(backgroundColor: Colors.green),
-                  onPressed: () async {
-                    List<NaoAlocado> naoAlocado = [];
-                    int response = await dbHelper.getEquipamentosCount();
-                    if (response > 0) {
-                      modelLevantamento.idUnidadeAdministrativa =
-                          widget.unidade.id;
-                      modelLevantamento.nomeUnidade = widget.unidade.nome;
-                      modelLevantamento.unidade = widget.unidade;
-
-                      modelLevantamento.dataLevantamento = DateTime.now();
-                      naoAlocado = await EquipamentoController()
-                          .verificarEquipamento(context, modelLevantamento);
-
-                      if (naoAlocado.isNotEmpty) {
-                        mostrarEquipamentosNaoAlocados(context:context,equipamentos: naoAlocado, idUnidade:  widget.unidade.id!);
-                      }
-                      // debugPrint(
-                      //     modelLevantamento.equipamentosLevantados.toString());
-                      // modelLevantamento.idUnidadeAdministrativa =
-                      //     widget.idUnidade;
-                      // modelLevantamento.dataLevantamento = DateTime.now();
-                      // await LevantamentoController()
-                      // //     .cadastrar(context, modelLevantamento);
-                      // setState(() {});
-                      // context.pop("ok");
-                    } else {
-                      Generic.snackBar(
-                          context: context,
-                          mensagem: "Nenhum equipamento foi levantado");
-                    }
-                  },
-                  child: const Text(
-                    'Finalizar',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                ),
-              ],
-            ),
-          )
+          _buildRowBotoes(context),
         ],
       ),
     );
   }
 
+  Padding _buildRowBotoes(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.only(bottom: 10.h),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          TextButton(
+            onPressed: () {
+              setState(() {
+                showDiscardConfirmationDialog(context);
+              });
+            },
+            child: const Text(
+              'Descartar',
+              style: TextStyle(color: AppColors.cErrorColor),
+            ),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
+            onPressed: () async {
+              List<NaoAlocado> naoAlocado = [];
+              int response = await dbHelper.getEquipamentosCount();
+              if (response > 0) {
+                modelLevantamento.idUnidadeAdministrativa = widget.unidade.id;
+                modelLevantamento.nomeUnidade = widget.unidade.nome;
+                modelLevantamento.unidade = widget.unidade;
+
+                modelLevantamento.dataLevantamento = DateTime.now();
+                naoAlocado = await EquipamentoController()
+                    .verificarEquipamento(context, modelLevantamento);
+
+                // modelLevantamento.idUnidadeAdministrativa = widget.unidade.id;
+                // modelLevantamento.dataLevantamento = DateTime.now();
+                // LevantamentoController().cadastrar(context, modelLevantamento);
+
+                if (naoAlocado.isNotEmpty) {
+                  mostrarEquipamentosNaoAlocados(
+                      context: context,
+                      equipamentos: naoAlocado,
+                      idUnidade: widget.unidade.id!);
+                }
+              } else {
+                Generic.snackBar(
+                    context: context,
+                    mensagem: "Nenhum equipamento foi levantado");
+              }
+            },
+            child: const Text(
+              'Finalizar',
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  FutureBuilder<List<dynamic>> _buildEquipamentoContainer() {
+    return FutureBuilder(
+      initialData: const [],
+      future: dbHelper.getEquipamentos(),
+      builder: (context, AsyncSnapshot<List> snapshot) {
+        var data = snapshot.data;
+        var datalength = data!.length;
+
+        return Container(
+          height: datalength == 0 ? 300.h : 340.h,
+          decoration: BoxDecoration(
+              color: AppColors.cSecondaryColor,
+              borderRadius: BorderRadius.circular(20)),
+          child: datalength == 0
+              ? Center(
+                  child: Text(
+                    "Levantamento ainda não iniciado",
+                    style: Styles()
+                        .mediumTextStyle()
+                        .copyWith(color: Colors.white),
+                  ),
+                )
+              : ListView.builder(
+                  itemCount: datalength,
+                  itemBuilder: (context, index) {
+                    modelLevantamento.equipamentosLevantados ??= [];
+
+                    EquipamentoLevantado novoEquipamento = EquipamentoLevantado(
+                      idEquipamento: data[index].idEquipamento,
+                      descricaoSala: data[index].setor,
+                    );
+
+                    modelLevantamento.equipamentosLevantados!
+                        .add(novoEquipamento);
+
+                    return cardEquipamento(
+                      context: context,
+                      index: index,
+                      equipamento: data[index],
+                    );
+                  },
+                ),
+        );
+      },
+    );
+  }
+
+  AppBar _buildAppBar(BuildContext context) {
+    return AppBar(
+      iconTheme: const IconThemeData(color: Colors.white),
+      leading: IconButton(
+          onPressed: () {
+            Navigator.pop(context, "ola");
+          },
+          icon: const Icon(Icons.arrow_back_ios_new)),
+      title: Text("Resumo",
+          style: Styles().titleStyle().copyWith(
+              color: AppColors.cWhiteColor,
+              fontSize: 22.sp,
+              fontWeight: FontWeight.normal)),
+      centerTitle: true,
+      backgroundColor: AppColors.cSecondaryColor,
+    );
+  }
+
   Future<void> mostrarEquipamentosNaoAlocados(
-   { required BuildContext context,
-    required List<NaoAlocado> equipamentos,
-    required int idUnidade}
-  ) async {
+      {required BuildContext context,
+      required List<NaoAlocado> equipamentos,
+      required int idUnidade}) async {
+    bool alocado = false;
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Equipamentos Não Alocados'),
+          title: const Text(
+              'Esses equipamentos NÃO estão alocados a esta unidade:',
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
           content: StatefulBuilder(
             builder: (BuildContext context, StateSetter setState) {
               return SizedBox(
@@ -195,19 +197,69 @@ class _ResumoLevantamentoState extends State<ResumoLevantamento> {
                         itemBuilder: (context, index) {
                           final equipamento = equipamentos[index];
                           return Card(
-                            margin: EdgeInsets.symmetric(vertical: 4.0),
+                            color: AppColors.cWhiteColor,
+                            margin: EdgeInsets.symmetric(
+                                vertical: 5.h, horizontal: 8.w),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15.0),
+                            ),
+                            elevation: 4,
                             child: ListTile(
-                              title: Text(equipamento.descricao!),
-                              subtitle: Text(equipamento.descricaoUnidade!),
-                              trailing: TextButton(
-                                child: Text('Adicionar'),
-                                onPressed: () {
-                                  EquipamentoController().movimentarEquipamento(
-                                      context: context, descricao: equipamento.descricao??"",idEquipamento: equipamento.idEquipamento!, idUnidade: equipamento. );
-                                  setState(() {
-                                    print("Alocado");
-                                  });
-                                },
+                              contentPadding: const EdgeInsets.symmetric(
+                                  vertical: 8.0, horizontal: 16.0),
+                              leading: const Icon(
+                                Icons.devices,
+                                color: AppColors.cSecondaryColor,
+                              ),
+                              title: Text(
+                                equipamento.descricao!,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16.0,
+                                  color: AppColors.cSecondaryColor,
+                                ),
+                              ),
+                              subtitle: Text(
+                                equipamento.descricaoUnidade!,
+                                style: const TextStyle(
+                                  fontSize: 14.0,
+                                  color: AppColors.cSecondaryColor,
+                                ),
+                              ),
+                              trailing: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: AppColors.cSecondaryColor,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10.0),
+                                  ),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 12.0, vertical: 8.0),
+                                ),
+                                onPressed: alocado == true
+                                    ? null
+                                    : () async {
+                                        int result =
+                                            await EquipamentoController()
+                                                .movimentarEquipamento(
+                                          context: context,
+                                          descricao:
+                                              equipamento.descricao ?? "",
+                                          idEquipamento:
+                                              equipamento.idEquipamento!,
+                                          idUnidade: idUnidade,
+                                        );
+                                        if (result == 200) {
+                                          setState(() {
+                                            alocado = true;
+                                          });
+                                        }
+                                      },
+                                child: Text(
+                                  alocado == true ? "Alocado" : 'Alocar',
+                                  style: const TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold),
+                                ),
                               ),
                             ),
                           );
@@ -221,22 +273,26 @@ class _ResumoLevantamentoState extends State<ResumoLevantamento> {
           ),
           actions: <Widget>[
             TextButton(
-              child: Text('Fechar'),
+              child: const Text('Cancelar',
+                  style: TextStyle(color: AppColors.cErrorColor)),
               onPressed: () {
                 Navigator.of(context).pop();
               },
             ),
-            TextButton(
-              child: Text('Alocar'),
+            ElevatedButton(
               onPressed: () {
-                // Aqui você pode tratar a lógica para alocar os equipamentos
-                // Filtrar equipamentos alocados
-                // final equipamentosAlocados = equipamentos.where((e) => e.alocado).toList();
-
-                // Por exemplo, você pode enviar os equipamentos alocados para algum serviço ou processar conforme necessário
-
-                Navigator.of(context).pop(); // Fechar o diálogo
+                //    Navigator.of(context).pop();
               },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.cSecondaryColor,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12.0),
+                ),
+              ),
+              child: const Text(
+                'Salvar',
+                style: TextStyle(color: Colors.white),
+              ),
             ),
           ],
         );

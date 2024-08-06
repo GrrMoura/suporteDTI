@@ -43,6 +43,10 @@ class ItemEquipamento {
   String? tipoEquipamento;
   int? idFabricante;
   int? idModelo;
+  String? alocao;
+  bool? comAssistenciaEmAberto;
+  bool? assistenciaMenos60Dias;
+  String? numeroLacre;
 
   ItemEquipamento(
       {this.idEquipamento,
@@ -59,14 +63,18 @@ class ItemEquipamento {
       this.setor});
 
   ItemEquipamento.fromJson(Map<String, dynamic> json) {
-    patrimonioSsp = json['patrimonioSsp'];
     idEquipamento = json['idEquipamento'];
     descricao = json['descricao'];
+    patrimonioSsp = json['patrimonioSsp'];
+    alocao = json['alocacao'];
     fabricante = json['fabricante'];
     modelo = json['modelo'];
     tipoEquipamento = json['tipoEquipamento'];
     numeroSerie = json['numeroSerie'];
     patrimonioSead = json['patrimonioSead'] ?? "";
+    numeroLacre = json['numeroLacre'] ?? "";
+    assistenciaMenos60Dias = json['assistenciaMenos60Dias'];
+    comAssistenciaEmAberto = json['comAssistenciaEmAberto'];
   }
 
   Map<String, dynamic> toJson() {

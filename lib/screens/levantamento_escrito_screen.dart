@@ -14,7 +14,8 @@ import 'package:suporte_dti/utils/snack_bar_generic.dart';
 import 'package:suporte_dti/viewModel/equipamento_view_model.dart';
 
 class LevantamentoDigitado extends StatefulWidget {
-  const LevantamentoDigitado({super.key});
+  const LevantamentoDigitado(
+      {super.key}); //TODO: TRAZER O ID DELEGACIA  AQUI PARA SALVAR NO BANCO E TRAZER OS RESUMOS POR ID
 
   @override
   State<LevantamentoDigitado> createState() => _LevantamentoDigitadoState();
@@ -92,30 +93,27 @@ class _LevantamentoDigitadoState extends State<LevantamentoDigitado> {
                                 ? Colors.white
                                 : AppColors.cSecondaryColor,
                         borderRadius: BorderRadius.circular(20)),
-                    child: SizedBox(
-                      height: height - kToolbarHeight - 115.h,
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(
-                            horizontal: 10.w, vertical: 5.h),
-                        child: GridView.builder(
-                          physics: const BouncingScrollPhysics(
-                              parent: AlwaysScrollableScrollPhysics()),
-                          gridDelegate:
-                              const SliverGridDelegateWithFixedCrossAxisCount(
-                                  crossAxisCount: 1,
-                                  mainAxisExtent: 220,
-                                  mainAxisSpacing: 15,
-                                  crossAxisSpacing: 15),
-                          controller: _scrollController,
-                          itemCount:
-                              model?.itensEquipamentoModels.equipamentos.length,
-                          itemBuilder: (BuildContext ctxt, int index) {
-                            return cardEquipamentosRestulado(
-                                context,
-                                model!.itensEquipamentoModels
-                                    .equipamentos[index]);
-                          },
+                    child: Padding(
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.h),
+                      child: GridView.builder(
+                        physics: const BouncingScrollPhysics(
+                            parent: AlwaysScrollableScrollPhysics()),
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 1,
+                          mainAxisExtent: 250,
+                          mainAxisSpacing: 20,
                         ),
+                        controller: _scrollController,
+                        itemCount:
+                            model?.itensEquipamentoModels.equipamentos.length,
+                        itemBuilder: (BuildContext ctxt, int index) {
+                          return cardEquipamentosRestulado(
+                              context,
+                              model!
+                                  .itensEquipamentoModels.equipamentos[index]);
+                        },
                       ),
                     ),
                   ),
@@ -138,11 +136,11 @@ class _LevantamentoDigitadoState extends State<LevantamentoDigitado> {
               .then((value) {
             setState(() {});
           });
-        },
+        }, //TODO: COLOCAR BOTÃO PARA IR PAR RESUMO
         child: Material(
+          color: AppColors.cWhiteColor,
           elevation: 7,
-          borderRadius: BorderRadius.circular(10),
-          shadowColor: Colors.grey,
+          borderRadius: BorderRadius.circular(15),
           child: Padding(
             padding: EdgeInsets.all(3.w),
             child: Column(
@@ -152,7 +150,9 @@ class _LevantamentoDigitadoState extends State<LevantamentoDigitado> {
                   padding: EdgeInsets.only(left: 5.w, right: 5.w, top: 3.h),
                   child: Text(
                     item.tipoEquipamento!,
-                    style: Styles().mediumTextStyle(),
+                    style: Styles()
+                        .mediumTextStyle()
+                        .copyWith(fontWeight: FontWeight.bold, fontSize: 16.sp),
                   ),
                 ),
                 LinhaDescricaoLevantamento(
@@ -161,75 +161,88 @@ class _LevantamentoDigitadoState extends State<LevantamentoDigitado> {
                     informacao: item.fabricante, nome: "Fabricante"),
                 LinhaDescricaoLevantamento(
                     informacao: item.modelo, nome: "Modelo"),
-                item.patrimonioSead!.length <= 1 || item.patrimonioSead == ""
-                    ? Container()
-                    : LinhaDescricaoLevantamento(
-                        informacao: item.patrimonioSead, nome: "SEAD"),
-                item.numeroSerie != null
-                    ? Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 5.w),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text("N° Série: ", style: Styles().hintTextStyle()),
-                            Flexible(
-                              child: SizedBox(
-                                child: Text(
-                                  item.numeroSerie!,
-                                  style: Styles()
-                                      .smallTextStyle()
-                                      .copyWith(fontSize: 10.sp),
-                                ),
-                              ),
-                            )
-                          ],
+                item.patrimonioSead!.isNotEmpty
+                    ? LinhaDescricaoLevantamento(
+                        informacao: item.patrimonioSead, nome: "SEAD")
+                    : Container(),
+                item.numeroLacre!.isNotEmpty
+                    ? LinhaDescricaoLevantamento(
+                        informacao: item.numeroLacre, nome: "Lacre")
+                    : Container(),
+                item.numeroSerie != null && item.numeroSerie!.isNotEmpty
+                    ? LinhaDescricaoLevantamento(
+                        informacao: item.numeroSerie, nome: "N° Série")
+                    : Container(),
+                item.comAssistenciaEmAberto == true
+                    ? const Padding(
+                        padding: EdgeInsets.only(top: 8.0),
+                        child: Text(
+                          "Assistência técnica em aberto",
+                          style: TextStyle(
+                              color: AppColors.cErrorColor,
+                              fontWeight: FontWeight.bold),
                         ),
                       )
-                    : Container(),
-                ElevatedButton(
-                    style:
-                        ElevatedButton.styleFrom(backgroundColor: Colors.green),
-                    onPressed: () async {
-                      bool existe =
-                          await dbHelper.equipamentoExiste(item.idEquipamento!);
+                    : Padding(
+                        padding: const EdgeInsets.only(top: 8.0),
+                        child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                                backgroundColor: AppColors.cSecondaryColor,
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12)),
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 24, vertical: 12)),
+                            onPressed: () async {
+                              bool existe = await dbHelper
+                                  .equipamentoExiste(item.idEquipamento!);
 
-                      if (existe) {
-                        return Generic.snackBar(
-                            context: context,
-                            mensagem: "Equipamento já levantado.",
-                            duracao: 1,
-                            tipo: AppName.erro);
-                      } else {
-                        String? setor = await showSetorDialog(context);
-                        if (setor == "Cancelado" || setor == "") {
-                          return Generic.snackBar(
-                              context: context,
-                              mensagem: "É preciso definir um setor",
-                              duracao: 1,
-                              tipo: AppName.erro);
-                        } else {
-                          item.setor = setor;
-                          String x = await dbHelper.insertEquipamento(item);
+                              if (existe) {
+                                return Generic.snackBar(
+                                    context: context,
+                                    mensagem: "Equipamento já levantado.",
+                                    duracao: 1,
+                                    tipo: AppName.erro);
+                              } else {
+                                String? setor = await showSetorDialog(context);
+                                if (setor == "Cancelado" || setor!.isEmpty) {
+                                  return Generic.snackBar(
+                                      context: context,
+                                      mensagem: "É preciso definir um setor",
+                                      duracao: 1,
+                                      tipo: AppName.erro);
+                                } else {
+                                  item.setor = setor;
+                                  String x =
+                                      await dbHelper.insertEquipamento(item);
 
-                          if (x == AppName.sucesso!) {
-                            Generic.snackBar(
-                                context: context,
-                                mensagem: "Item adicionado ao levantamento.",
-                                duracao: 1,
-                                tipo: AppName.info);
-                          } else {
-                            Generic.snackBar(
-                                context: context,
-                                mensagem:
-                                    "Não foi possível adicionar o equipamento",
-                                duracao: 1,
-                                tipo: AppName.erro);
-                          }
-                        }
-                      }
-                    },
-                    child: const Text("Adicionar",
-                        style: TextStyle(color: Colors.white))),
+                                  if (x == AppName.sucesso!) {
+                                    Generic.snackBar(
+                                        context: context,
+                                        mensagem:
+                                            "Item adicionado ao levantamento.",
+                                        duracao: 1,
+                                        tipo: AppName.info);
+                                  } else {
+                                    Generic.snackBar(
+                                        context: context,
+                                        mensagem:
+                                            "Não foi possível adicionar o equipamento",
+                                        duracao: 1,
+                                        tipo: AppName.erro);
+                                  }
+                                }
+                              }
+                            },
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.add, color: Colors.white),
+                                SizedBox(width: 8),
+                                const Text("Adicionar",
+                                    style: TextStyle(color: Colors.white)),
+                              ],
+                            )),
+                      ),
                 SizedBox(height: 3.h),
               ],
             ),

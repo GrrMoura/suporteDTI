@@ -47,4 +47,8 @@ class NaoAlocado {
       'descricaoUnidade': descricaoUnidade,
     };
   }
+
+  static List<NaoAlocado> listFromJson(List<dynamic> jsonList) {
+    return jsonList.map((json) => NaoAlocado.fromJson(json)).toList();
+  }
 }

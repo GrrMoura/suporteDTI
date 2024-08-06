@@ -23,11 +23,16 @@ import 'package:suporte_dti/viewModel/equipamento_view_model.dart';
 
 class DelegaciaDetalhe extends StatefulWidget {
   final String? sigla;
-  final String nome;
+  final String? nomeDelegacia;
+  final String? descricao;
   final EquipamentoViewModel? model;
 
   const DelegaciaDetalhe(
-      {super.key, this.sigla, required this.nome, this.model});
+      {super.key,
+      this.sigla,
+      required this.nomeDelegacia,
+      this.model,
+      required this.descricao});
 
   @override
   State<DelegaciaDetalhe> createState() => _DelegaciaDetalheState();
@@ -100,7 +105,8 @@ class _DelegaciaDetalheState extends State<DelegaciaDetalhe> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 SizedBox(
-                  child: Text(widget.nome, style: Styles().smallTextStyle()),
+                  child: Text(widget.nomeDelegacia ?? "",
+                      style: Styles().smallTextStyle()),
                 ),
               ],
             ),
@@ -150,6 +156,7 @@ class _DelegaciaDetalheState extends State<DelegaciaDetalhe> {
                               ),
                               DelegaciasCardLevantamento(
                                 idUnidade: widget.model!.idUnidade!,
+                                delegaciaNome: widget.nomeDelegacia,
                                 nome: "",
                                 idLevantamento: 0,
                                 data: formatDate(),
@@ -163,7 +170,9 @@ class _DelegaciaDetalheState extends State<DelegaciaDetalhe> {
                         List<Widget> levantamentosCards = [];
                         levantamentosCards.add(
                           DelegaciasCardLevantamento(
+                            delegaciaNome: widget.nomeDelegacia,
                             idUnidade: widget.model!.idUnidade!,
+                            siglaDelegacia: widget.sigla,
                             nome: "",
                             idLevantamento: 0,
                             data: formatDate(),
@@ -174,6 +183,8 @@ class _DelegaciaDetalheState extends State<DelegaciaDetalhe> {
                         for (var levantamento in snapshot.data!.cadastrados!) {
                           levantamentosCards.add(
                             DelegaciasCardLevantamento(
+                              delegaciaNome: widget.nomeDelegacia,
+                              siglaDelegacia: widget.sigla,
                               nomeArquivo: levantamento
                                   .levantamentoAssinado?.nomeArquivo,
                               idLevantamentoAssinado: levantamento
@@ -551,9 +562,13 @@ class DelegaciasCardLevantamento extends StatefulWidget {
       required this.delegacia,
       required this.idUnidade,
       this.nomeAssinado,
+      required this.delegaciaNome,
+      this.siglaDelegacia,
       required this.quantEquipamento});
 
   final String nome;
+  final String? delegaciaNome;
+  final String? siglaDelegacia;
   final int idLevantamento;
   final String data;
   final String delegacia;
@@ -576,8 +591,13 @@ class _DelegaciasCardLevantamentoState
     return InkWell(
       onTap: () async {
         if (widget.delegacia == "Resumo") {
+          Unidade unidade = Unidade();
+          unidade.id = widget.idUnidade;
+          unidade.nome = widget.delegaciaNome;
+          unidade.sigla = widget.siglaDelegacia;
+
           var result = await context.push(AppRouterName.resumoLevantamento,
-              extra: widget.idUnidade);
+              extra: unidade);
 
           if (result == "ok") {
             setState(() {});

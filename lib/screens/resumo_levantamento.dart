@@ -5,24 +5,21 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:suporte_dti/controller/equipamento_controller.dart';
-import 'package:suporte_dti/controller/levantamento_controller.dart';
 import 'package:suporte_dti/data/sqflite_helper.dart';
-import 'package:suporte_dti/model/equipamento_model.dart';
+import 'package:suporte_dti/viewModel/equipamento_nao_alocados.dart';
 import 'package:suporte_dti/model/itens_equipamento_model.dart';
 import 'package:suporte_dti/model/levantamento_model.dart';
-import 'package:suporte_dti/navegacao/app_screens_path.dart';
 import 'package:suporte_dti/screens/widgets/custom_dialog.dart';
 import 'package:suporte_dti/utils/app_colors.dart';
 import 'package:suporte_dti/utils/app_dimens.dart';
 import 'package:suporte_dti/utils/app_name.dart';
 import 'package:suporte_dti/utils/app_styles.dart';
 import 'package:suporte_dti/utils/snack_bar_generic.dart';
-import 'package:suporte_dti/viewModel/equipamento_verificado_view_model.dart';
-import 'package:suporte_dti/viewModel/equipamento_view_model.dart';
 
 class ResumoLevantamento extends StatefulWidget {
-  const ResumoLevantamento({super.key, required this.idUnidade});
-  final int idUnidade;
+  const ResumoLevantamento({super.key, required this.unidade});
+
+  final Unidade unidade;
   @override
   State<ResumoLevantamento> createState() => _ResumoLevantamentoState();
 }
@@ -31,8 +28,8 @@ class _ResumoLevantamentoState extends State<ResumoLevantamento> {
   final DatabaseHelper dbHelper = DatabaseHelper();
   final LevantamentoModel modelLevantamento =
       LevantamentoModel(equipamentosLevantados: []);
-  EquipamentoVerificadoViewmodel equipamentoVerificadoViewmodel =
-      EquipamentoVerificadoViewmodel();
+  // EquipamentoVerificadoViewmodel equipamentoVerificadoViewmodel =
+  //     EquipamentoVerificadoViewmodel();
 
   @override
   Widget build(BuildContext context) {
@@ -132,20 +129,30 @@ class _ResumoLevantamentoState extends State<ResumoLevantamento> {
                   style:
                       ElevatedButton.styleFrom(backgroundColor: Colors.green),
                   onPressed: () async {
+                    List<NaoAlocado> naoAlocado = [];
                     int response = await dbHelper.getEquipamentosCount();
                     if (response > 0) {
-                      // equipamentoViewModel.descricao
-                      EquipamentoController().verificarEquipamento(
-                          context, equipamentoVerificadoViewmodel);
+                      modelLevantamento.idUnidadeAdministrativa =
+                          widget.unidade.id;
+                      modelLevantamento.nomeUnidade = widget.unidade.nome;
+                      modelLevantamento.unidade = widget.unidade;
+
+                      modelLevantamento.dataLevantamento = DateTime.now();
+                      naoAlocado = await EquipamentoController()
+                          .verificarEquipamento(context, modelLevantamento);
+
+                      if (naoAlocado.isNotEmpty) {
+                        mostrarEquipamentosNaoAlocados(context:context,equipamentos: naoAlocado, idUnidade:  widget.unidade.id!);
+                      }
                       // debugPrint(
                       //     modelLevantamento.equipamentosLevantados.toString());
                       // modelLevantamento.idUnidadeAdministrativa =
                       //     widget.idUnidade;
                       // modelLevantamento.dataLevantamento = DateTime.now();
                       // await LevantamentoController()
-                      //     .cadastrar(context, modelLevantamento);
-                      setState(() {});
-                      context.pop("ok");
+                      // //     .cadastrar(context, modelLevantamento);
+                      // setState(() {});
+                      // context.pop("ok");
                     } else {
                       Generic.snackBar(
                           context: context,
@@ -162,6 +169,78 @@ class _ResumoLevantamentoState extends State<ResumoLevantamento> {
           )
         ],
       ),
+    );
+  }
+
+  Future<void> mostrarEquipamentosNaoAlocados(
+   { required BuildContext context,
+    required List<NaoAlocado> equipamentos,
+    required int idUnidade}
+  ) async {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Equipamentos Não Alocados'),
+          content: StatefulBuilder(
+            builder: (BuildContext context, StateSetter setState) {
+              return SizedBox(
+                width: double.maxFinite,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Expanded(
+                      child: ListView.builder(
+                        itemCount: equipamentos.length,
+                        itemBuilder: (context, index) {
+                          final equipamento = equipamentos[index];
+                          return Card(
+                            margin: EdgeInsets.symmetric(vertical: 4.0),
+                            child: ListTile(
+                              title: Text(equipamento.descricao!),
+                              subtitle: Text(equipamento.descricaoUnidade!),
+                              trailing: TextButton(
+                                child: Text('Adicionar'),
+                                onPressed: () {
+                                  EquipamentoController().movimentarEquipamento(
+                                      context: context, descricao: equipamento.descricao??"",idEquipamento: equipamento.idEquipamento!, idUnidade: equipamento. );
+                                  setState(() {
+                                    print("Alocado");
+                                  });
+                                },
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Fechar'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text('Alocar'),
+              onPressed: () {
+                // Aqui você pode tratar a lógica para alocar os equipamentos
+                // Filtrar equipamentos alocados
+                // final equipamentosAlocados = equipamentos.where((e) => e.alocado).toList();
+
+                // Por exemplo, você pode enviar os equipamentos alocados para algum serviço ou processar conforme necessário
+
+                Navigator.of(context).pop(); // Fechar o diálogo
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 

@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:suporte_dti/model/itens_equipamento_model.dart';
+import 'package:suporte_dti/model/levantamento_model.dart';
 import 'package:suporte_dti/services/api_services.dart';
 import 'package:suporte_dti/services/autenticacao_service.dart';
 import 'package:suporte_dti/services/requests_services.dart';
@@ -29,15 +30,14 @@ class EquipamentoService {
     return response;
   }
 
-  static Future<Response> verificarEquipamentos(
-      EquipamentoVerificadoViewmodel model) async {
+  static Future<Response> verificarEquipamentos(LevantamentoModel model) async {
     var url =
         ApiServices.concatSGIUrl("Levantamentos/VerificarEquipamentosAlocados");
 
     var options = await AutenticacaoService.getCabecalhoRequisicao();
 
     var responseConsulta = await RequestsServices.postOptions(
-        url: url, data: model.toJson(), options: options);
+        url: url, data: model.toJsonVerificar(), options: options);
 
     return responseConsulta;
   }

@@ -1,10 +1,14 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'dart:ffi';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:suporte_dti/model/equipamento_model.dart';
+import 'package:suporte_dti/viewModel/equipamento_nao_alocados.dart';
 import 'package:suporte_dti/model/itens_equipamento_model.dart';
+import 'package:suporte_dti/model/levantamento_model.dart';
 import 'package:suporte_dti/navegacao/app_screens_path.dart';
 import 'package:suporte_dti/services/equipamento_service.dart';
 import 'package:suporte_dti/services/dispositivo_service.dart';
@@ -55,8 +59,8 @@ class EquipamentoController {
     model.paginacao = itensEquipamentoModel.paginacao;
   }
 
-  Future<void> verificarEquipamento(
-      BuildContext context, EquipamentoVerificadoViewmodel model) async {
+  Future<List<NaoAlocado>> verificarEquipamento(
+      BuildContext context, LevantamentoModel model) async {
     await _verificarConexao(context);
 
     try {
@@ -64,26 +68,35 @@ class EquipamentoController {
           await EquipamentoService.verificarEquipamentos(model);
 
       if (responseConsulta.statusCode == 200) {
-        return;
+        if (responseConsulta.data.containsKey('naoAlocados')) {
+          return NaoAlocado.listFromJson(responseConsulta.data['naoAlocados']);
+        }
       }
+
       _tratarErro(context, responseConsulta);
+      return [];
     } catch (e) {
       Generic.snackBar(
         context: context,
         mensagem: "Erro inesperado:",
       );
+      return [];
     }
   }
 
-  Future<void> movimentarEquipamento(
-      BuildContext context, EquipamentoVerificadoViewmodel model) async {
+  Future<void> movimentarEquipamento({
+    required BuildContext context,
+    required String descricao,
+    required Int idUnidade,
+    required int idEquipamento,
+  }) async {
     await _verificarConexao(context);
 
     try {
       FormData formData = FormData.fromMap({
-        'idUnidadeAdministrativa': model.idUnidadeAdministrativa,
-        'idEquipamento': model.idEquipamento,
-        'descricao': model.descricao,
+        'idUnidadeAdministrativa': idUnidade,
+        'idEquipamento': idEquipamento,
+        'descricao': descricao
       });
 
       Response responseConsulta =

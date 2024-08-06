@@ -1,6 +1,7 @@
 import 'package:go_router/go_router.dart';
 import 'package:suporte_dti/controller/home_controller.dart';
 import 'package:suporte_dti/model/equipamento_model.dart';
+import 'package:suporte_dti/model/levantamento_model.dart';
 import 'package:suporte_dti/navegacao/app_screens_path.dart';
 import 'package:suporte_dti/screens/delegacia_list.dart';
 import 'package:suporte_dti/screens/equipamento_detalhe_screen.dart';
@@ -70,7 +71,11 @@ class Rotas {
         builder: (context, state) {
           final data = state.extra! as Map<String, dynamic>;
           return (DelegaciaDetalhe(
-              model: data["model"], sigla: data["sigla"], nome: data["nome"]));
+            model: data["model"],
+            sigla: data["sigla"],
+            nomeDelegacia: data["nome"],
+            descricao: data['descricao'],
+          ));
         },
       ),
       GoRoute(
@@ -85,8 +90,8 @@ class Rotas {
         name: 'resumoLevantamento',
         path: AppRouterName.resumoLevantamento,
         builder: (context, state) {
-          int id = state.extra as int;
-          return (ResumoLevantamento(idUnidade: id));
+          Unidade data = state.extra! as Unidade;
+          return (ResumoLevantamento(unidade: data));
         },
       ),
       GoRoute(

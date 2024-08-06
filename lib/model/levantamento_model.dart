@@ -5,11 +5,13 @@ class LevantamentoModel {
   int? idUnidadeAdministrativa;
   DateTime? dataLevantamento;
   Unidade? unidade;
-  LevantamentoModel({
-    this.equipamentosLevantados,
-    this.idUnidadeAdministrativa,
-    this.dataLevantamento,
-  });
+  String? nomeUnidade;
+  LevantamentoModel(
+      {this.equipamentosLevantados,
+      this.idUnidadeAdministrativa,
+      this.dataLevantamento,
+      this.nomeUnidade,
+      this.unidade});
 
   LevantamentoModel.fromJson(Map<String, dynamic> json) {
     if (json['equipamentosLevantados'] != null) {
@@ -31,6 +33,21 @@ class LevantamentoModel {
           equipamentosLevantados!.map((v) => v.toJson()).toList();
     }
     data['idUnidadeAdministrativa'] = idUnidadeAdministrativa;
+    data['dataLevantamento'] = dataLevantamento != null
+        ? DateFormat('dd/MM/yyyy').format(dataLevantamento!)
+        : null;
+    return data;
+  }
+
+  Map<String, dynamic> toJsonVerificar() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    if (equipamentosLevantados != null) {
+      data['equipamentosLevantados'] =
+          equipamentosLevantados!.map((v) => v.toJson()).toList();
+    }
+    data['idUnidadeAdministrativa'] = idUnidadeAdministrativa;
+    data['nomeUnidade'] = nomeUnidade;
+
     data['dataLevantamento'] = dataLevantamento != null
         ? DateFormat('dd/MM/yyyy').format(dataLevantamento!)
         : null;
@@ -58,19 +75,32 @@ class EquipamentoLevantado {
 }
 
 class Unidade {
-  int idEquipamento;
-  int idIntranetAntiga;
-  String nome;
-  String sigla;
-  String descricao;
+  int? id;
+  int? idEquipamento;
+  int? idIntranetAntiga;
+  String? nome;
+  String? sigla;
+  String? descricao;
 
   Unidade({
-    required this.idEquipamento,
-    required this.idIntranetAntiga,
-    required this.nome,
-    required this.sigla,
-    required this.descricao,
+    this.idEquipamento,
+    this.idIntranetAntiga,
+    this.nome,
+    this.sigla,
+    this.id,
+    this.descricao,
   });
+
+  factory Unidade.fromJson(Map<String, dynamic> json) {
+    return Unidade(
+      idEquipamento: json['idEquipamento'],
+      id: json['id'],
+      idIntranetAntiga: json['idIntranetAntiga'],
+      nome: json['nome'],
+      sigla: json['sigla'],
+      descricao: json['descricao'],
+    );
+  }
 
   Map<String, dynamic> toJson() {
     return {
@@ -79,6 +109,7 @@ class Unidade {
       'nome': nome,
       'sigla': sigla,
       'descricao': descricao,
+      'id': id,
     };
   }
 }

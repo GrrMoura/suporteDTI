@@ -148,12 +148,14 @@ class _DelegaciaListScreenState extends State<DelegaciaListScreen> {
         child: InkWell(
           onTap: () async {
             modelEquipamento!.idUnidade = item.id;
+
             context.push(
               AppRouterName.delegaciaDetalhe,
               extra: {
                 "model": modelEquipamento,
                 "sigla": item.sigla,
                 "nome": item.nome,
+                "descricao": item.descricao,
               },
             );
           },

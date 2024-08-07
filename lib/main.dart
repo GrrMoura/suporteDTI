@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:suporte_dti/navegacao/app_rotas.dart';
+import 'package:suporte_dti/utils/app_colors.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -24,6 +25,10 @@ class MyApp extends StatelessWidget {
           title: 'Flutter Demo',
           theme: ThemeData(
             useMaterial3: true,
+            primaryColor: AppColors.cSecondaryColor,
+            colorScheme: ColorScheme.fromSeed(
+              seedColor: AppColors.cSecondaryColor,
+            ),
           ),
           routerConfig: Rotas.routers,
           debugShowCheckedModeBanner: false,

@@ -22,19 +22,21 @@ class DatabaseHelper {
           id INTEGER PRIMARY KEY AUTOINCREMENT, 
           descricao TEXT, 
           fabricante TEXT,   
-          IdEquipamento INTEGER,
+          idEquipamento INTEGER,
+          idUnidade INTEGER,
           idFabricante INTEGER,
           idModelo INTEGER,
           modelo TEXT, 
           setor TEXT, 
           numeroSerie TEXT,
+          numeroLacre TEXT,
           patrimonioSead TEXT,
           patrimonioSsp TEXT,
           tipoEquipamento TEXT)''',
     );
   }
 
-  Future<String> insertEquipamento(ItemEquipamento itens) async {
+  Future<String> insertEquipamento({required ItemEquipamento itens}) async {
     final db = await database;
 
     try {
@@ -73,7 +75,35 @@ class DatabaseHelper {
       return ItemEquipamento(
         idBanco: maps[i]['id'],
         setor: maps[i]['setor'],
-        idEquipamento: maps[i]['IdEquipamento'],
+        idEquipamento: maps[i]['idEquipamento'],
+        numeroSerie: maps[i]['numeroSerie'],
+        patrimonioSead: maps[i]['patrimonioSead'],
+        patrimonioSsp: maps[i]['patrimonioSsp'],
+        idFabricante: maps[i]['idFabricante'],
+        descricao: maps[i]['descricao'],
+        fabricante: maps[i]['fabricante'],
+        modelo: maps[i]['modelo'],
+        tipoEquipamento: maps[i]['tipoEquipamento'],
+      );
+    });
+  }
+
+  Future<List<ItemEquipamento>> getEquipamentosPorIdUnidade(
+      int idUnidade) async {
+    final db = await database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      'equipamento',
+      where: 'idUnidade = ?',
+      whereArgs: [idUnidade],
+    );
+
+    return List.generate(maps.length, (i) {
+      return ItemEquipamento(
+        idBanco: maps[i]['id'],
+        setor: maps[i]['setor'],
+        idUnidade: maps[i]['idUnidade'],
+        numeroLacre: maps[i]['numeroLacre'],
+        idEquipamento: maps[i]['idEquipamento'],
         numeroSerie: maps[i]['numeroSerie'],
         patrimonioSead: maps[i]['patrimonioSead'],
         patrimonioSsp: maps[i]['patrimonioSsp'],
@@ -127,10 +157,14 @@ class DatabaseHelper {
     );
   }
 
-  Future<void> deleteAllEquipamentos() async {
+  Future<void> deleteAllEquipamentos(int idUnidade) async {
     final Database db = await database;
 
-    await db.delete("equipamento"); // Exclui todos os registros da tabela
+    await db.delete(
+      "equipamento",
+      where: "idUnidade = ?",
+      whereArgs: [idUnidade],
+    ); // Exclui todos os registros da tabela
   }
 
   Future<void> deleteATable() async {

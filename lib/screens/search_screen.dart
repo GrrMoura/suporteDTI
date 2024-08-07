@@ -263,6 +263,8 @@ class DelegaciasIcones extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Unidade? unidade = Unidade();
+
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 4.sp),
       child: InkWell(
@@ -282,10 +284,10 @@ class DelegaciasIcones extends StatelessWidget {
               break;
           }
           if (idUnidade != null) {
-            Unidade? unidade;
-            unidade?.nome = "";
-            unidade?.descricao = '';
-            unidade?.sigla = name;
+            unidade.nome = "";
+            unidade.descricao = '';
+            unidade.sigla = name;
+            unidade.id = idUnidade;
             context.push(
               AppRouterName.delegaciaDetalhe,
               extra: {
@@ -294,8 +296,7 @@ class DelegaciasIcones extends StatelessWidget {
                       ItensEquipamentoModels(equipamentos: []),
                   idUnidade: idUnidade,
                 ),
-                "sigla": name,
-                "nome": "",
+                "unidade": unidade,
               },
             );
           } else {

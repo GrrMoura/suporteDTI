@@ -99,7 +99,7 @@ class _DelegaciaListScreenState extends State<DelegaciaListScreen> {
               },
               decoration: const InputDecoration(
                 labelText: "Pesquisar",
-                hintText: "Nome, sigla,",
+                hintText: "Nome ou sigla",
                 prefixIcon: Icon(Icons.search),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.all(Radius.circular(16)),
@@ -135,6 +135,7 @@ class _DelegaciaListScreenState extends State<DelegaciaListScreen> {
   }
 
   Widget _buildCardDelegacia(ItemDelegacia item, int index) {
+    Unidade? unidade = Unidade();
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 5.h, horizontal: 10.w),
       child: Card(
@@ -149,10 +150,10 @@ class _DelegaciaListScreenState extends State<DelegaciaListScreen> {
         child: InkWell(
           onTap: () async {
             modelEquipamento!.idUnidade = item.id;
-            Unidade? unidade;
-            unidade?.nome = item.nome;
-            unidade?.descricao = item.descricao;
-            unidade?.sigla = item.sigla;
+            unidade.id = item.id;
+            unidade.nome = item.nome;
+            unidade.descricao = item.descricao;
+            unidade.sigla = item.sigla;
             context.push(
               AppRouterName.delegaciaDetalhe,
               extra: {"model": modelEquipamento, "unidade": unidade},
@@ -196,8 +197,8 @@ class _DelegaciaListScreenState extends State<DelegaciaListScreen> {
           List.from(widget.model!.itensDelegaciaModel!.delegacias);
       if (query.isNotEmpty) {
         dummySearchList.removeWhere((item) =>
-            !(item.nome ?? "").toLowerCase().contains(query) &&
-            !(item.sigla ?? "").toLowerCase().contains(query));
+            !(item.nome ?? "").toLowerCase().contains(query.toLowerCase()) &&
+            !(item.sigla ?? "").toLowerCase().contains(query.toLowerCase()));
       }
       delegacias.addAll(dummySearchList);
     });

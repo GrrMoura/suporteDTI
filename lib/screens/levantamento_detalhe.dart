@@ -30,7 +30,7 @@ class LevantamentoDetalheScreen extends StatefulWidget {
       required this.idLevantamento,
       required this.nomeArquivo,
       required this.assinado});
-//TODO: AO FECHAR OU CONFIRMAR O LEVANTAMENTO FAZER ATUALIZAR A TELA
+
   @override
   LevantamentoDetalheScreenState createState() =>
       LevantamentoDetalheScreenState();
@@ -432,7 +432,6 @@ class LevantamentoDetalheScreenState extends State<LevantamentoDetalheScreen>
   }
 
   Future<void> _carregarDetalhesLevantamento() async {
-    print("carreguei de novo");
     try {
       final detalheLevantamento = await _levantamentoController
           .levantamentoDetalhe(context, widget.idLevantamento);

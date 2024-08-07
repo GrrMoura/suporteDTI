@@ -5,7 +5,6 @@ class UsuarioModel {
   final String funcao;
   final String matricula;
 
-  ///TODO: PEDIR PRA LEANDRO ADICIOANR LACRE NO RETORNO DA FUNÇÃO
   UsuarioModel(
       {required this.id,
       required this.nome,

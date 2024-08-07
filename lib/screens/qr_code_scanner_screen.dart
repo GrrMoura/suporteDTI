@@ -50,15 +50,15 @@ class _QrCodeScannerState extends State<QrCodeScanner> {
 
   @override
   Widget build(BuildContext context) {
-    final scanWindow = Rect.fromCenter(
-      center: MediaQuery.of(context).size.center(Offset.zero),
-      width: 200,
-      height: 200,
-    );
+    // final scanWindow = Rect.fromCenter(
+    //   center: MediaQuery.of(context).size.center(Offset.zero),
+    //   width: 200,
+    //   height: 200,
+    // );
     return Scaffold(
       appBar: AppBar(
         backgroundColor: AppColors.cSecondaryColor,
-        automaticallyImplyLeading: false,
+        automaticallyImplyLeading: true,
       ),
       body: const Center(
         child: Padding(

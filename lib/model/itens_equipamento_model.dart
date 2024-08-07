@@ -33,6 +33,7 @@ class ItensEquipamentoModels {
 class ItemEquipamento {
   int? idBanco;
   int? idEquipamento;
+  int? idUnidade;
   String? setor;
   String? numeroSerie;
   String? patrimonioSead;
@@ -60,6 +61,8 @@ class ItemEquipamento {
       this.patrimonioSsp,
       this.tipoEquipamento,
       this.idBanco,
+      this.idUnidade,
+      this.numeroLacre,
       this.setor});
 
   ItemEquipamento.fromJson(Map<String, dynamic> json) {
@@ -101,6 +104,8 @@ class ItemEquipamento {
     data['modelo'] = modelo;
     data['tipoEquipamento'] = tipoEquipamento;
     data['setor'] = setor;
+    data['idUnidade'] = setor;
+    data['numeroLacre'] = setor;
 
     return data;
   }

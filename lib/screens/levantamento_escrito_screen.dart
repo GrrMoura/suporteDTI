@@ -14,9 +14,10 @@ import 'package:suporte_dti/utils/snack_bar_generic.dart';
 import 'package:suporte_dti/viewModel/equipamento_view_model.dart';
 
 class LevantamentoDigitado extends StatefulWidget {
-  const LevantamentoDigitado(
-      {super.key}); //TODO: TRAZER O ID DELEGACIA  AQUI PARA SALVAR NO BANCO E TRAZER OS RESUMOS POR ID
+  const LevantamentoDigitado(this.idUnidade, {super.key});
+  //TODO: TRAZER O ID DELEGACIA  AQUI PARA SALVAR NO BANCO E TRAZER OS RESUMOS POR ID
 
+  final int idUnidade;
   @override
   State<LevantamentoDigitado> createState() => _LevantamentoDigitadoState();
 }
@@ -190,7 +191,7 @@ class _LevantamentoDigitadoState extends State<LevantamentoDigitado> {
                                 backgroundColor: AppColors.cSecondaryColor,
                                 shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(12)),
-                                padding: EdgeInsets.symmetric(
+                                padding: const EdgeInsets.symmetric(
                                     horizontal: 24, vertical: 12)),
                             onPressed: () async {
                               bool existe = await dbHelper
@@ -212,8 +213,9 @@ class _LevantamentoDigitadoState extends State<LevantamentoDigitado> {
                                       tipo: AppName.erro);
                                 } else {
                                   item.setor = setor;
-                                  String x =
-                                      await dbHelper.insertEquipamento(item);
+                                  item.idUnidade = widget.idUnidade;
+                                  String x = await dbHelper.insertEquipamento(
+                                      itens: item);
 
                                   if (x == AppName.sucesso!) {
                                     Generic.snackBar(
@@ -233,12 +235,12 @@ class _LevantamentoDigitadoState extends State<LevantamentoDigitado> {
                                 }
                               }
                             },
-                            child: Row(
+                            child: const Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 Icon(Icons.add, color: Colors.white),
                                 SizedBox(width: 8),
-                                const Text("Adicionar",
+                                Text("Adicionar",
                                     style: TextStyle(color: Colors.white)),
                               ],
                             )),

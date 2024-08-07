@@ -31,9 +31,6 @@ class _ResumoLevantamentoState extends State<ResumoLevantamento> {
   final DatabaseHelper dbHelper = DatabaseHelper();
   final LevantamentoModel modelLevantamento =
       LevantamentoModel(equipamentosLevantados: []);
-  bool isOk = false;
-  // EquipamentoVerificadoViewmodel equipamentoVerificadoViewmodel =
-  //     EquipamentoVerificadoViewmodel();
 
   @override
   Widget build(BuildContext context) {
@@ -73,6 +70,11 @@ class _ResumoLevantamentoState extends State<ResumoLevantamento> {
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
             onPressed: () async {
+              EquipamentoViewModel modelEquipamento = EquipamentoViewModel(
+                itensEquipamentoModels:
+                    ItensEquipamentoModels(equipamentos: []),
+              );
+              modelEquipamento.idUnidade = widget.unidade.id;
               List<NaoAlocado> naoAlocado = [];
               int response = await dbHelper.getEquipamentosCount();
               if (response > 0) {
@@ -96,7 +98,13 @@ class _ResumoLevantamentoState extends State<ResumoLevantamento> {
                 } else {
                   LevantamentoController()
                       .cadastrar(context, modelLevantamento);
-                  Navigator.of(context).pop();
+                  context.go(
+                    AppRouterName.delegaciaDetalhe,
+                    extra: {
+                      "model": modelEquipamento,
+                      "unidade": widget.unidade
+                    },
+                  );
                 }
               } else {
                 Generic.snackBar(
@@ -183,6 +191,7 @@ class _ResumoLevantamentoState extends State<ResumoLevantamento> {
       {required BuildContext context,
       required List<NaoAlocado> equipamentos,
       required Unidade unidade}) async {
+    bool isLoadingAlocar = false;
     final Map<int, bool> equipamentosAlocados = {
       for (var eq in equipamentos) eq.idEquipamento!: false,
     };
@@ -272,6 +281,9 @@ class _ResumoLevantamentoState extends State<ResumoLevantamento> {
                                 onPressed: isAlocado == true
                                     ? null
                                     : () async {
+                                        setState(() {
+                                          isLoadingAlocar = true;
+                                        });
                                         int result =
                                             await EquipamentoController()
                                                 .movimentarEquipamento(
@@ -288,13 +300,27 @@ class _ResumoLevantamentoState extends State<ResumoLevantamento> {
                                                 .idEquipamento!] = true;
                                           });
                                         }
+                                        setState(() {
+                                          isLoadingAlocar = false;
+                                        });
                                       },
-                                child: Text(
-                                  isAlocado == true ? "Alocado" : 'Alocar',
-                                  style: const TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold),
-                                ),
+                                child: isLoadingAlocar == true &&
+                                        isAlocado == false
+                                    ? SizedBox(
+                                        height: 20.h,
+                                        width: 20.h,
+                                        child: const CircularProgressIndicator(
+                                            strokeWidth: 1,
+                                            color: Colors.white),
+                                      )
+                                    : Text(
+                                        isAlocado == true
+                                            ? "Alocado"
+                                            : 'Alocar',
+                                        style: const TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold),
+                                      ),
                               ),
                             ),
                           );
@@ -367,8 +393,11 @@ class _ResumoLevantamentoState extends State<ResumoLevantamento> {
             ),
             ElevatedButton(
               onPressed: () {
-                EquipamentoViewModel? modelEquipamento;
-                modelEquipamento?.idUnidade = unidade.id;
+                EquipamentoViewModel modelEquipamento = EquipamentoViewModel(
+                  itensEquipamentoModels:
+                      ItensEquipamentoModels(equipamentos: []),
+                );
+                modelEquipamento.idUnidade = unidade.id;
                 final todosAlocados =
                     equipamentosAlocados.values.every((value) => value == true);
 
@@ -377,14 +406,10 @@ class _ResumoLevantamentoState extends State<ResumoLevantamento> {
                   modelLevantamento.dataLevantamento = DateTime.now();
                   LevantamentoController()
                       .cadastrar(context, modelLevantamento);
-                  context.push(
+                  context.go(
                     AppRouterName.delegaciaDetalhe,
                     extra: {"model": modelEquipamento, "unidade": unidade},
                   );
-                  // int count = 0;
-                  // Navigator.of(context).popUntil((route) {
-                  //   return count++ == 2; // metodo para voltar 2 pilhas
-                  // });
                 } else {
                   Generic.snackBar(
                     context: context,
@@ -462,7 +487,7 @@ class _ResumoLevantamentoState extends State<ResumoLevantamento> {
     ).then((value) {
       if (value == true) {
         setState(() {
-          dbHelper.deleteAllEquipamentos();
+          dbHelper.deleteAllEquipamentos(widget.unidade.id!);
         });
       }
     });

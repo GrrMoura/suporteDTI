@@ -23,9 +23,6 @@ import 'package:suporte_dti/viewModel/equipamento_view_model.dart';
 
 class DelegaciaDetalhe extends StatefulWidget {
   final Unidade unidade;
-  // final String? sigla;
-  // final String? nomeDelegacia;
-  // final String? descricao;
   final EquipamentoViewModel? model;
 
   const DelegaciaDetalhe({
@@ -278,12 +275,6 @@ class _DelegaciaDetalheState extends State<DelegaciaDetalhe> {
 
               setState(() {
                 isLoading = false;
-                if (widget.model!.itensEquipamentoModels.equipamentos.isEmpty) {
-                  Generic.snackBar(
-                      context: context,
-                      mensagem: "Não foi encontrado nenhum equipamento",
-                      tipo: AppName.info);
-                }
               });
             } else {
               Generic.snackBar(
@@ -486,7 +477,8 @@ class _DelegaciaDetalheState extends State<DelegaciaDetalhe> {
                     borderRadius: BorderRadius.circular(10),
                     onTap: () {
                       context.pop('value');
-                      context.push(AppRouterName.levantamentoDigitadoScreen);
+                      context.push(AppRouterName.levantamentoDigitadoScreen,
+                          extra: widget.unidade.id);
                     },
                     child: Image.asset(
                       AppName.teclado!,
@@ -558,12 +550,10 @@ class DelegaciasCardLevantamento extends StatefulWidget {
       required this.delegacia,
       required this.unidade,
       this.nomeAssinado,
-      this.siglaDelegacia,
       required this.quantEquipamento});
 
   final String nome;
 
-  final String? siglaDelegacia;
   final int idLevantamento;
 
   final String data;
@@ -588,13 +578,8 @@ class _DelegaciasCardLevantamentoState
     return InkWell(
       onTap: () async {
         if (widget.delegacia == "Resumo") {
-          Unidade unidade = Unidade();
-          unidade.id = widget.unidade.id;
-          unidade.nome = widget.unidade.nome;
-          unidade.sigla = widget.siglaDelegacia;
-
           var result = await context.push(AppRouterName.resumoLevantamento,
-              extra: unidade);
+              extra: widget.unidade);
 
           if (result == "ok") {
             setState(() {});

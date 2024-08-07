@@ -99,7 +99,10 @@ class Rotas {
       ),
       GoRoute(
         path: AppRouterName.levantamentoDigitadoScreen,
-        builder: (context, state) => (const LevantamentoDigitado()),
+        builder: (context, state) {
+          int id = state.extra as int;
+          return (LevantamentoDigitado(id));
+        },
       ),
       GoRoute(
         path: AppRouterName.qrCodeScanner,

@@ -35,6 +35,7 @@ class EquipamentoController {
           return Generic.snackBar(
               context: context,
               mensagem: "Não foi encontrado nenhum equipamento",
+              duracao: 1,
               tipo: AppName.info);
         }
 

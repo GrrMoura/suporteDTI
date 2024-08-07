@@ -123,8 +123,6 @@ class _ResultadoEquipamentoConsultaScreenState
                       itemBuilder: (BuildContext ctxt, int index) {
                         return _buildCard(widget
                             .model!.itensEquipamentoModels.equipamentos[index]);
-
-                        //TODO:FAZER AQUI, QUANDO ESTIVER VINDO NULO
                       },
                     ),
                   ),
@@ -198,12 +196,9 @@ class _ResultadoEquipamentoConsultaScreenState
 
               setState(() {
                 isLoading = false;
-                if (model!.itensEquipamentoModels.equipamentos.isEmpty) {
-                  Generic.snackBar(
-                      context: context,
-                      mensagem: "Não foi encontrado nenhum equipamento",
-                      tipo: AppName.info);
-                }
+                // if (model!.itensEquipamentoModels.equipamentos.isEmpty) {
+
+                // }
               });
             } else {
               Generic.snackBar(

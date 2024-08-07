@@ -421,11 +421,7 @@ class LevantamentoDetalheScreenState extends State<LevantamentoDetalheScreen>
         }
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Erro ao fazer download do PDF: $e'),
-        ),
-      );
+      debugPrint("$e");
     }
   }
 
@@ -452,11 +448,7 @@ class LevantamentoDetalheScreenState extends State<LevantamentoDetalheScreen>
         );
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Erro ao buscar detalhes do levantamento: $e'),
-        ),
-      );
+      debugPrint("$e");
     }
   }
 

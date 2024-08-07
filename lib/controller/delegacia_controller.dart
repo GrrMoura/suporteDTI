@@ -22,8 +22,9 @@ class DelegaciaController {
       } else {
         _tratarErro(context, response);
       }
-    } catch (e) {
-      _tratarErroInesperado(context);
+    } catch (e, stackTracer) {
+      debugPrint("$e");
+      debugPrint("$stackTracer");
     }
   }
 
@@ -42,7 +43,8 @@ class DelegaciaController {
         context: context,
         mensagem: "Usuário não autenticado ou token encerrado",
       );
-      context.goNamed(AppRouterName.login);
+
+      return context.go(AppRouterName.login);
     } else {
       if (response.data is List) {
         if (response.data.isNotEmpty && response.data[0] != null) {
@@ -69,12 +71,5 @@ class DelegaciaController {
       );
       throw Exception("Sem conexão com a internet.");
     }
-  }
-
-  void _tratarErroInesperado(BuildContext context) {
-    Generic.snackBar(
-      context: context,
-      mensagem: "Erro inesperado",
-    );
   }
 }

@@ -22,17 +22,17 @@ import 'package:suporte_dti/utils/snack_bar_generic.dart';
 import 'package:suporte_dti/viewModel/equipamento_view_model.dart';
 
 class DelegaciaDetalhe extends StatefulWidget {
-  final String? sigla;
-  final String? nomeDelegacia;
-  final String? descricao;
+  final Unidade unidade;
+  // final String? sigla;
+  // final String? nomeDelegacia;
+  // final String? descricao;
   final EquipamentoViewModel? model;
 
-  const DelegaciaDetalhe(
-      {super.key,
-      this.sigla,
-      required this.nomeDelegacia,
-      this.model,
-      required this.descricao});
+  const DelegaciaDetalhe({
+    super.key,
+    required this.unidade,
+    this.model,
+  });
 
   @override
   State<DelegaciaDetalhe> createState() => _DelegaciaDetalheState();
@@ -86,7 +86,7 @@ class _DelegaciaDetalheState extends State<DelegaciaDetalhe> {
         title: Padding(
           padding: EdgeInsets.only(top: 10.h),
           child: Text(
-            widget.sigla ?? "",
+            widget.unidade.sigla ?? "",
             style: Styles().titleStyle().copyWith(
                   color: AppColors.cWhiteColor,
                   fontSize: 22.sp,
@@ -105,7 +105,7 @@ class _DelegaciaDetalheState extends State<DelegaciaDetalhe> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 SizedBox(
-                  child: Text(widget.nomeDelegacia ?? "",
+                  child: Text(widget.unidade.nome ?? "",
                       style: Styles().smallTextStyle()),
                 ),
               ],
@@ -155,8 +155,7 @@ class _DelegaciaDetalheState extends State<DelegaciaDetalhe> {
                                 textAlign: TextAlign.center,
                               ),
                               DelegaciasCardLevantamento(
-                                idUnidade: widget.model!.idUnidade!,
-                                delegaciaNome: widget.nomeDelegacia,
+                                unidade: widget.unidade,
                                 nome: "",
                                 idLevantamento: 0,
                                 data: formatDate(),
@@ -170,9 +169,7 @@ class _DelegaciaDetalheState extends State<DelegaciaDetalhe> {
                         List<Widget> levantamentosCards = [];
                         levantamentosCards.add(
                           DelegaciasCardLevantamento(
-                            delegaciaNome: widget.nomeDelegacia,
-                            idUnidade: widget.model!.idUnidade!,
-                            siglaDelegacia: widget.sigla,
+                            unidade: widget.unidade,
                             nome: "",
                             idLevantamento: 0,
                             data: formatDate(),
@@ -183,14 +180,12 @@ class _DelegaciaDetalheState extends State<DelegaciaDetalhe> {
                         for (var levantamento in snapshot.data!.cadastrados!) {
                           levantamentosCards.add(
                             DelegaciasCardLevantamento(
-                              delegaciaNome: widget.nomeDelegacia,
-                              siglaDelegacia: widget.sigla,
+                              unidade: widget.unidade,
                               nomeArquivo: levantamento
                                   .levantamentoAssinado?.nomeArquivo,
                               idLevantamentoAssinado: levantamento
                                   .levantamentoAssinado?.idLevantamentoAssinado,
                               assinado: levantamento.assinado,
-                              idUnidade: widget.model!.idUnidade!,
                               nome: levantamento.usuario!,
                               idLevantamento: levantamento.idLevantamento!,
                               data: levantamento.dataLevantamento!,
@@ -365,6 +360,7 @@ class _DelegaciaDetalheState extends State<DelegaciaDetalhe> {
       }
       return levantamento;
     } catch (e) {
+      debugPrint("$e");
       setState(() {
         _levantamentoHeight = (existemEquipamentos ? 200.h : 100.h);
       });
@@ -560,19 +556,20 @@ class DelegaciasCardLevantamento extends StatefulWidget {
       required this.idLevantamento,
       required this.data,
       required this.delegacia,
-      required this.idUnidade,
+      required this.unidade,
       this.nomeAssinado,
-      required this.delegaciaNome,
       this.siglaDelegacia,
       required this.quantEquipamento});
 
   final String nome;
-  final String? delegaciaNome;
+
   final String? siglaDelegacia;
   final int idLevantamento;
+
   final String data;
   final String delegacia;
-  final int idUnidade;
+  final Unidade unidade;
+
   final int quantEquipamento;
   final bool? assinado;
   final int? idLevantamentoAssinado;
@@ -592,8 +589,8 @@ class _DelegaciasCardLevantamentoState
       onTap: () async {
         if (widget.delegacia == "Resumo") {
           Unidade unidade = Unidade();
-          unidade.id = widget.idUnidade;
-          unidade.nome = widget.delegaciaNome;
+          unidade.id = widget.unidade.id;
+          unidade.nome = widget.unidade.nome;
           unidade.sigla = widget.siglaDelegacia;
 
           var result = await context.push(AppRouterName.resumoLevantamento,

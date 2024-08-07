@@ -4,7 +4,6 @@ import 'package:suporte_dti/model/levantamento_model.dart';
 import 'package:suporte_dti/services/api_services.dart';
 import 'package:suporte_dti/services/autenticacao_service.dart';
 import 'package:suporte_dti/services/requests_services.dart';
-import 'package:suporte_dti/viewModel/equipamento_verificado_view_model.dart';
 import 'package:suporte_dti/viewModel/equipamento_view_model.dart';
 
 class EquipamentoService {

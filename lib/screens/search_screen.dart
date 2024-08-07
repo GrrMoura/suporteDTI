@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:suporte_dti/model/equipamento_model.dart';
 import 'package:suporte_dti/model/itens_delegacia_model.dart';
 import 'package:suporte_dti/model/itens_equipamento_model.dart';
+import 'package:suporte_dti/model/levantamento_model.dart';
 import 'package:suporte_dti/navegacao/app_screens_path.dart';
 import 'package:suporte_dti/screens/widgets/loading_default.dart';
 import 'package:suporte_dti/services/sqlite_service.dart';
@@ -281,6 +282,10 @@ class DelegaciasIcones extends StatelessWidget {
               break;
           }
           if (idUnidade != null) {
+            Unidade? unidade;
+            unidade?.nome = "";
+            unidade?.descricao = '';
+            unidade?.sigla = name;
             context.push(
               AppRouterName.delegaciaDetalhe,
               extra: {

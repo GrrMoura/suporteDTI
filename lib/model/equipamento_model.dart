@@ -76,20 +76,19 @@ class EquipamentoModel {
     patrimonioSsp = json['patrimonioSsp'];
     descricaoSo = json['descricaoSo'];
     fabricante = json['fabricante'];
+    notaFiscal = json['notaFiscal'];
+    idTipoAquisicao = json['idTipoAquisicao'];
+    unidadeAtual = json['unidadeAtual'];
+    idUnidadedeAdministrativaDestino = json['idUnidadeAdministrativaDestino'];
+    descricaoUnidadeDestino = json['DescricaoUnidadeDestino'];
+    numeroRegistro = json['numeroRegistro'];
+    numeroLacre = json['numeroLacre'];
     if (json['alocacoes'] != null || json['alocacoes'] == []) {
       alocacoes = [];
       json['alocacoes'].forEach((v) {
         alocacoes!.add(Alocacoes.fromJson(v));
       });
     }
-    notaFiscal = json['notaFiscal'];
-    idTipoAquisicao = json['idTipoAquisicao'];
-
-    unidadeAtual = json['unidadeAtual'];
-    idUnidadedeAdministrativaDestino = json['idUnidadeAdministrativaDestino'];
-    descricaoUnidadeDestino = json['DescricaoUnidadeDestino'];
-    numeroRegistro = json['numeroRegistro'];
-    numeroLacre = json['numeroLacre'];
   }
   Map<String, dynamic> toJson() {
     return {

@@ -21,7 +21,7 @@ import 'package:suporte_dti/viewModel/equipamento_view_model.dart';
 class Rotas {
   Rotas();
   static final routers = GoRouter(
-    initialLocation: AppRouterName.login,
+    initialLocation: AppRouterName.homeController,
     routes: [
       GoRoute(
         path: AppRouterName.login,
@@ -72,9 +72,7 @@ class Rotas {
           final data = state.extra! as Map<String, dynamic>;
           return (DelegaciaDetalhe(
             model: data["model"],
-            sigla: data["sigla"],
-            nomeDelegacia: data["nome"],
-            descricao: data['descricao'],
+            unidade: data["unidade"],
           ));
         },
       ),

@@ -5,7 +5,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:suporte_dti/controller/equipamento_controller.dart';
+import 'package:suporte_dti/controller/levantamento_controller.dart';
 import 'package:suporte_dti/data/sqflite_helper.dart';
+import 'package:suporte_dti/navegacao/app_screens_path.dart';
 import 'package:suporte_dti/viewModel/equipamento_nao_alocados.dart';
 import 'package:suporte_dti/model/itens_equipamento_model.dart';
 import 'package:suporte_dti/model/levantamento_model.dart';
@@ -15,6 +17,7 @@ import 'package:suporte_dti/utils/app_dimens.dart';
 import 'package:suporte_dti/utils/app_name.dart';
 import 'package:suporte_dti/utils/app_styles.dart';
 import 'package:suporte_dti/utils/snack_bar_generic.dart';
+import 'package:suporte_dti/viewModel/equipamento_view_model.dart';
 
 class ResumoLevantamento extends StatefulWidget {
   const ResumoLevantamento({super.key, required this.unidade});
@@ -28,6 +31,7 @@ class _ResumoLevantamentoState extends State<ResumoLevantamento> {
   final DatabaseHelper dbHelper = DatabaseHelper();
   final LevantamentoModel modelLevantamento =
       LevantamentoModel(equipamentosLevantados: []);
+  bool isOk = false;
   // EquipamentoVerificadoViewmodel equipamentoVerificadoViewmodel =
   //     EquipamentoVerificadoViewmodel();
 
@@ -88,7 +92,11 @@ class _ResumoLevantamentoState extends State<ResumoLevantamento> {
                   mostrarEquipamentosNaoAlocados(
                       context: context,
                       equipamentos: naoAlocado,
-                      idUnidade: widget.unidade.id!);
+                      unidade: widget.unidade);
+                } else {
+                  LevantamentoController()
+                      .cadastrar(context, modelLevantamento);
+                  Navigator.of(context).pop();
                 }
               } else {
                 Generic.snackBar(
@@ -174,16 +182,39 @@ class _ResumoLevantamentoState extends State<ResumoLevantamento> {
   Future<void> mostrarEquipamentosNaoAlocados(
       {required BuildContext context,
       required List<NaoAlocado> equipamentos,
-      required int idUnidade}) async {
-    bool alocado = false;
+      required Unidade unidade}) async {
+    final Map<int, bool> equipamentosAlocados = {
+      for (var eq in equipamentos) eq.idEquipamento!: false,
+    };
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text(
-              'Esses equipamentos NÃO estão alocados a esta unidade:',
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+          title: RichText(
+            textAlign: TextAlign.center,
+            text: const TextSpan(
+              style:
+                  TextStyle(fontSize: 20, color: Colors.black), // Estilo padrão
+              children: <TextSpan>[
+                TextSpan(
+                  text: 'Esses equipamentos ',
+                  style: TextStyle(fontWeight: FontWeight.normal),
+                ),
+                TextSpan(
+                  text: 'NÃO',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
+                ),
+                TextSpan(
+                  text: ' estão alocados nesta unidade:',
+                  style: TextStyle(fontWeight: FontWeight.normal),
+                ),
+              ],
+            ),
+          ),
           content: StatefulBuilder(
             builder: (BuildContext context, StateSetter setState) {
               return SizedBox(
@@ -196,6 +227,9 @@ class _ResumoLevantamentoState extends State<ResumoLevantamento> {
                         itemCount: equipamentos.length,
                         itemBuilder: (context, index) {
                           final equipamento = equipamentos[index];
+                          final bool isAlocado = equipamentosAlocados[
+                                  equipamento.idEquipamento!] ??
+                              false;
                           return Card(
                             color: AppColors.cWhiteColor,
                             margin: EdgeInsets.symmetric(
@@ -235,7 +269,7 @@ class _ResumoLevantamentoState extends State<ResumoLevantamento> {
                                   padding: const EdgeInsets.symmetric(
                                       horizontal: 12.0, vertical: 8.0),
                                 ),
-                                onPressed: alocado == true
+                                onPressed: isAlocado == true
                                     ? null
                                     : () async {
                                         int result =
@@ -246,16 +280,17 @@ class _ResumoLevantamentoState extends State<ResumoLevantamento> {
                                               equipamento.descricao ?? "",
                                           idEquipamento:
                                               equipamento.idEquipamento!,
-                                          idUnidade: idUnidade,
+                                          idUnidade: unidade.id!,
                                         );
                                         if (result == 200) {
                                           setState(() {
-                                            alocado = true;
+                                            equipamentosAlocados[equipamento
+                                                .idEquipamento!] = true;
                                           });
                                         }
                                       },
                                 child: Text(
-                                  alocado == true ? "Alocado" : 'Alocar',
+                                  isAlocado == true ? "Alocado" : 'Alocar',
                                   style: const TextStyle(
                                       color: Colors.white,
                                       fontWeight: FontWeight.bold),
@@ -266,6 +301,57 @@ class _ResumoLevantamentoState extends State<ResumoLevantamento> {
                         },
                       ),
                     ),
+                    //FUNÇÃO PARA ALOCAR TODOS OS EQUIPAMENTOS DE UMA VEZ
+                    // SizedBox(height: 5.h),
+                    // Row(
+                    //   mainAxisAlignment: MainAxisAlignment.end,
+                    //   children: [
+                    //     ElevatedButton(
+                    //       onPressed: () async {
+                    //         bool sucesso = true;
+                    //         for (var equipamento in equipamentos) {
+                    //           if (!(equipamentosAlocados[
+                    //                   equipamento.idEquipamento!] ??
+                    //               false)) {
+                    //             int result = await EquipamentoController()
+                    //                 .movimentarEquipamento(
+                    //               context: context,
+                    //               descricao: equipamento.descricao ?? "",
+                    //               idEquipamento: equipamento.idEquipamento!,
+                    //               idUnidade: idUnidade,
+                    //             );
+                    //             if (result != 200) {
+                    //               sucesso = false;
+                    //               break; // Se algum item falhar, interrompe a alocação de todos
+                    //             }
+                    //           }
+                    //         }
+                    //         if (sucesso) {
+                    //           setState(() {
+                    //             equipamentosAlocados
+                    //                 .updateAll((key, value) => true);
+                    //           });
+                    //           Navigator.of(context).pop();
+                    //         } else {
+                    //           // Tratar falha na alocação (exibir mensagem de erro, etc.)
+                    //           ScaffoldMessenger.of(context).showSnackBar(
+                    //             const SnackBar(
+                    //                 content: Text(
+                    //                     'Falha ao alocar todos os itens.')),
+                    //           );
+                    //         }
+                    //       },
+                    //       style: ElevatedButton.styleFrom(
+                    //         backgroundColor: Colors.green,
+                    //         shape: RoundedRectangleBorder(
+                    //           borderRadius: BorderRadius.circular(12.0),
+                    //         ),
+                    //       ),
+                    //       child: const Text('Alocar Todos',
+                    //           style: TextStyle(color: Colors.white)),
+                    //     ),
+                    //   ],
+                    // ),
                   ],
                 ),
               );
@@ -281,7 +367,31 @@ class _ResumoLevantamentoState extends State<ResumoLevantamento> {
             ),
             ElevatedButton(
               onPressed: () {
-                //    Navigator.of(context).pop();
+                EquipamentoViewModel? modelEquipamento;
+                modelEquipamento?.idUnidade = unidade.id;
+                final todosAlocados =
+                    equipamentosAlocados.values.every((value) => value == true);
+
+                if (todosAlocados) {
+                  modelLevantamento.idUnidadeAdministrativa = widget.unidade.id;
+                  modelLevantamento.dataLevantamento = DateTime.now();
+                  LevantamentoController()
+                      .cadastrar(context, modelLevantamento);
+                  context.push(
+                    AppRouterName.delegaciaDetalhe,
+                    extra: {"model": modelEquipamento, "unidade": unidade},
+                  );
+                  // int count = 0;
+                  // Navigator.of(context).popUntil((route) {
+                  //   return count++ == 2; // metodo para voltar 2 pilhas
+                  // });
+                } else {
+                  Generic.snackBar(
+                    context: context,
+                    mensagem: "Todos os Equipamentos precisam ser alocados ",
+                    duracao: 1,
+                  );
+                }
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.cSecondaryColor,
@@ -290,7 +400,7 @@ class _ResumoLevantamentoState extends State<ResumoLevantamento> {
                 ),
               ),
               child: const Text(
-                'Salvar',
+                'Continuar',
                 style: TextStyle(color: Colors.white),
               ),
             ),

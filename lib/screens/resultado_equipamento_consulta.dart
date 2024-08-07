@@ -129,10 +129,7 @@ class _ResultadoEquipamentoConsultaScreenState
                     ),
                   ),
                 )
-              : Container(
-                  color: Colors.amber,
-                  height: 100,
-                ),
+              : Container(),
           // Padding(
           //   padding: EdgeInsets.symmetric(vertical: 5.h),
           //   child: Row(

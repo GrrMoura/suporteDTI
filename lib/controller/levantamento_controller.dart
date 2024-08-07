@@ -118,10 +118,7 @@ class LevantamentoController {
         return null;
       }
     } catch (e) {
-      Generic.snackBar(
-        context: context,
-        mensagem: "Erro inesperado",
-      );
+      debugPrint("$e");
       return null;
     }
   }
@@ -157,7 +154,7 @@ class LevantamentoController {
         _tratarErro(context, response);
       }
     } catch (e) {
-      Generic.snackBar(context: context, mensagem: "Erro inesperado");
+      debugPrint("$e");
     }
   }
 
@@ -200,7 +197,7 @@ class LevantamentoController {
         mensagem: "Usuário não autenticado ou token encerrado",
       );
 
-      context.goNamed(AppRouterName.login);
+      return context.go(AppRouterName.login);
     } else {
       if (response.data is List) {
         if (response.data.isNotEmpty && response.data[0] != null) {

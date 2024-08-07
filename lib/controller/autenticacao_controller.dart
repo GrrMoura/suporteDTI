@@ -45,10 +45,7 @@ class AutenticacaoController {
       }
     } catch (e) {
       model.ocupado = false;
-      Generic.snackBar(
-        context: context,
-        mensagem: 'Erro ao fazer login: $e',
-      );
+      debugPrint("$e");
     }
   }
 

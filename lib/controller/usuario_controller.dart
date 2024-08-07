@@ -27,7 +27,7 @@ class UsuarioController {
         _handleErrorResponse(context, response);
       }
     } catch (e) {
-      // Tratamento de erro pode ser adicionado aqui
+      debugPrint("$e");
     }
   }
 
@@ -41,7 +41,7 @@ class UsuarioController {
 
       Dados.fromJson(response.data).setDados(prefs);
     } catch (e) {
-      // Tratamento de erro pode ser adicionado aqui
+      debugPrint("$e");
     }
   }
 
@@ -83,9 +83,7 @@ class UsuarioController {
         context: context,
         mensagem: "Usuário não autenticado ou token encerrado",
       );
-      // Future.delayed(const Duration(seconds: 3)) TODO: TSTAR SE AINDA DÁ ERRO MESMO SEM O FUTURE
-      //     .then((_) => {context.goNamed(AppRouterName.login)});
-      context.goNamed(AppRouterName.login);
+      return context.go(AppRouterName.login);
     }
     if (response.data is List) {
       if (response.data.isNotEmpty && response.data[0] != null) {

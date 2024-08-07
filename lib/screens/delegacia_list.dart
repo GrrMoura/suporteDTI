@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:suporte_dti/controller/delegacia_controller.dart';
 import 'package:suporte_dti/model/itens_delegacia_model.dart';
 import 'package:suporte_dti/model/itens_equipamento_model.dart';
+import 'package:suporte_dti/model/levantamento_model.dart';
 import 'package:suporte_dti/navegacao/app_screens_path.dart';
 import 'package:suporte_dti/screens/widgets/loading_default.dart';
 import 'package:suporte_dti/utils/app_colors.dart';
@@ -54,7 +55,7 @@ class _DelegaciaListScreenState extends State<DelegaciaListScreen> {
         _loading = false;
       });
     } catch (e) {
-      // Tratar erro conforme necessário
+      debugPrint("$e");
       setState(() {
         _loading = false;
       });
@@ -148,15 +149,13 @@ class _DelegaciaListScreenState extends State<DelegaciaListScreen> {
         child: InkWell(
           onTap: () async {
             modelEquipamento!.idUnidade = item.id;
-
+            Unidade? unidade;
+            unidade?.nome = item.nome;
+            unidade?.descricao = item.descricao;
+            unidade?.sigla = item.sigla;
             context.push(
               AppRouterName.delegaciaDetalhe,
-              extra: {
-                "model": modelEquipamento,
-                "sigla": item.sigla,
-                "nome": item.nome,
-                "descricao": item.descricao,
-              },
+              extra: {"model": modelEquipamento, "unidade": unidade},
             );
           },
           child: Padding(

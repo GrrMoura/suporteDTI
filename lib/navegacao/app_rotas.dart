@@ -100,8 +100,8 @@ class Rotas {
       GoRoute(
         path: AppRouterName.levantamentoDigitadoScreen,
         builder: (context, state) {
-          int id = state.extra as int;
-          return (LevantamentoDigitado(id));
+          Unidade unidade = state.extra as Unidade;
+          return (LevantamentoDigitado(unidade));
         },
       ),
       GoRoute(

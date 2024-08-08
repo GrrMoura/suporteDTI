@@ -39,7 +39,7 @@ class _ResumoLevantamentoState extends State<ResumoLevantamento> {
       body: ListView(
         children: [
           const Header(),
-          LevantamentoAtual(dbHelper: dbHelper),
+          LevantamentoAtual(dbHelper: dbHelper, idUnidade: widget.unidade.id!),
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 5.h),
             child: _buildEquipamentoContainer(),
@@ -76,7 +76,8 @@ class _ResumoLevantamentoState extends State<ResumoLevantamento> {
               );
               modelEquipamento.idUnidade = widget.unidade.id;
               List<NaoAlocado> naoAlocado = [];
-              int response = await dbHelper.getEquipamentosCount();
+              int response =
+                  await dbHelper.getEquipamentosCount(widget.unidade.id!);
               if (response > 0) {
                 modelLevantamento.idUnidadeAdministrativa = widget.unidade.id;
                 modelLevantamento.nomeUnidade = widget.unidade.nome;
@@ -98,6 +99,7 @@ class _ResumoLevantamentoState extends State<ResumoLevantamento> {
                 } else {
                   LevantamentoController()
                       .cadastrar(context, modelLevantamento);
+                  dbHelper.deleteAllEquipamentosPorUnidade(widget.unidade.id!);
                   context.go(
                     AppRouterName.delegaciaDetalhe,
                     extra: {
@@ -125,7 +127,7 @@ class _ResumoLevantamentoState extends State<ResumoLevantamento> {
   FutureBuilder<List<dynamic>> _buildEquipamentoContainer() {
     return FutureBuilder(
       initialData: const [],
-      future: dbHelper.getEquipamentos(),
+      future: dbHelper.getEquipamentosPorIdUnidade(widget.unidade.id!),
       builder: (context, AsyncSnapshot<List> snapshot) {
         var data = snapshot.data;
         var datalength = data!.length;
@@ -177,7 +179,7 @@ class _ResumoLevantamentoState extends State<ResumoLevantamento> {
             Navigator.pop(context, "ola");
           },
           icon: const Icon(Icons.arrow_back_ios_new)),
-      title: Text("Resumo",
+      title: Text(widget.unidade.sigla ?? "",
           style: Styles().titleStyle().copyWith(
               color: AppColors.cWhiteColor,
               fontSize: 22.sp,
@@ -487,7 +489,7 @@ class _ResumoLevantamentoState extends State<ResumoLevantamento> {
     ).then((value) {
       if (value == true) {
         setState(() {
-          dbHelper.deleteAllEquipamentos(widget.unidade.id!);
+          dbHelper.deleteAllEquipamentosPorUnidade(widget.unidade.id!);
         });
       }
     });
@@ -533,7 +535,7 @@ class _ResumoLevantamentoState extends State<ResumoLevantamento> {
                               context: context, equipamento: equipamento);
                         },
                         icon: Icon(Icons.more_vert_outlined, size: 15.sp)),
-                  ], //TODO COLOCAR OS RESUMOS INDIVIDUAIS POR ID UNIDADE
+                  ],
                 ),
                 InkWell(
                   // onTap: () {
@@ -715,11 +717,10 @@ class _ResumoLevantamentoState extends State<ResumoLevantamento> {
 }
 
 class LevantamentoAtual extends StatelessWidget {
-  const LevantamentoAtual({
-    required this.dbHelper,
-    super.key,
-  });
+  const LevantamentoAtual(
+      {required this.idUnidade, required this.dbHelper, super.key});
   final DatabaseHelper dbHelper;
+  final int idUnidade;
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -761,7 +762,7 @@ class LevantamentoAtual extends StatelessWidget {
               ),
             ),
             FutureBuilder(
-                future: dbHelper.getEquipamentosCount(),
+                future: dbHelper.getEquipamentosCount(idUnidade),
                 builder: ((context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Text("");

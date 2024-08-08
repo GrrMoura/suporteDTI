@@ -19,7 +19,6 @@ class DelegaciasViewModel {
       required this.itensDelegaciaModel});
 
   Map<String, dynamic> toJson() {
-    print("passei aqui");
     final Map<String, dynamic> data = <String, dynamic>{};
     data['id'] = id;
     data['idIntranetAntiga'] = idIntranetAntiga;

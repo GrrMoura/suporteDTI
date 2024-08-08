@@ -7,7 +7,6 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:suporte_dti/controller/equipamento_controller.dart';
 import 'package:suporte_dti/controller/levantamento_controller.dart';
-import 'package:suporte_dti/data/sqflite_helper.dart';
 import 'package:suporte_dti/model/itens_equipamento_model.dart';
 import 'package:suporte_dti/model/levantamento_cadastrados_model.dart';
 import 'package:suporte_dti/model/levantamento_model.dart';
@@ -25,18 +24,13 @@ class DelegaciaDetalhe extends StatefulWidget {
   final Unidade unidade;
   final EquipamentoViewModel? model;
 
-  const DelegaciaDetalhe({
-    super.key,
-    required this.unidade,
-    this.model,
-  });
+  const DelegaciaDetalhe({super.key, required this.unidade, this.model});
 
   @override
   State<DelegaciaDetalhe> createState() => _DelegaciaDetalheState();
 }
 
 class _DelegaciaDetalheState extends State<DelegaciaDetalhe> {
-  DatabaseHelper _db = DatabaseHelper();
   final ScrollController _scrollCtrl = ScrollController();
   final EquipamentoController _equipamentoCtlr = EquipamentoController();
   final LevantamentoController _levantamentoCtrl = LevantamentoController();
@@ -54,7 +48,7 @@ class _DelegaciaDetalheState extends State<DelegaciaDetalhe> {
     _scrollCtrl.addListener(_scrollListener);
     _fetchEquipamento();
     _levantamentoFuture = _fetchLevantamentos();
-    _temEquipamento();
+    // _temEquipamento();
   }
 
   @override
@@ -211,7 +205,6 @@ class _DelegaciaDetalheState extends State<DelegaciaDetalhe> {
                 ],
               ),
             ),
-            //TODO: CoLOCOAR O ICON DE COMPARTILHAR.
             Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
@@ -311,11 +304,6 @@ class _DelegaciaDetalheState extends State<DelegaciaDetalhe> {
     return " $totalEquipamentos de $totalRegistros equipamentos  ";
   }
 
-  Future<void> _temEquipamento() async {
-    existemEquipamentos = await _db.temEquipamentosCadastrados();
-    setState(() {});
-  }
-
   Future<LevantamentocadastradoModel?> _fetchLevantamentos() async {
     try {
       final levantamento =
@@ -352,9 +340,7 @@ class _DelegaciaDetalheState extends State<DelegaciaDetalhe> {
       return levantamento;
     } catch (e) {
       debugPrint("$e");
-      setState(() {
-        _levantamentoHeight = (existemEquipamentos ? 200.h : 100.h);
-      });
+
       return null;
     }
   }
@@ -478,7 +464,7 @@ class _DelegaciaDetalheState extends State<DelegaciaDetalhe> {
                     onTap: () {
                       context.pop('value');
                       context.push(AppRouterName.levantamentoDigitadoScreen,
-                          extra: widget.unidade.id);
+                          extra: widget.unidade);
                     },
                     child: Image.asset(
                       AppName.teclado!,

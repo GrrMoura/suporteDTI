@@ -7,7 +7,6 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
-import 'package:suporte_dti/data/sqflite_helper.dart';
 import 'package:suporte_dti/model/levantamento_cadastrados_model.dart';
 import 'package:suporte_dti/model/levantamento_detalhe.dart';
 import 'package:suporte_dti/model/levantamento_model.dart';
@@ -20,13 +19,10 @@ import 'package:uuid/uuid.dart';
 
 class LevantamentoController {
   Future<void> cadastrar(BuildContext context, LevantamentoModel model) async {
-    final DatabaseHelper dbHelper = DatabaseHelper();
     await _verificarConexao(context);
 
     Response response = await LevantamentoService.cadastrar(model);
     if (response.statusCode == 200) {
-      dbHelper.deleteAllEquipamentos();
-
       return Generic.snackBar(
           context: context,
           tipo: AppName.sucesso,

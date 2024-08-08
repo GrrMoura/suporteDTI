@@ -104,8 +104,8 @@ class ItemEquipamento {
     data['modelo'] = modelo;
     data['tipoEquipamento'] = tipoEquipamento;
     data['setor'] = setor;
-    data['idUnidade'] = setor;
-    data['numeroLacre'] = setor;
+    data['idUnidade'] = idUnidade;
+    data['numeroLacre'] = numeroLacre;
 
     return data;
   }

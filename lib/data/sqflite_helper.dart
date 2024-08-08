@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:suporte_dti/model/itens_equipamento_model.dart';
@@ -38,31 +39,27 @@ class DatabaseHelper {
 
   Future<String> insertEquipamento({required ItemEquipamento itens}) async {
     final db = await database;
-
     try {
-      bool seExiste = await equipamentoExiste(itens.idEquipamento!);
-      if (seExiste) {
-        return "Equipamento já cadastrado";
-      } else {
-        await db.insert(
-          'equipamento',
-          itens.toDb(),
-          conflictAlgorithm: ConflictAlgorithm.replace,
-        );
-        return AppName.sucesso!;
-      }
+      await db.insert(
+        'equipamento',
+        itens.toDb(),
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+      return AppName.sucesso!;
     } catch (e) {
-      return "Erro: ${e.toString()}";
+      debugPrint("Erro: ${e.toString()}");
+      return "Erro";
     }
   }
 
-  Future<bool> equipamentoExiste(int idEquipamento) async {
+  Future<bool> equipamentoExiste(
+      {required int idEquipamento, required int idUnidade}) async {
     final db = await database;
 
     final List<Map<String, dynamic>> resultado = await db.query(
       'equipamento',
-      where: 'idEquipamento = ?',
-      whereArgs: [idEquipamento],
+      where: 'idEquipamento = ? AND idUnidade = ?',
+      whereArgs: [idEquipamento, idUnidade],
     );
 
     return resultado.isNotEmpty;
@@ -74,6 +71,7 @@ class DatabaseHelper {
     return List.generate(maps.length, (i) {
       return ItemEquipamento(
         idBanco: maps[i]['id'],
+        idUnidade: maps[i]['idUnidade'],
         setor: maps[i]['setor'],
         idEquipamento: maps[i]['idEquipamento'],
         numeroSerie: maps[i]['numeroSerie'],
@@ -116,16 +114,18 @@ class DatabaseHelper {
     });
   }
 
-  Future<int> getEquipamentosCount() async {
+  Future<int> getEquipamentosCount(int idUnidade) async {
     final db = await database;
-    final List<Map<String, dynamic>> maps = await db.query('equipamento');
+    final List<Map<String, dynamic>> maps = await db
+        .query('equipamento', where: 'idUnidade = ?', whereArgs: [idUnidade]);
+
     return maps.length;
   }
 
-  Future<bool> temEquipamentosCadastrados() async {
+  Future<bool> temEquipamentosCadastrados(int idUnidade) async {
     final db = await database;
-    final List<Map<String, dynamic>> result =
-        await db.query('equipamento', limit: 1);
+    final List<Map<String, dynamic>> result = await db.query('equipamento',
+        where: 'idUnidade = ?', whereArgs: [idUnidade], limit: 1);
 
     return result.isNotEmpty;
   }
@@ -157,7 +157,15 @@ class DatabaseHelper {
     );
   }
 
-  Future<void> deleteAllEquipamentos(int idUnidade) async {
+  Future<void> deleteAllEquipamentos() async {
+    final Database db = await database;
+
+    await db.delete(
+      "equipamento",
+    ); // Exclui todos os registros da tabela
+  }
+
+  Future<void> deleteAllEquipamentosPorUnidade(int idUnidade) async {
     final Database db = await database;
 
     await db.delete(

@@ -14,6 +14,6 @@ class DelegaciaService {
     var responseConsulta = await RequestsServices.postOptions(
         url: url, data: model.toJson(), options: options);
 
-    return responseConsulta; //TODO: NAS DELEGACIAS, SE COLOCAR O LETRAS MAISCULAS NÃO FILTRA
+    return responseConsulta;
   }
 }

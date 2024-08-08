@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:suporte_dti/controller/equipamento_controller.dart';
 import 'package:suporte_dti/data/sqflite_helper.dart';
 import 'package:suporte_dti/model/itens_equipamento_model.dart';
+import 'package:suporte_dti/model/levantamento_model.dart';
 import 'package:suporte_dti/navegacao/app_screens_path.dart';
 import 'package:suporte_dti/screens/widgets/loading_default.dart';
 import 'package:suporte_dti/utils/app_colors.dart';
@@ -14,10 +15,9 @@ import 'package:suporte_dti/utils/snack_bar_generic.dart';
 import 'package:suporte_dti/viewModel/equipamento_view_model.dart';
 
 class LevantamentoDigitado extends StatefulWidget {
-  const LevantamentoDigitado(this.idUnidade, {super.key});
-  //TODO: TRAZER O ID DELEGACIA  AQUI PARA SALVAR NO BANCO E TRAZER OS RESUMOS POR ID
+  const LevantamentoDigitado(this.unidade, {super.key});
 
-  final int idUnidade;
+  final Unidade unidade;
   @override
   State<LevantamentoDigitado> createState() => _LevantamentoDigitadoState();
 }
@@ -25,6 +25,7 @@ class LevantamentoDigitado extends StatefulWidget {
 class _LevantamentoDigitadoState extends State<LevantamentoDigitado> {
   ScrollController? _scrollController;
   bool isLoading = false;
+  double? heightCardAzul = 160.h;
   final DatabaseHelper dbHelper = DatabaseHelper();
   EquipamentoController equipamentoController = EquipamentoController();
   EquipamentoViewModel? model = EquipamentoViewModel(
@@ -60,9 +61,10 @@ class _LevantamentoDigitadoState extends State<LevantamentoDigitado> {
             IconButton(
                 onPressed: () {
                   setState(() {});
-                  context.go(AppRouterName.homeController);
+                  context.push(AppRouterName.resumoLevantamento,
+                      extra: widget.unidade);
                 },
-                icon: const Icon(Icons.home)),
+                icon: const Icon(Icons.description)),
           ],
         ),
         iconTheme: const IconThemeData(color: Colors.white),
@@ -87,7 +89,7 @@ class _LevantamentoDigitadoState extends State<LevantamentoDigitado> {
                   padding:
                       EdgeInsets.symmetric(horizontal: 12.w, vertical: 5.h),
                   child: Container(
-                    height: height - kToolbarHeight - 100.h,
+                    height: height - kToolbarHeight - heightCardAzul!,
                     decoration: BoxDecoration(
                         color:
                             model!.itensEquipamentoModels.equipamentos.isEmpty
@@ -137,7 +139,7 @@ class _LevantamentoDigitadoState extends State<LevantamentoDigitado> {
               .then((value) {
             setState(() {});
           });
-        }, //TODO: COLOCAR BOTÃO PARA IR PAR RESUMO
+        },
         child: Material(
           color: AppColors.cWhiteColor,
           elevation: 7,
@@ -194,8 +196,10 @@ class _LevantamentoDigitadoState extends State<LevantamentoDigitado> {
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 24, vertical: 12)),
                             onPressed: () async {
-                              bool existe = await dbHelper
-                                  .equipamentoExiste(item.idEquipamento!);
+                              //  await dbHelper.deleteAllEquipamentos();
+                              bool existe = await dbHelper.equipamentoExiste(
+                                  idEquipamento: item.idEquipamento!,
+                                  idUnidade: widget.unidade.id!);
 
                               if (existe) {
                                 return Generic.snackBar(
@@ -213,7 +217,7 @@ class _LevantamentoDigitadoState extends State<LevantamentoDigitado> {
                                       tipo: AppName.erro);
                                 } else {
                                   item.setor = setor;
-                                  item.idUnidade = widget.idUnidade;
+                                  item.idUnidade = widget.unidade.id;
                                   String x = await dbHelper.insertEquipamento(
                                       itens: item);
 
@@ -362,6 +366,9 @@ class _LevantamentoDigitadoState extends State<LevantamentoDigitado> {
               await equipamentoController.buscarEquipamentos(context, model!);
 
               setState(() {
+                if (model!.itensEquipamentoModels.equipamentos.length > 2) {
+                  heightCardAzul = 130.h;
+                }
                 isLoading = false;
               });
             } else {

@@ -112,4 +112,28 @@ class Unidade {
       'id': id,
     };
   }
+
+  Map<String, dynamic> toJsonTop3() {
+    return {
+      'nome': nome,
+      'sigla': sigla,
+      'id': id,
+    };
+  }
+
+  factory Unidade.fromJsonTop3(Map<String, dynamic> json) {
+    return Unidade(
+      idEquipamento: json['idEquipamento'],
+      id: json['id'],
+      idIntranetAntiga: json['idIntranetAntiga'],
+      nome: json['nome'],
+      sigla: json['sigla'],
+      descricao: json['descricao'],
+    );
+  }
+  static List<Unidade> fromJsonTop3List(List<dynamic> jsonList) {
+    return jsonList
+        .map((item) => Unidade.fromJsonTop3(item as Map<String, dynamic>))
+        .toList();
+  }
 }

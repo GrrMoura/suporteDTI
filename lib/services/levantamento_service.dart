@@ -28,6 +28,17 @@ class LevantamentoService {
     return response;
   }
 
+  static Future<Response> buscarTop3UnidadesComMaisLevantamentos() async {
+    var url = ApiServices.concatSGIUrl("Levantamentos/UnidadesLevantamentos");
+    var options = await AutenticacaoService.getCabecalhoRequisicao();
+    var response = await RequestsServices.postOptions(
+      url: url,
+      data: [],
+      options: options,
+    );
+    return response;
+  }
+
   static Future<Response> levantamentoDetalhe(int id) async {
     var idLevantamento = {'idLevantamento': id};
     var url = ApiServices.concatSGIUrl("Levantamentos/Detalhes");

@@ -1,7 +1,10 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:suporte_dti/controller/levantamento_controller.dart';
 import 'package:suporte_dti/model/equipamento_model.dart';
 import 'package:suporte_dti/model/itens_delegacia_model.dart';
 import 'package:suporte_dti/model/itens_equipamento_model.dart';
@@ -24,7 +27,9 @@ class SearchScreen extends StatefulWidget {
 }
 
 class SearchScreenState extends State<SearchScreen> {
+  LevantamentoController levantamentoController = LevantamentoController();
   late List<EquipamentoModel> equipamentoList;
+  late Future<List<Unidade>> _unidadesFuture;
   EquipamentoViewModel? model = EquipamentoViewModel(
     itensEquipamentoModels: ItensEquipamentoModels(equipamentos: []),
   );
@@ -36,6 +41,7 @@ class SearchScreenState extends State<SearchScreen> {
   @override
   void initState() {
     super.initState();
+    _pegartop3Unidades();
     _fetchUserDetails();
   }
 
@@ -64,7 +70,9 @@ class SearchScreenState extends State<SearchScreen> {
                 child: Column(
                   children: [
                     _buildHeading(),
-                    const FastSearch(),
+                    FastSearch(
+                      unidadesFuture: _unidadesFuture,
+                    ),
                     _buildSearchBar(context),
                     SizedBox(height: 25.h),
                   ],
@@ -169,11 +177,32 @@ class SearchScreenState extends State<SearchScreen> {
       ),
     );
   }
+
+  void _pegartop3Unidades() async {
+    await levantamentoController.buscarTop3UnidadesComMaisLevantamentos(
+      context,
+    );
+
+    setState(() {
+      _unidadesFuture = carregarTop3Unidades();
+    });
+  }
+
+  Future<List<Unidade>> carregarTop3Unidades() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? unidadesJson = prefs.getString('top3Unidades');
+
+    if (unidadesJson != null) {
+      List<dynamic> listaMapas = jsonDecode(unidadesJson) as List<dynamic>;
+      return Unidade.fromJsonTop3List(listaMapas);
+    }
+    return [];
+  }
 }
 
 class FastSearch extends StatelessWidget {
-  const FastSearch({super.key});
-
+  const FastSearch({super.key, required this.unidadesFuture});
+  final Future<List<Unidade>> unidadesFuture;
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -181,22 +210,33 @@ class FastSearch extends StatelessWidget {
       child: SizedBox(
         height: 107.h,
         width: double.infinity,
-        child: Row(
-          children: [
-            DelegaciasIcones(
-              path: AppName.dpLagarto,
-              name: "DP Lagarto",
-            ),
-            DelegaciasIcones(
-              path: AppName.dpItabaiana,
-              name: "DP Itabaiana",
-            ),
-            DelegaciasIcones(
-              path: AppName.dpDeotap,
-              name: "DEOTAP",
-            ),
-            const PesquisarDelegacias(),
-          ],
+        child: FutureBuilder<List<Unidade>>(
+          future: unidadesFuture,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (snapshot.hasError) {
+              return const Center(child: Text('Erro ao carregar dados'));
+            } else if (snapshot.hasData) {
+              List<Unidade>? unidades = snapshot.data;
+
+              return Row(
+                children: [
+                  ...unidades!.map((unidade) {
+                    return DelegaciasIcones(
+                      path: (unidade.sigla),
+                      sigla: unidade.sigla,
+                      id: unidade.id,
+                      name: unidade.nome,
+                    );
+                  }),
+                  const PesquisarDelegacias(), // Adiciona o botão de pesquisa no final
+                ],
+              );
+            } else {
+              return const Center(child: Text('Nenhum dado disponível'));
+            }
+          },
         ),
       ),
     );
@@ -254,10 +294,14 @@ class PesquisarDelegacias extends StatelessWidget {
 class DelegaciasIcones extends StatelessWidget {
   final String? path;
   final String? name;
+  final String? sigla;
+  final int? id;
 
   const DelegaciasIcones({
     required this.path,
     required this.name,
+    required this.sigla,
+    required this.id,
     super.key,
   });
 
@@ -271,40 +315,21 @@ class DelegaciasIcones extends StatelessWidget {
         highlightColor: Colors.transparent,
         splashFactory: NoSplash.splashFactory,
         onTap: () {
-          int? idUnidade;
-          switch (name) {
-            case "DP Lagarto":
-              idUnidade = 468;
-              break;
-            case "DEOTAP":
-              idUnidade = 63;
-              break;
-            case "DP Itabaiana":
-              idUnidade = 102;
-              break;
-          }
-          if (idUnidade != null) {
-            unidade.nome = "";
-            unidade.descricao = '';
-            unidade.sigla = name;
-            unidade.id = idUnidade;
-            context.push(
-              AppRouterName.delegaciaDetalhe,
-              extra: {
-                "model": EquipamentoViewModel(
-                  itensEquipamentoModels:
-                      ItensEquipamentoModels(equipamentos: []),
-                  idUnidade: idUnidade,
-                ),
-                "unidade": unidade,
-              },
-            );
-          } else {
-            Generic.snackBar(
-              context: context,
-              mensagem: "Tente novamente",
-            );
-          }
+          unidade.nome = name;
+          unidade.descricao = '';
+          unidade.sigla = sigla;
+          unidade.id = id;
+          context.push(
+            AppRouterName.delegaciaDetalhe,
+            extra: {
+              "model": EquipamentoViewModel(
+                itensEquipamentoModels:
+                    ItensEquipamentoModels(equipamentos: []),
+                idUnidade: id,
+              ),
+              "unidade": unidade,
+            },
+          );
         },
         child: Column(
           children: [
@@ -327,7 +352,7 @@ class DelegaciasIcones extends StatelessWidget {
               ),
             ),
             SizedBox(height: 5.h),
-            Text(name!, style: Styles().smallTextStyle()),
+            Text(sigla!, style: Styles().smallTextStyle()),
           ],
         ),
       ),

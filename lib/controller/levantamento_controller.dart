@@ -7,6 +7,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:suporte_dti/model/levantamento_cadastrados_model.dart';
 import 'package:suporte_dti/model/levantamento_detalhe.dart';
 import 'package:suporte_dti/model/levantamento_model.dart';
@@ -27,7 +28,43 @@ class LevantamentoController {
           context: context,
           tipo: AppName.sucesso,
           mensagem: "Levantamento cadastrado com sucesso");
+    } else {
+      _tratarErro(context, response);
     }
+  }
+
+  Future<List<Unidade>> buscarTop3UnidadesComMaisLevantamentos(
+      BuildContext context) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    String hoje = DateFormat('dd/MM/yyyy').format(DateTime.now());
+    String? ultimaRequisicao = prefs.getString('ultimaRequisicao');
+
+    if (ultimaRequisicao == hoje) {
+      String? unidadesJson = prefs.getString('top3Unidades');
+
+      if (unidadesJson != null) {
+        List<dynamic> listaMapas = jsonDecode(unidadesJson);
+        return Unidade.fromJsonTop3List(listaMapas);
+      }
+    } else {
+      await _verificarConexao(context);
+      Response response =
+          await LevantamentoService.buscarTop3UnidadesComMaisLevantamentos();
+      if (response.statusCode == 200) {
+        if (response.data != null) {
+          List<dynamic> listaMapas = response.data;
+          List<Unidade> unidades = Unidade.fromJsonTop3List(listaMapas);
+          await prefs.setString('top3Unidades',
+              jsonEncode(unidades.map((u) => u.toJsonTop3()).toList()));
+          await prefs.setString('ultimaRequisicao', hoje);
+          return unidades;
+        }
+      } else {
+        _tratarErro(context, response);
+      }
+    }
+    return [];
   }
 
   Future<LevantamentocadastradoModel?> buscarLevantamentoPorIdUnidade(
@@ -47,7 +84,7 @@ class LevantamentoController {
       } else {
         _tratarErro(context, response);
       }
-
+//Levantamentos/UnidadesLevantamentos
       return null;
     } catch (e) {
       debugPrint("Erro inesperado: $e");

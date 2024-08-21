@@ -149,7 +149,7 @@ class MarcaModelo extends StatelessWidget {
               AppName.fotoEquipamento(model.tipoEquipamento!),
               height: 140.h,
               width: 100.w,
-              fit: BoxFit.cover,
+              fit: BoxFit.contain,
             ),
           ),
         ),

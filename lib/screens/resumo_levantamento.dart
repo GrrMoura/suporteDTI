@@ -39,7 +39,10 @@ class _ResumoLevantamentoState extends State<ResumoLevantamento> {
       body: ListView(
         children: [
           const Header(),
-          LevantamentoAtual(dbHelper: dbHelper, idUnidade: widget.unidade.id!),
+          LevantamentoAtual(
+              dbHelper: dbHelper,
+              idUnidade: widget.unidade
+                  .id!), //TODO: OLHAR AQUI PRA Vê SE NÃO PODE MELHORAR, POIS ELE TA FAZENDO UMA CONSULTA AO BANCO
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 5.h),
             child: _buildEquipamentoContainer(),
@@ -100,7 +103,7 @@ class _ResumoLevantamentoState extends State<ResumoLevantamento> {
                   LevantamentoController()
                       .cadastrar(context, modelLevantamento);
                   dbHelper.deleteAllEquipamentosPorUnidade(widget.unidade.id!);
-                  context.go(
+                  context.push(
                     AppRouterName.delegaciaDetalhe,
                     extra: {
                       "model": modelEquipamento,

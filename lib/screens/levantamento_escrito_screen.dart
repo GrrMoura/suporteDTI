@@ -60,7 +60,7 @@ class _LevantamentoDigitadoState extends State<LevantamentoDigitado> {
             ),
             IconButton(
                 onPressed: () {
-                  setState(() {});
+                  // setState(() {});
                   context.push(AppRouterName.resumoLevantamento,
                       extra: widget.unidade);
                 },

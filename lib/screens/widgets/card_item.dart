@@ -13,66 +13,78 @@ class CardEquipamentosResultado extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: AppColors.cWhiteColor,
-      elevation: 7,
-      borderRadius: BorderRadius.circular(10),
-      shadowColor: Colors.grey,
-      child: Padding(
-        padding: EdgeInsets.all(3.w),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            SizedBox(height: 3.h),
-            Row(
-              children: [
-                Text("Patr. ", style: Styles().hintTextStyle()),
-                Flexible(
-                  child: SizedBox(
-                    child: Text(
-                      item.patrimonioSsp ?? "",
-                      style: Styles().smallTextStyle(),
+    return Padding(
+      padding: const EdgeInsets.all(4.0),
+      child: Container(
+        decoration: BoxDecoration(
+          color: AppColors.cWhiteColor,
+          borderRadius: BorderRadius.circular(10),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.25),
+              spreadRadius: 1,
+              blurRadius: 6,
+              offset: const Offset(0, 2), // Deslocamento da sombra
+            ),
+          ],
+        ),
+        child: Padding(
+          padding: EdgeInsets.all(2.w),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              SizedBox(height: 3.h),
+              Row(
+                children: [
+                  Text("Patr. ", style: Styles().hintTextStyle()),
+                  Flexible(
+                    child: SizedBox(
+                      child: Text(
+                        item.patrimonioSsp ?? "",
+                        style: Styles().smallTextStyle(),
+                      ),
                     ),
                   ),
-                ),
-              ],
-            ),
-            // Text(marca ?? "Sem marca", style: Styles().smallTextStyle()),
-            Padding(
-              padding: EdgeInsets.symmetric(vertical: 2.h),
-              child: Image.asset(
-                AppName.fotoEquipamento(item.tipoEquipamento!),
-                height: 60.h,
+                ],
               ),
-            ),
-            LinhaDescricao(informacao: item.fabricante, nome: "Fabricante"),
-            LinhaDescricao(informacao: item.modelo, nome: "Modelo"),
-            item.patrimonioSead!.length <= 1 || item.patrimonioSead == ""
-                ? Container()
-                : LinhaDescricao(informacao: item.patrimonioSead, nome: "SEAD"),
-            item.numeroSerie != null
-                ? Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 5.w),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text("TAG: ", style: Styles().hintTextStyle()),
-                        Flexible(
-                          child: SizedBox(
-                            child: Text(
-                              item.numeroSerie!,
-                              style: Styles()
-                                  .smallTextStyle()
-                                  .copyWith(fontSize: 10.sp),
+              // Text(marca ?? "Sem marca", style: Styles().smallTextStyle()),
+              Padding(
+                padding: EdgeInsets.symmetric(vertical: 2.h),
+                child: Image.asset(
+                  AppName.fotoEquipamento(item.tipoEquipamento!),
+                  height: 60.h,
+                ),
+              ),
+              LinhaDescricao(informacao: item.fabricante, nome: "Fabricante"),
+              LinhaDescricao(informacao: item.modelo, nome: "Modelo"),
+              item.patrimonioSead!.length <= 1 || item.patrimonioSead == ""
+                  ? Container()
+                  : LinhaDescricao(
+                      informacao: item.patrimonioSead, nome: "SEAD"),
+              item.numeroSerie != null
+                  ? Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 5.w),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text("TAG: ", style: Styles().hintTextStyle()),
+                          Flexible(
+                            child: SizedBox(
+                              child: Text(
+                                item.numeroSerie ?? '',
+                                style: Styles()
+                                    .smallTextStyle()
+                                    .copyWith(fontSize: 10.sp),
+                              ),
                             ),
-                          ),
-                        )
-                      ],
-                    ),
-                  )
-                : Container(),
-            SizedBox(height: 3.h),
-          ],
+                          )
+                        ],
+                      ),
+                    )
+                  : Container(),
+              SizedBox(height: 3.h),
+            ],
+          ),
         ),
       ),
     );

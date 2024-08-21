@@ -203,8 +203,6 @@ class _LoginScreenState extends State<LoginScreen> {
       right: 60.w,
       child: ElevatedButton(
         onPressed: () async {
-          usuarioCtrl.text = "093.472.924-78";
-          passController.text = "T923/ML7a=\$Y";
           String msg = _validateUserAndSenhaTextfield(
             usuarioCtrl.text,
             passController.text,
@@ -298,6 +296,7 @@ class _LoginScreenState extends State<LoginScreen> {
           child: TextFormField(
             controller: usuarioCtrl,
             style: TextStyle(fontSize: 14.sp),
+            textInputAction: TextInputAction.next,
             inputFormatters: [MaskUtils.maskFormatterCpf()],
             keyboardType: TextInputType.number,
             cursorColor: Colors.black,

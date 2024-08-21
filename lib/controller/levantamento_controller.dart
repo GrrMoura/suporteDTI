@@ -241,6 +241,8 @@ class LevantamentoController {
       } else {
         if (response.data == null || response.data == '') {
           mensagemErro = response.statusMessage ?? 'Erro desconhecido';
+        } else if (response.data.toString().contains("<!DOCTYPE html>")) {
+          mensagemErro = response.statusMessage ?? "Erro deseconhecido";
         } else {
           mensagemErro = response.data;
         }

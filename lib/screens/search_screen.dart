@@ -29,7 +29,7 @@ class SearchScreen extends StatefulWidget {
 class SearchScreenState extends State<SearchScreen> {
   LevantamentoController levantamentoController = LevantamentoController();
   late List<EquipamentoModel> equipamentoList;
-  late Future<List<Unidade>> _unidadesFuture;
+  late Future<List<Unidade>> _unidadesFuture = Future.value([]);
   EquipamentoViewModel? model = EquipamentoViewModel(
     itensEquipamentoModels: ItensEquipamentoModels(equipamentos: []),
   );
@@ -222,15 +222,18 @@ class FastSearch extends StatelessWidget {
 
               return Row(
                 children: [
-                  ...unidades!.map((unidade) {
+                  ...unidades!.asMap().entries.map((entry) {
+                    int index = entry.key;
+                    Unidade unidade = entry.value;
+
                     return DelegaciasIcones(
-                      path: (unidade.sigla),
                       sigla: unidade.sigla,
                       id: unidade.id,
                       name: unidade.nome,
+                      index: index,
                     );
                   }),
-                  const PesquisarDelegacias(), // Adiciona o botão de pesquisa no final
+                  const PesquisarDelegacias(),
                 ],
               );
             } else {
@@ -292,22 +295,35 @@ class PesquisarDelegacias extends StatelessWidget {
 }
 
 class DelegaciasIcones extends StatelessWidget {
-  final String? path;
   final String? name;
   final String? sigla;
   final int? id;
+  final int? index;
 
   const DelegaciasIcones({
-    required this.path,
     required this.name,
     required this.sigla,
     required this.id,
+    required this.index,
     super.key,
   });
 
   @override
   Widget build(BuildContext context) {
+    String path;
     Unidade? unidade = Unidade();
+
+    switch (index) {
+      case 0:
+        path = AppName.dpLagarto!;
+        break;
+      case 1:
+        path = AppName.dpItabaiana!;
+        break;
+      default:
+        path = AppName.dpDeotap!;
+        break;
+    }
 
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 4.sp),
@@ -337,18 +353,16 @@ class DelegaciasIcones extends StatelessWidget {
               height: 75.h,
               width: 75.w,
               decoration: BoxDecoration(
+                color: AppColors.cSecondaryColor,
                 boxShadow: const [
                   BoxShadow(
-                    color: Colors.black54,
+                    color: Colors.white,
                     offset: Offset(0.0, 2.0),
                     blurRadius: 6.0,
                   )
                 ],
                 shape: BoxShape.circle,
-                image: DecorationImage(
-                  image: AssetImage(path!),
-                  fit: BoxFit.cover,
-                ),
+                image: DecorationImage(scale: 3, image: AssetImage(path)),
               ),
             ),
             SizedBox(height: 5.h),

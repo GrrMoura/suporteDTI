@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_final_fields
 
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:go_router/go_router.dart';
@@ -92,14 +93,12 @@ class _DelegaciaDetalheState extends State<DelegaciaDetalhe> {
         child: Column(
           children: [
             SizedBox(height: 5.h),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                SizedBox(
-                  child: Text(widget.unidade.nome ?? "",
-                      style: Styles().smallTextStyle()),
-                ),
-              ],
+            Align(
+              alignment: Alignment.center,
+              child: SizedBox(
+                child: Text(widget.unidade.nome ?? "",
+                    style: Styles().smallTextStyle()),
+              ),
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,

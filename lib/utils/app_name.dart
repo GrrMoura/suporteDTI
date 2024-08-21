@@ -33,9 +33,9 @@ class AppName {
   static String? semImagem = "assets/images/semimagem.png";
   static String? monitor = "assets/images/monitor.png";
   static String? hd = "assets/images/hds.png";
-  static String? dpLagarto = "assets/images/lagarto.jpg";
-  static String? dpItabaiana = "assets/images/itabaiana.jpg";
-  static String? dpDeotap = "assets/images/deotap.jpeg";
+  static String? dpLagarto = "assets/images/icone02.png";
+  static String? dpItabaiana = "assets/images/icone03.png";
+  static String? dpDeotap = "assets/images/icone01.png";
 
   static String fotoEquipamento(String tipoEquipamento) {
     switch (tipoEquipamento) {
